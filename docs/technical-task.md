@@ -57,7 +57,7 @@
 - перегляд логів.
 
 ## Технології
-- Backend: Python, FastAPI, SQLAlchemy, alembic
+- Backend: Python: FastAPI, SQLAlchemy + pydantic (або SQLModel), alembic, apscheduler
 - Frontend: React
 - Database: MariaDB
 - Parsing: BeautifulSoup
