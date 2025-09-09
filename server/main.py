@@ -3,6 +3,8 @@ import logging
 from typing import AsyncIterator
 from fastapi import FastAPI
 
+from server.routes import auth, user
+
 logger = logging.getLogger("server")
 
 @asynccontextmanager
@@ -20,4 +22,5 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# TODO: include routers, `app.include_router(...)`
+app.include_router(auth.router)
+app.include_router(user.router)
