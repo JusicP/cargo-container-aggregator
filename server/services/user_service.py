@@ -1,8 +1,8 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from schemas.user import UserCreate, UserUpdate
-from models.user import User
+from server.schemas.user import UserCreate, UserUpdate
+from server.models.user import User
 
 
 async def create_user(session: AsyncSession, user_create: UserCreate):
