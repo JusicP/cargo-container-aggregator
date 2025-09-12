@@ -2,6 +2,8 @@ from contextlib import asynccontextmanager
 import logging
 from typing import AsyncIterator
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 
 from server.routes import auth, user
 
@@ -22,5 +24,15 @@ app = FastAPI(
     version="1.0.0",
 )
 
+
 app.include_router(auth.router)
 app.include_router(user.router)
+
+# Allow CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
