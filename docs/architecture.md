@@ -7,9 +7,9 @@ flowchart TD
     end
 
     subgraph Frontend[Frontend Web App]
-        F1[Головна сторінка - каталог]
+        F1[Головна сторінка - оголошення]
         F2[Кабінет користувача]
-        F3[Форма додавання або редагування]
+        F3[Форма додавання або редагування оголошення]
         F4[Сторінка аналітики]
         F5[Список обраного]
         F6[Адмін-панель]
@@ -19,8 +19,8 @@ flowchart TD
         B1[Auth Service]
         B2[Listing Service]
         B3[User Service]
-        B4[Analytics Service]
-        B5[Parser Service]
+        B4[Listing Analytics Service]
+        B5[Listing Parser Service]
     end
 
     subgraph External[Зовнішні джерела]
@@ -31,11 +31,13 @@ flowchart TD
 
     subgraph Database[База даних]
         D1[(Users)]
-        D2[(Catalog)]
-        D6[(FavoriteListing)]
+        D2[(UserFavoriteListing)]
         D3[(Listing)]
-        D4[(ParserListing)]
-        D5[(Analytics)]
+        D4[(ListingParser)]
+        D5[(ListingAnalytics)]
+        D6[(ListingHistory)]
+        D7[(ListingPhoto)]
+        D8[(UserPhoto)]
     end
 
     %% Взаємодія користувачів
@@ -59,17 +61,20 @@ flowchart TD
 
     %% Backend <-> Database
     B1 --> D1
-    B2 --> D2
-    B2 --> D6
     B2 --> D3
+    B2 --> D2
+    B2 --> D1
+    B2 --> D6
+    B2 --> D7
     B3 --> D1
+    B3 --> D8
     B4 --> D5
     B5 --> D4
     B5 --> D3
-    B2 --> D1
 
     %% Parser -> External
     B5 --> E1
     B5 --> E2
     B5 --> E3
+
 ```
