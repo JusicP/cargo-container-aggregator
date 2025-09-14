@@ -1,8 +1,8 @@
-# To be adjusted...
+# ER діаграма
 ```mermaid
 erDiagram
     User {
-      uuid id PK
+      uuid id
       string name
       string email
       string password
@@ -13,67 +13,93 @@ erDiagram
       string company_name "optional (seller)"
     }
 
+    UserPhoto {
+      uuid id
+      uuid user_id
+      string url
+      datetime uploaded_at
+    }
+
     Listing {
-      uuid id PK
-      uuid user_id FK "seller"
+      uuid id
+      uuid user_id "seller"
       string title
       text description
       enum container_type "20ft|40ft|40hc|reefer|tank|other"
       enum condition "new|used"
-      enum listing_type "sale|rent"
+      enum type "sale|rent"
       decimal price
       enum currency "USD|EUR|UAH"
       string location
-      datetime date_added
-      datetime updated_at
-      enum source "own|external"
+      string ral_color "optional"
+      datetime addition_date
+      datetime approval_date "optional"
+      datetime updated_at "optional"
       string original_url "if external"
       enum status "active|pending|rejected|deleted"
-      int views_count
-      int contacts_count
     }
 
-    FavoriteListing {
-      uuid id PK
-      uuid user_id FK "buyer"
-      uuid listing_id FK
-      datetime date_added
-      unique user_listing "user_id+listing_id"
+    ListingPhoto {
+      uuid id
+      uuid listing_id
+      string url
+      datetime uploaded_at
+      bool is_main "optional"
     }
 
-    ParserListing {
-      uuid id PK
+    UserFavoriteListing {
+      uuid user_id
+      uuid listing_id
+      datetime addition_date
+    }
+
+    ListingParser {
+      uuid id
       string company_name
+      string method "optional"
       string url
       string location
-      datetime last_started_at
-      datetime last_finished_at
+      enum container_type "20ft|40ft|40hc|reefer|tank|other"
+      enum condition "new|used"
+      enum type "sale|rent"
+      datetime addition_date
+      datetime last_started_at "optional"
+      datetime last_finished_at "optional"
       enum status "idle|running|success|error"
-      int imported_count
-      text error_message "optional"
+      string error_message "optional"
     }
 
-    Analytics {
-      string id PK "or composite key"
-      enum container_type "as in Listing"
+    ListingAnalytics {
+      uuid listing_id
       decimal average_price
-      json price_trend "time series"
-      json regional_availability
-      int active_listings
+      decimal min_price "optional"
+      decimal max_price "optional"
+      json price_trend "time series, ціна по днях"
+      int views
+      int contacts
+      int favorites
       datetime updated_at
     }
 
-    Catalog {
-      string normalized_name PK
-      decimal average_price
-      int listings_count
+    ListingHistory {
+      uuid id
+      uuid listing_id
+      decimal price "optional"
+      int views
+      int contacts
+      int favorites
+      datetime addition_date
     }
 
     %% Relations
     User ||--o{ Listing : "sells"
-    User ||--o{ FavoriteListing : "marks"
-    FavoriteListing }o--|| Listing : "refers to"
-    ParserListing ||--o{ Listing : "imports"
-    Listing ||--o{ Analytics : "feeds"
-    Listing ||--o{ Catalog : "normalized into"
+    User ||--o{ UserPhoto : "uploads"
+    User ||--o{ UserFavoriteListing : "marks"
+    UserFavoriteListing }o--|| Listing : "refers to"
+
+    Listing ||--o{ ListingPhoto : "has"
+    Listing ||--o{ ListingAnalytics : "feeds"
+    Listing ||--o{ ListingHistory : "records history"
+    ListingParser ||--o{ Listing : "imports"
+
 ```
