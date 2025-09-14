@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
 from server.main import app
-from server.database.db import Base, generate_async_session
+from server.database.connection import Base, generate_async_session
 
 
 @pytest_asyncio.fixture(scope="function")
