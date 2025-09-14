@@ -2,5 +2,9 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+<<<<<<< HEAD
+=======
+    <mapping directory="$PROJECT_DIR$/cargo-container-aggregator" vcs="Git" />
+>>>>>>> d3dfc7b (commented previous changes in user.py; added base endpoints with fake data in file user.py, tested in swagger)
   </component>
 </project>
