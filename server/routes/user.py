@@ -1,128 +1,103 @@
 import uuid
 from datetime import datetime
+from fastapi import APIRouter
 
-from fastapi import APIRouter, Body
+from server.schemas.user import UserCreate, UserGet, UserUpdate, UserRole, UserStatus
 
-from server.schemas.user import UserCreate, UserGet
-
-# router = APIRouter(prefix="/register")
 router = APIRouter(prefix="/users", tags=["users"])
 
-@router.get("/")
+
+@router.get("/", response_model=list[UserGet])
 async def get_users():
     return [
         {
-            "id": str(uuid.uuid4()),
+            "id": uuid.uuid4(),
             "name": "admin",
             "email": "admin@gmail.com",
-            "password": "Admin1234",
-            "role": "admin",
-            "registration_date": datetime.utcnow().isoformat(),
-            "status": "active",
             "phone_number": "+380991112233",
-            "company_name": None
+            "company_name": None,
+            "role": UserRole.ADMIN,
+            "registration_date": datetime.utcnow(),
+            "status": UserStatus.ACTIVE,
         },
         {
-            "id": str(uuid.uuid4()),
+            "id": uuid.uuid4(),
             "name": "user1",
             "email": "user1@gmail.com",
-            "password": "User1234",
-            "role": "user",
-            "registration_date": datetime.utcnow().isoformat(),
-            "status": "active",
             "phone_number": "+380991112234",
             "company_name": "Strawberry",
-        }
+            "role": UserRole.USER,
+            "registration_date": datetime.utcnow(),
+            "status": UserStatus.ACTIVE,
+        },
     ]
 
-@router.get("/me")
+
+@router.get("/me", response_model=UserGet)
 async def get_me():
     return {
-        "id": str(uuid.uuid4()),
+        "id": uuid.uuid4(),
         "name": "user1",
         "email": "user1@gmail.com",
-        "password": "User1234",
-        "role": "user",
-        "registration_date": datetime.utcnow().isoformat(),
-        "status": "active",
         "phone_number": "+380991112234",
         "company_name": "Strawberry",
+        "role": UserRole.USER,
+        "registration_date": datetime.utcnow(),
+        "status": UserStatus.ACTIVE,
     }
 
-@router.post("/register")
-async def register_user(user: dict = Body(...)):
+
+@router.post("/register", response_model=UserGet)
+async def register_user(user: UserCreate):
     return {
-        "status": "ok",
-        "user": {
-            "id": str(uuid.uuid4()),
-            "name": user.get("name", "NewUser"),
-            "email": user.get("email", "new@gmail.com"),
-            "password": "NewUser1234",
-            "role": "user",
-            "registration_date": datetime.utcnow().isoformat(),
-            "status": "active",
-            "phone_number": user.get("phone_number"),
-            "company_name": user.get("company_name")
-        }
+        "id": uuid.uuid4(),
+        "name": user.name,
+        "email": user.email,
+        "phone_number": user.phone_number,
+        "company_name": user.company_name,
+        "role": UserRole.USER,
+        "registration_date": datetime.utcnow(),
+        "status": UserStatus.ACTIVE,
     }
 
-@router.put("/me")
-async def update_user(user: dict = Body(...)):
-    return {
-        "status": "ok",
-        "user":
-                {
-                    "id": str(uuid.uuid4()),
-                    "name": user.get("name", "UpdatedUser"),
-                    "email": user.get("email", "updated@test.com"),
-                    "password": "User1234",
-                    "role": "user",
-                    "registration_date": datetime.utcnow().isoformat(),
-                    "status": "active",
-                    "phone_number": user.get("phone_number"),
-                    "company_name": user.get("company_name")
-                }
-            }
 
-@router.get("/{id}")
-async def get_user(id: str):
+@router.put("/me", response_model=UserGet)
+async def update_me(user: UserUpdate):
+    return {
+        "id": uuid.uuid4(),
+        "name": user.name,
+        "email": user.email,
+        "phone_number": user.phone_number,
+        "company_name": user.company_name,
+        "role": UserRole.USER,
+        "registration_date": datetime.utcnow(),
+        "status": UserStatus.ACTIVE,
+    }
+
+
+@router.get("/{id}", response_model=UserGet)
+async def get_user(id: uuid.UUID):
     return {
         "id": id,
-        "name": f"User-{id[:8]}",
-        "email": f"user{id[:8]}@gmail.com",
-        "password": "User1234",
-        "role": "user",
-        "registration_date": datetime.utcnow().isoformat(),
-        "status": "active",
+        "name": f"User-{id}",
+        "email": f"user{id}@gmail.com",
         "phone_number": "+380994445566",
-        "company_name": None
+        "company_name": None,
+        "role": UserRole.USER,
+        "registration_date": datetime.utcnow(),
+        "status": UserStatus.ACTIVE,
     }
 
-@router.put("/{id}")
-async def update_user(id: str, user: dict = Body(...)):
+
+@router.put("/{id}", response_model=UserGet)
+async def update_user(id: uuid.UUID, user: UserUpdate):
     return {
-        "status": "ok",
-        "user": {
-            "id": id,
-            "name": user.get("name", f"User-{id[:8]}"),
-            "email": user.get("email", f"user{id[:8]}@gmail.com"),
-            "password": "User1234",
-            "role": user.get("role", "user"),
-            "registration_date": datetime.utcnow().isoformat(),
-            "status": user.get("status", "active"),
-            "phone_number": user.get("phone_number"),
-            "company_name": user.get("company_name")
-        }
+        "id": id,
+        "name": user.name or f"User-{id}",
+        "email": user.email or f"user{id}@gmail.com",
+        "phone_number": user.phone_number,
+        "company_name": user.company_name,
+        "role": UserRole.USER,
+        "registration_date": datetime.utcnow(),
+        "status": UserStatus.ACTIVE,
     }
-# @router.post(
-#     path="/register"
-# )
-# async def register(user: UserCreate):
-#     return {"status": "ok"}
-#
-# @router.post(
-#     path="/me",
-#     response_model=UserGet
-# )
-# async def me():
-#     return {"status": "ok"}

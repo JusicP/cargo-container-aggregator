@@ -1,5 +1,7 @@
 import datetime
 from enum import Enum
+from uuid import UUID
+
 from pydantic import BaseModel, Field
 
 
@@ -22,7 +24,7 @@ class UserCreate(UserBase):
     password: str = Field(max_length=128)
 
 class UserGet(UserBase):
-    id: int
+    id: UUID
     role: str
     registration_date: datetime.datetime
     status: str
