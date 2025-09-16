@@ -21,7 +21,7 @@ class Listing(Base):
     price: Mapped[float | None]
     currency: Mapped[str | None]
     location: Mapped[str] = mapped_column(String(128))
-    ral_color: Mapped[str | None]
+    ral_color: Mapped[str | None] = mapped_column(String(7)) # RAL0000
 
     addition_date: Mapped[datetime.datetime] = mapped_column(default=datetime.datetime.now(datetime.timezone.utc))
     approval_date: Mapped[datetime.datetime | None]
