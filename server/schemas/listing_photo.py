@@ -12,3 +12,6 @@ class ListingPhotoGet(ListingPhotoBase):
 
 class ListingPhotoCreate(ListingPhotoBase):
     pass
+
+class ListingPhotoUpdate(ListingPhotoBase):
+    listing_id: int

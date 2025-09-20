@@ -11,7 +11,7 @@ class ListingAnalyticsBase(BaseModel):
     
     views: int
     contacts: int
-    favorties: int
+    favorites: int
 
 class ListingAnalyticsGet(ListingAnalyticsBase):
     listing_id: int
