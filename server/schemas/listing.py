@@ -32,4 +32,4 @@ class ListingGet(ListingBase):
     analytics: ListingAnalyticsGet
     
 class ListingCreate(ListingBase):
-    photos: list[ListingPhotoGet] = []
+    photos: list[int] = []
