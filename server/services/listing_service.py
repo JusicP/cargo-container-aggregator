@@ -1,13 +1,16 @@
+import datetime
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.models.listing import Listing
+from server.services.listing_photo_service import create_listing_photos
 from server.schemas.listing import ListingCreate, ListingGet
 
 
-async def create_listing(session: AsyncSession, listing_create: ListingCreate):
+async def create_listing(session: AsyncSession, user_id: int, listing_create: ListingCreate):
     listing = Listing(
-        user_id=listing_create.user_id,
+        user_id=user_id,
         title=listing_create.title,
         description=listing_create.description,
         container_type=listing_create.container_type,
@@ -22,6 +25,10 @@ async def create_listing(session: AsyncSession, listing_create: ListingCreate):
     session.add(listing)
     await session.commit()
     await session.refresh(listing)
+
+    if getattr(listing_create, "photos", None):
+        await create_listing_photos(session, listing_id=listing.id, photo_ids=listing_create.photos)
+
     return listing
 
 
@@ -29,15 +36,22 @@ async def get_all_listings(session: AsyncSession):
     result = await session.execute(select(Listing))
     return result.scalars().all()
 
+
 async def get_listing_by_id(session: AsyncSession, listing_id: int):
     return await session.get(Listing, listing_id)
 
-async def update_listing(session: AsyncSession, listing_id: int, listing_get: ListingGet):
-    listing = await get_listing_by_id(session, listing_id)
+
+async def _ensure_can_modify_listing(session: AsyncSession, listing: Listing | None, actor_user_id: int, is_admin: bool):
     if not listing:
         raise ValueError("Listing doesn't exist")
+    if not is_admin and listing.user_id != actor_user_id:
+        raise PermissionError("You are not allowed to modify this listing")
 
-    listing.user_id = listing_get.user_id
+
+async def update_listing(session: AsyncSession,actor_user_id: int,listing_id: int,listing_get: ListingGet,*,is_admin: bool = False,):
+    listing = await get_listing_by_id(session, listing_id)
+    await _ensure_can_modify_listing(session, listing, actor_user_id, is_admin)
+
     listing.title = listing_get.title
     listing.description = listing_get.description
     listing.container_type = listing_get.container_type
@@ -49,19 +63,17 @@ async def update_listing(session: AsyncSession, listing_id: int, listing_get: Li
     listing.ral_color = listing_get.ral_color
     listing.original_url = listing_get.original_url
 
-    listing.status = listing_get.status
-    listing.approval_date = listing_get.approval_date
-    listing.updated_at = listing_get.updated_at
+
+    listing.updated_at = datetime.datetime.now(datetime.timezone.utc)
 
     await session.commit()
     await session.refresh(listing)
     return listing
 
 
-async def delete_listing(session: AsyncSession, listing_id: int):
+async def delete_listing(session: AsyncSession,actor_user_id: int,listing_id: int,*,is_admin: bool = False,):
     listing = await get_listing_by_id(session, listing_id)
-    if not listing:
-        raise ValueError("Listing doesn't exist")
+    await _ensure_can_modify_listing(session, listing, actor_user_id, is_admin)
 
     await session.delete(listing)
     await session.commit()
