@@ -1,8 +1,10 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from server.models.listing import Listing
 from server.models.listing_photo import ListingPhoto
-from server.schemas.listing_photo import ListingPhotoCreate, ListingPhotoGet
+from server.models.user import User
+from server.schemas.listing_photo import ListingPhotoCreate, ListingPhotoUpdate
 
 
 async def create_listing_photo(session: AsyncSession, photo_create: ListingPhotoCreate):
@@ -14,10 +16,9 @@ async def create_listing_photo(session: AsyncSession, photo_create: ListingPhoto
 
 
 async def create_listing_photos(session: AsyncSession, listing_id: int, photo_ids: list[int]):
-    if not photo_ids:
-        return
     for pid in photo_ids:
-        session.add(ListingPhoto(listing_id=listing_id, photo_id=pid, is_main=False))
+        session.add(ListingPhoto(listing_id=listing_id, photo_id=pid, is_main=False)) # FIXME: do something with is_main
+    
     await session.commit()
 
 
@@ -26,8 +27,8 @@ async def get_all_listing_photos(session: AsyncSession):
     return result.scalars().all()
 
 
-async def get_listing_photo_by_id(session: AsyncSession, photo_id: int):
-    return await session.get(ListingPhoto, photo_id)
+async def get_listing_photo_by_id(session: AsyncSession, listing_photo_id: int):
+    return await session.get(ListingPhoto, listing_photo_id)
 
 
 async def get_listing_photos_by_listing(session: AsyncSession, listing_id: int):
@@ -44,43 +45,33 @@ async def get_listing_photo_main(session: AsyncSession, user_id: int, listing_id
         .where(
             ListingPhoto.listing_id == listing_id,
             Listing.user_id == user_id,
-            ListingPhoto.is_main.is_(True),
+            ListingPhoto.is_main == True,
         )
     )
     return result.scalar_one_or_none()
 
 
-async def _ensure_can_modify_listing_photo(
-    session: AsyncSession,
-    actor_user_id: int,
-    listing_id: int,
-    *,
-    is_admin: bool = False,
-):
-    listing = await session.get(Listing, listing_id)
-    if not listing:
-        raise ValueError("Listing doesn't exist")
-    if not is_admin and listing.user_id != actor_user_id:
-        raise PermissionError("You are not allowed to modify photos of this listing")
-
-
-async def update_listing_photo(
-    session: AsyncSession,
-    user_id: int,
-    photo_id: int,
-    photo_update: ListingPhotoUpdate,
-    *,
-    is_admin: bool = False,
-):
-    photo = await get_listing_photo_by_id(session, photo_id)
+async def get_listing_photo_and_check_rights(session: AsyncSession, user: User, listing_photo_id: int):
+    photo = await get_listing_photo_by_id(session, listing_photo_id)
     if not photo:
         raise ValueError("Listing photo doesn't exist")
 
-    await _ensure_can_modify_listing_photo(session, user_id, photo_update.listing_id, is_admin=is_admin)
+    listing = await session.get(Listing, photo.listing_id)
+    if not listing:
+        raise ValueError("Listing doesn't exist")
+    
+    if not user.is_admin() and listing.user_id != user.id:
+        raise PermissionError("You are not allowed to modify photos of this listing") # FIXME: not sure if it's suitable exception type...
+
+    return photo
+
+
+async def update_listing_photo(session: AsyncSession, user: User, listing_photo_id: int, photo_update: ListingPhotoUpdate):
+    photo = await get_listing_photo_and_check_rights(session, user, listing_photo_id)
 
     if photo_update.is_main:
         photo.is_main = True
-        current_main = await get_listing_photo_main(session, user_id, photo_update.listing_id)
+        current_main = await get_listing_photo_main(session, user, photo.listing_id)
         if current_main and current_main != photo:
             current_main.is_main = False
     else:
@@ -88,21 +79,12 @@ async def update_listing_photo(
 
     await session.commit()
     await session.refresh(photo)
+
     return photo
 
 
-async def delete_listing_photo(
-    session: AsyncSession,
-    user_id: int,
-    photo_id: int,
-    *,
-    is_admin: bool = False,
-):
-    photo = await get_listing_photo_by_id(session, photo_id)
-    if not photo:
-        raise ValueError("Listing photo doesn't exist")
-
-    await _ensure_can_modify_listing_photo(session, user_id, photo.listing_id, is_admin=is_admin)
+async def delete_listing_photo(session: AsyncSession, user: User, listing_photo_id: int):
+    photo = await get_listing_photo_and_check_rights(session, user, listing_photo_id)
 
     await session.delete(photo)
     await session.commit()

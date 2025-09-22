@@ -4,6 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.models.listing import Listing
+from server.models.user import User
 from server.services.listing_photo_service import create_listing_photos
 from server.schemas.listing import ListingCreate, ListingGet
 
@@ -22,12 +23,12 @@ async def create_listing(session: AsyncSession, user_id: int, listing_create: Li
         ral_color=listing_create.ral_color,
         original_url=listing_create.original_url,
     )
+
     session.add(listing)
     await session.commit()
     await session.refresh(listing)
 
-    if getattr(listing_create, "photos", None):
-        await create_listing_photos(session, listing_id=listing.id, photo_ids=listing_create.photos)
+    await create_listing_photos(session, listing_id=listing.id, photo_ids=listing_create.photos)
 
     return listing
 
@@ -41,16 +42,21 @@ async def get_listing_by_id(session: AsyncSession, listing_id: int):
     return await session.get(Listing, listing_id)
 
 
-async def _ensure_can_modify_listing(session: AsyncSession, listing: Listing | None, actor_user_id: int, is_admin: bool):
+# FIXME: make permission check as fastapi dependency? 
+async def get_listing_by_id_and_check_rights(session: AsyncSession, listing_id: int, user: User):
+    listing = await get_listing_by_id(session, listing_id)
+
     if not listing:
         raise ValueError("Listing doesn't exist")
-    if not is_admin and listing.user_id != actor_user_id:
-        raise PermissionError("You are not allowed to modify this listing")
+    
+    if not user.is_admin() and listing.user_id != user.id:
+        raise PermissionError("You are not allowed to modify this listing") # FIXME: not sure if it's suitable exception type...
+
+    return listing
 
 
-async def update_listing(session: AsyncSession,actor_user_id: int,listing_id: int,listing_get: ListingGet,*,is_admin: bool = False,):
-    listing = await get_listing_by_id(session, listing_id)
-    await _ensure_can_modify_listing(session, listing, actor_user_id, is_admin)
+async def update_listing(session: AsyncSession, user: User, listing_id: int, listing_get: ListingGet):
+    listing = await get_listing_by_id_and_check_rights(session, listing_id, user)
 
     listing.title = listing_get.title
     listing.description = listing_get.description
@@ -63,7 +69,6 @@ async def update_listing(session: AsyncSession,actor_user_id: int,listing_id: in
     listing.ral_color = listing_get.ral_color
     listing.original_url = listing_get.original_url
 
-
     listing.updated_at = datetime.datetime.now(datetime.timezone.utc)
 
     await session.commit()
@@ -71,9 +76,8 @@ async def update_listing(session: AsyncSession,actor_user_id: int,listing_id: in
     return listing
 
 
-async def delete_listing(session: AsyncSession,actor_user_id: int,listing_id: int,*,is_admin: bool = False,):
-    listing = await get_listing_by_id(session, listing_id)
-    await _ensure_can_modify_listing(session, listing, actor_user_id, is_admin)
+async def delete_listing(session: AsyncSession, user: User, listing_id: int):
+    listing = await get_listing_by_id_and_check_rights(session, listing_id, user)
 
     await session.delete(listing)
     await session.commit()

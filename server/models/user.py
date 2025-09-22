@@ -35,3 +35,6 @@ class User(Base):
         foreign_keys="UserPhoto.user_id",
         cascade="all, delete-orphan"
     )
+
+    def is_admin(self) -> bool:
+        return self.role == "admin"

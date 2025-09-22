@@ -17,6 +17,7 @@ async def get_all_listing_analytics(session: AsyncSession):
     result = await session.execute(select(ListingAnalytics))
     return result.scalars().all()
 
+
 async def get_listing_analytics_by_id(session: AsyncSession, listing_id: int):
     result = await session.execute(
         select(ListingAnalytics).where(ListingAnalytics.listing_id == listing_id)

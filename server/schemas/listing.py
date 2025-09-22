@@ -2,11 +2,10 @@ import datetime
 from pydantic import BaseModel, Field
 
 from server.schemas.listing_analytics import ListingAnalyticsGet
-from server.schemas.listing_photo import ListingPhotoCreate, ListingPhotoGet
+from server.schemas.listing_photo import ListingPhotoGet
 
 
 class ListingBase(BaseModel):
-    user_id: int | None
     title: str = Field(max_length=128)
     description: str = Field(max_length=2048)
 
@@ -22,13 +21,14 @@ class ListingBase(BaseModel):
     original_url: str | None = Field(max_length=2048)
 
 class ListingGet(ListingBase):
+    user_id: int | None # none if listing created by parser
     addition_date: datetime.datetime
     approval_date: datetime.datetime | None
     updated_at: datetime.datetime | None
 
     status: str = Field(max_length=64)
 
-    photos: list[ListingPhotoCreate] = []
+    photos: list[ListingPhotoGet] = []
     analytics: ListingAnalyticsGet
     
 class ListingCreate(ListingBase):
