@@ -2,7 +2,7 @@ import datetime
 from pydantic import BaseModel, Field
 
 from server.schemas.listing_analytics import ListingAnalyticsGet
-from server.schemas.listing_photo import ListingPhotoGet
+from server.schemas.listing_photo import ListingPhotoCreate, ListingPhotoGet
 
 
 class ListingBase(BaseModel):
@@ -32,4 +32,4 @@ class ListingGet(ListingBase):
     analytics: ListingAnalyticsGet
     
 class ListingCreate(ListingBase):
-    photos: list[int] = []
+    photos: list[ListingPhotoCreate] = []

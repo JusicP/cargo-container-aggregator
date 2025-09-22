@@ -6,18 +6,32 @@ from server.models.listing_photo import ListingPhoto
 from server.models.user import User
 from server.schemas.listing_photo import ListingPhotoCreate, ListingPhotoUpdate
 
+import server.services.listing_service as listing_service
 
-async def create_listing_photo(session: AsyncSession, photo_create: ListingPhotoCreate):
-    photo = ListingPhoto(**photo_create.model_dump())
-    session.add(photo)
+
+async def create_listing_photo(session: AsyncSession, user: User, listing_id: int, listing_photo_create: ListingPhotoCreate):
+    _ = await listing_service.get_listing_by_id_and_check_rights(session, listing_id, user)
+
+    listing_photo = ListingPhoto(
+        listing_id=listing_id,
+        photo_id=listing_photo_create.photo_id,
+        is_main=listing_photo_create.is_main
+    )
+    session.add(listing_photo)
     await session.commit()
-    await session.refresh(photo)
-    return photo
+    await session.refresh(listing_photo)
+
+    return listing_photo
 
 
-async def create_listing_photos(session: AsyncSession, listing_id: int, photo_ids: list[int]):
-    for pid in photo_ids:
-        session.add(ListingPhoto(listing_id=listing_id, photo_id=pid, is_main=False)) # FIXME: do something with is_main
+async def create_listing_photos(session: AsyncSession, listing_id: int, listing_photos: list[ListingPhotoCreate]):
+    # TODO: check if photo attribute is_main == True for only one photo from the list
+    for listing_photo in listing_photos:
+        session.add(ListingPhoto(
+            listing_id=listing_id,
+            photo_id=listing_photo.photo_id,
+            is_main=listing_photo.is_main
+        ))
     
     await session.commit()
 
