@@ -15,8 +15,6 @@ class ListingParserBase(BaseModel):
     currency: str = Field(max_length=3)
     ral_color: str | None
 
-    original_url: str | None = Field(max_length=2048)
-
 class ListingParserGet(ListingParserBase):
     addition_date: datetime.datetime
     last_started_at: datetime.datetime | None

@@ -33,6 +33,31 @@ async def create_listing(session: AsyncSession, user_id: int, listing_create: Li
     return listing
 
 
+async def create_or_update_listings(session: AsyncSession, listings_create: list[ListingCreate]):
+    # TODO: implement update logic
+    for listing_create in listings_create:
+        listing = Listing(
+            title=listing_create.title,
+            description=listing_create.description,
+            container_type=listing_create.container_type,
+            condition=listing_create.condition,
+            type=listing_create.type,
+            price=listing_create.price,
+            currency=listing_create.currency,
+            location=listing_create.location,
+            ral_color=listing_create.ral_color,
+            original_url=listing_create.original_url,
+        )
+
+        session.add(listing)
+        await session.flush()
+        await session.refresh(listing)
+
+        await create_listing_photos(session, listing_id=listing.id, photo_ids=listing_create.photos)
+
+    await session.commit()
+
+
 async def get_all_listings(session: AsyncSession):
     result = await session.execute(select(Listing))
     return result.scalars().all()

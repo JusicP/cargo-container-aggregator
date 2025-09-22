@@ -34,7 +34,6 @@ async def update_listing_parser(session: AsyncSession, parser_id: int, parser_ge
     parser.type = parser_get.type
     parser.currency = parser_get.currency
     parser.ral_color = parser_get.ral_color
-    parser.original_url = parser_get.original_url
 
     parser.addition_date = parser_get.addition_date
     parser.last_started_at = parser_get.last_started_at
