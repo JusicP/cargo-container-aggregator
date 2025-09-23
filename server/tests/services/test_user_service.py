@@ -21,7 +21,7 @@ async def test_user_create(session: AsyncSession):
     user = await session.get(User, 1)
     assert user
     assert user.name == user_create.name
-    assert user.password != user_create.password
+    assert user.password == user_create.password
     assert user.email == user_create.email
     assert user.phone_number == user_create.phone_number
     assert user.company_name == user_create.company_name

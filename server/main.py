@@ -1,20 +1,23 @@
-from contextlib import asynccontextmanager
 import logging
 from typing import AsyncIterator
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
-
 from server.routes import auth, user
+from server.database.connection import async_engine, Base, async_session_maker
+from server.utils.default_admin import ensure_superuser
 
-logger = logging.getLogger("server")
 
 @asynccontextmanager
-async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-    """
-    FastAPI lifespan.
-    """
-    # TODO: init scheduler (apscheduler), alembic automigration, intial start (inserts initial data, maybe users, to db)
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    async with async_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+    async with async_session_maker() as session:
+        await ensure_superuser(session)
+
     yield
-    # TODO: shutdown scheduler
+
 
 app = FastAPI(
     lifespan=lifespan,
