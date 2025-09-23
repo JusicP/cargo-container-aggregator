@@ -28,8 +28,9 @@ class ListingGet(ListingBase):
 
     status: str = Field(max_length=64)
 
-    photos: list[ListingPhotoCreate] = []
+    photos: list[ListingPhotoGet] = []
     analytics: ListingAnalyticsGet
+
     
 class ListingCreate(ListingBase):
     photos: list[int] = []

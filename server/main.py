@@ -3,7 +3,7 @@ import logging
 from typing import AsyncIterator
 from fastapi import FastAPI
 
-from server.routes import auth, user
+from server.routes import auth, user, listings, favorites, parserListings, analytics
 
 logger = logging.getLogger("server")
 
@@ -24,3 +24,7 @@ app = FastAPI(
 
 app.include_router(auth.router)
 app.include_router(user.router)
+app.include_router(listings.router)
+app.include_router(favorites.router)
+app.include_router(parserListings.router)
+app.include_router(analytics.router)
