@@ -1,8 +1,7 @@
-import uuid
 from datetime import datetime
 from fastapi import APIRouter
 
-from server.schemas.user import UserCreate, UserGet, UserUpdate, UserRole, UserStatus
+from server.schemas.user import UserCreate, UserGet, UserUpdate, UserRole, UserStatus, UserUpdate, UserRole, UserStatus
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -11,24 +10,25 @@ router = APIRouter(prefix="/users", tags=["users"])
 async def get_users():
     return [
         {
-            "id": uuid.uuid4(),
+            "id": 1,
             "name": "admin",
             "email": "admin@gmail.com",
             "phone_number": "+380991112233",
             "company_name": None,
             "role": UserRole.ADMIN,
-            "registration_date": datetime.utcnow(),
+            "registration_date": datetime.now(),
             "status": UserStatus.ACTIVE,
         },
         {
-            "id": uuid.uuid4(),
+            "id": 2,
             "name": "user1",
             "email": "user1@gmail.com",
             "phone_number": "+380991112234",
             "company_name": "Strawberry",
             "role": UserRole.USER,
-            "registration_date": datetime.utcnow(),
+            "registration_date": datetime.now(),
             "status": UserStatus.ACTIVE,
+            "avatar_photo_id": None,
         },
     ]
 
@@ -36,27 +36,28 @@ async def get_users():
 @router.get("/me", response_model=UserGet)
 async def get_me():
     return {
-        "id": uuid.uuid4(),
+        "id": 1,
         "name": "user1",
         "email": "user1@gmail.com",
         "phone_number": "+380991112234",
         "company_name": "Strawberry",
         "role": UserRole.USER,
-        "registration_date": datetime.utcnow(),
+        "registration_date": datetime.now(),
         "status": UserStatus.ACTIVE,
+        "avatar_photo_id": None,
     }
 
 
 @router.post("/register", response_model=UserGet)
 async def register_user(user: UserCreate):
     return {
-        "id": uuid.uuid4(),
+        "id": 3,
         "name": user.name,
         "email": user.email,
         "phone_number": user.phone_number,
         "company_name": user.company_name,
         "role": UserRole.USER,
-        "registration_date": datetime.utcnow(),
+        "registration_date": datetime.now(),
         "status": UserStatus.ACTIVE,
     }
 
@@ -64,19 +65,19 @@ async def register_user(user: UserCreate):
 @router.put("/me", response_model=UserGet)
 async def update_me(user: UserUpdate):
     return {
-        "id": uuid.uuid4(),
+        "id": 4,
         "name": user.name,
         "email": user.email,
         "phone_number": user.phone_number,
         "company_name": user.company_name,
         "role": UserRole.USER,
-        "registration_date": datetime.utcnow(),
+        "registration_date": datetime.now(),
         "status": UserStatus.ACTIVE,
     }
 
 
 @router.get("/{id}", response_model=UserGet)
-async def get_user(id: uuid.UUID):
+async def get_user(id: int):
     return {
         "id": id,
         "name": f"User-{id}",
@@ -84,20 +85,21 @@ async def get_user(id: uuid.UUID):
         "phone_number": "+380994445566",
         "company_name": None,
         "role": UserRole.USER,
-        "registration_date": datetime.utcnow(),
+        "registration_date": datetime.now(),
         "status": UserStatus.ACTIVE,
     }
 
 
 @router.put("/{id}", response_model=UserGet)
-async def update_user(id: uuid.UUID, user: UserUpdate):
+async def update_user(id: int, user: UserUpdate):
     return {
         "id": id,
         "name": user.name or f"User-{id}",
         "email": user.email or f"user{id}@gmail.com",
         "phone_number": user.phone_number,
         "company_name": user.company_name,
+        "avatar_photo_id": user.avatar_photo_id,
         "role": UserRole.USER,
-        "registration_date": datetime.utcnow(),
+        "registration_date": datetime.now(),
         "status": UserStatus.ACTIVE,
     }
