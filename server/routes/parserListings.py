@@ -19,8 +19,7 @@ async def get_parser_listings():
             type="sale",
             currency="USD",
             ral_color="RAL5010",
-            original_url="https://example.com/original/1",
-            addition_date=datetime.utcnow(),
+            addition_date=datetime.now(),
             last_started_at=None,
             last_finished_at=None,
             status="NEW",
@@ -33,7 +32,7 @@ async def get_parser_listings():
 async def create_parser_listing(listing: ListingParserCreate):
     return ListingParserGet(
         **listing.dict(),
-        addition_date=datetime.utcnow(),
+        addition_date=datetime.now(),
         last_started_at=None,
         last_finished_at=None,
         status="NEW",
@@ -45,8 +44,8 @@ async def create_parser_listing(listing: ListingParserCreate):
 async def update_parser_listing(id: int, listing: ListingParserCreate):
     return ListingParserGet(
         **listing.dict(),
-        addition_date=datetime.utcnow(),
-        last_started_at=datetime.utcnow(),
+        addition_date=datetime.now(),
+        last_started_at=datetime.now(),
         last_finished_at=None,
         status="UPD",
         error_message=""

@@ -10,7 +10,7 @@ router = APIRouter(prefix="/listings", tags=["listings"])
 
 @router.get("/", response_model=list[ListingGet])
 async def get_listings():
-    now = datetime.utcnow()
+    now = datetime.now()
     return [
         ListingGet(
             user_id=1,
@@ -31,7 +31,6 @@ async def get_listings():
             photos=[
                 ListingPhotoGet(
                     photo_id=1,
-                    url="https://example.com/photo1.jpg",
                     is_main=True,
                     listing_int=1,
                     uploaded_at=now
@@ -68,7 +67,6 @@ async def get_listings():
             photos=[
                 ListingPhotoGet(
                     photo_id=2,
-                    url="https://example.com/photo2.jpg",
                     is_main=True,
                     listing_int=2,
                     uploaded_at=now
@@ -92,7 +90,7 @@ async def get_listings():
 
 @router.post("/", response_model=ListingGet)
 async def create_listing(listing: ListingCreate):
-    now = datetime.utcnow()
+    now = datetime.now()
     listing_data = listing.dict()
     listing_data.pop("photos", None)
 
@@ -120,7 +118,7 @@ async def create_listing(listing: ListingCreate):
 
 @router.get("/{id}", response_model=ListingGet)
 async def get_listing(id: str):
-    now = datetime.utcnow()
+    now = datetime.now()
     return ListingGet(
         user_id=1,
         title="40ft Container Example",
@@ -154,7 +152,7 @@ async def get_listing(id: str):
 
 @router.put("/{id}", response_model=ListingGet)
 async def update_listing(id: str, listing: ListingCreate):
-    now = datetime.utcnow()
+    now = datetime.now()
     data = listing.dict()
     data.pop("photos", None)
     return ListingGet(
