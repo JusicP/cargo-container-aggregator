@@ -24,7 +24,7 @@ class UserCreate(UserBase):
     avatar_photo_id: int | None = Field(None, exclude=True) # don't allow to set avatar_photo_id on creation, we allow it after creation only
 
 class UserGet(UserBase):
-    id: UUID
+    id: int
     role: str
     registration_date: datetime.datetime
     status: str

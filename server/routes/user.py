@@ -18,6 +18,7 @@ async def get_users():
             "role": UserRole.ADMIN,
             "registration_date": datetime.now(),
             "status": UserStatus.ACTIVE,
+            "avatar_photo_id": None,
         },
         {
             "id": 2,
@@ -59,6 +60,7 @@ async def register_user(user: UserCreate):
         "role": UserRole.USER,
         "registration_date": datetime.now(),
         "status": UserStatus.ACTIVE,
+        "avatar_photo_id": None,
     }
 
 
@@ -73,6 +75,7 @@ async def update_me(user: UserUpdate):
         "role": UserRole.USER,
         "registration_date": datetime.now(),
         "status": UserStatus.ACTIVE,
+        "avatar_photo_id": None,
     }
 
 
@@ -87,6 +90,7 @@ async def get_user(id: int):
         "role": UserRole.USER,
         "registration_date": datetime.now(),
         "status": UserStatus.ACTIVE,
+        "avatar_photo_id": None,
     }
 
 
