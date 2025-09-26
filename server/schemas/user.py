@@ -1,5 +1,7 @@
 import datetime
 from enum import Enum
+from uuid import UUID
+
 from pydantic import BaseModel, Field
 
 
@@ -24,7 +26,7 @@ class UserCreate(UserBase):
     avatar_photo_id: int | None = Field(None, exclude=True) # don't allow to set avatar_photo_id on creation, we allow it after creation only
 
 class UserGet(UserBase):
-    id: int
+    id: UUID
     role: str
     registration_date: datetime.datetime
     status: str
