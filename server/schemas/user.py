@@ -27,7 +27,7 @@ class UserCreate(UserRegister):
     role: str = "user"
 
 class UserGet(UserBase):
-    id: UUID
+    id: int
     role: str
     registration_date: datetime.datetime
     status: str
