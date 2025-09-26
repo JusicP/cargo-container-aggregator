@@ -1,0 +1,119 @@
+
+.site-header {
+  background-color: #101D29;
+  color: white;
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+}
+
+.nav-left a {
+  color: #F5F5F5;
+  margin-right: 20px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.nav-right select,
+.icon-btn {
+  margin-left: 15px;
+  background: none;
+  border: none;
+  color: #F5F5F5;
+  font-size: 18px;
+  cursor: pointer;
+}
+.site-header {
+  background-color: #101D29;
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+}
+
+.nav-left a {
+  font-family: 'Avenir', sans-serif;
+  font-size: 20px;
+  line-height: 100%;
+  letter-spacing: 0;
+  text-decoration: none;
+  margin-right: 20px;
+  color: #F5F5F5;
+}
+
+.nav-left a:first-child {
+  font-weight: 800; /* Heavy */
+}
+
+.nav-left a:not(:first-child) {
+  font-weight: 400;
+}
+.hero-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 60px 80px;
+  flex: 1;
+}
+
+.hero-left {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding-bottom: 60px;
+}
+
+.hero-title {
+  font-family: 'Atkinson Hyperlegible', sans-serif;
+  font-weight: 700;
+  font-size: 80px;
+  line-height: 88px;
+  letter-spacing: 2.4px;
+  color: white;
+  margin: 0;
+}
+
+.hero-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 60px;
+}
+
+.hero-desc {
+  font-family: 'Geologica', sans-serif;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 29px;
+  letter-spacing: 0.72px;
+  color: white;
+  width: 452px;
+  margin-bottom: 20px;
+  white-space: pre-line;
+  text-align: left;
+}
+
+.cta-btn {
+  background-color: #ff6600;
+  color: white;
+  font-size: 18px;
+  padding: 17px 32px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 12px;
+  align-self: flex-start;
+  margin-left: 300px;
+}
+.cta-btn:hover {
+  background-color: #e65c00;
+}
