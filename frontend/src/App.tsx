@@ -2,12 +2,14 @@ import "./App.css";
 import {useState} from "react";
 import background from "./assets/background.png";
 import './index.css'
+import AppRouter from './router/AppRouter';
 
 function App() {
     const [lang, setLang] = useState("UA");
     const colors = ['#bada55', '#bada55', '#bada55', '#bada55', '#bada55'];
     return (
         <div
+
             className="app-root"
             style={{
                 backgroundImage: `url(${background})`,
@@ -19,6 +21,7 @@ function App() {
 
             }}
         >
+            <AppRouter />
             {/* Header */}
             <header className="site-header">
                 <nav className="nav-left">
@@ -175,6 +178,7 @@ function App() {
             </div>
 
         </div>
+
     );
 }
 
