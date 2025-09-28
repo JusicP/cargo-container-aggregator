@@ -1,5 +1,7 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import ProtectedRoute from '../components/ProtectedRoute';
+import { useAuth } from '../contexts/AuthContext';
 
 // Імпорти компонентів сторінок
 import HomePage from '../pages/HomePage';
@@ -24,45 +26,186 @@ import AdminUsersPage from '../pages/admin/AdminUsersPage';
 import AdminLogsPage from '../pages/admin/AdminLogsPage';
 import NotFoundPage from '../pages/NotFoundPage';
 
+const AppRouterContent: React.FC = () => {
+  const { isAuthenticated } = useAuth();
+
+  return (
+    <Routes>
+      {/* Головна сторінка - доступна всім */}
+      <Route path="/" element={<HomePage />} />
+      
+      {/* Аутентифікація - доступна тільки неавторизованим користувачам */}
+      <Route 
+        path="/login" 
+        element={
+          isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />
+        } 
+      />
+      <Route 
+        path="/register" 
+        element={
+          isAuthenticated ? <Navigate to="/" replace /> : <RegisterPage />
+        } 
+      />
+      
+      {/* Мій акаунт - доступний тільки авторизованим користувачам */}
+      <Route 
+        path="/myaccount" 
+        element={
+          <ProtectedRoute>
+            <MyAccountPage />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Оголошення в акаунті - доступні тільки покупцям і продавцям */}
+      <Route 
+        path="/myaccount/listings/active" 
+        element={
+          <ProtectedRoute requiredRoles={['buyer', 'seller']}>
+            <ActiveListingsPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/myaccount/listings/pending" 
+        element={
+          <ProtectedRoute requiredRoles={['buyer', 'seller']}>
+            <PendingListingsPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/myaccount/listings/rejected" 
+        element={
+          <ProtectedRoute requiredRoles={['buyer', 'seller']}>
+            <RejectedListingsPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/myaccount/listings/deleted" 
+        element={
+          <ProtectedRoute requiredRoles={['buyer', 'seller']}>
+            <DeletedListingsPage />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Профіль і налаштування - доступні всім авторизованим користувачам */}
+      <Route 
+        path="/myaccount/profile" 
+        element={
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/myaccount/user-settings" 
+        element={
+          <ProtectedRoute>
+            <UserSettingsPage />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Створення оголошення - тільки для продавців з верифікацією */}
+      <Route 
+        path="/create-listing" 
+        element={
+          <ProtectedRoute 
+            requiredRoles={['seller']} 
+            requireVerification={true}
+          >
+            <CreateListingPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/create-listing/success" 
+        element={
+          <ProtectedRoute requiredRoles={['seller']}>
+            <CreateListingSuccessPage />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Перегляд оголошення - доступний всім */}
+      <Route path="/listing/:id" element={<ListingPage />} />
+      
+      {/* Аналітика оголошення - тільки для власника оголошення або адмінів */}
+      <Route 
+        path="/listing/:id/analytics" 
+        element={
+          <ProtectedRoute requiredRoles={['seller', 'admin']}>
+            <ListingAnalyticsPage />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Редагування оголошення - тільки для власника оголошення або адмінів */}
+      <Route 
+        path="/listing/:id/edit" 
+        element={
+          <ProtectedRoute requiredRoles={['seller', 'admin']}>
+            <EditListingPage />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Адмін панель - тільки для адміністраторів */}
+      <Route 
+        path="/admin" 
+        element={
+          <ProtectedRoute requiredRoles={['admin']}>
+            <AdminPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin/listings" 
+        element={
+          <ProtectedRoute requiredRoles={['admin']}>
+            <AdminListingsPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin/parser" 
+        element={
+          <ProtectedRoute requiredRoles={['admin']}>
+            <AdminParserPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin/users" 
+        element={
+          <ProtectedRoute requiredRoles={['admin']}>
+            <AdminUsersPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin/logs" 
+        element={
+          <ProtectedRoute requiredRoles={['admin']}>
+            <AdminLogsPage />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* 404 сторінка для всіх інших маршрутів */}
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
+  );
+};
+
 const AppRouter: React.FC = () => {
   return (
     <BrowserRouter>
-      <Routes>
-        {/* Головна сторінка */}
-        <Route path="/" element={<HomePage />} />
-        
-        {/* Аутентифікація */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        
-        {/* Мій акаунт */}
-        <Route path="/myaccount" element={<MyAccountPage />} />
-        <Route path="/myaccount/listings/active" element={<ActiveListingsPage />} />
-        <Route path="/myaccount/listings/pending" element={<PendingListingsPage />} />
-        <Route path="/myaccount/listings/rejected" element={<RejectedListingsPage />} />
-        <Route path="/myaccount/listings/deleted" element={<DeletedListingsPage />} />
-        <Route path="/myaccount/profile" element={<ProfilePage />} />
-        <Route path="/myaccount/user-settings" element={<UserSettingsPage />} />
-        
-        {/* Створення оголошення */}
-        <Route path="/create-listing" element={<CreateListingPage />} />
-        <Route path="/create-listing/success" element={<CreateListingSuccessPage />} />
-        
-        {/* Оголошення */}
-        <Route path="/listing/:id" element={<ListingPage />} />
-        <Route path="/listing/:id/analytics" element={<ListingAnalyticsPage />} />
-        <Route path="/listing/:id/edit" element={<EditListingPage />} />
-        
-        {/* Адмін панель */}
-        <Route path="/admin" element={<AdminPage />} />
-        <Route path="/admin/listings" element={<AdminListingsPage />} />
-        <Route path="/admin/parser" element={<AdminParserPage />} />
-        <Route path="/admin/users" element={<AdminUsersPage />} />
-        <Route path="/admin/logs" element={<AdminLogsPage />} />
-        
-        {/* 404 сторінка для всіх інших маршрутів */}
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
+      <AppRouterContent />
     </BrowserRouter>
   );
 };
