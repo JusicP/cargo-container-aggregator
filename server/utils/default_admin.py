@@ -19,7 +19,7 @@ async def ensure_superuser(session):
         phone_number="0000000000",
         company_name=None,
         avatar_photo_id=None,
-        role="user"
+        role="admin"
     )
 
     await create_user(session, user_create)
