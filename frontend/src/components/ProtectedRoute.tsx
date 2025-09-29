@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import type { UserRole } from '../contexts/AuthContext';
 import './ProtectedRoute.css';
@@ -8,20 +8,22 @@ interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredRoles?: UserRole[];
   requireAuth?: boolean;
-  requireVerification?: boolean;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   requiredRoles = [],
   requireAuth = true,
-  requireVerification = false
 }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  console.log('ProtectedRoute check:', { user, isAuthenticated, isLoading, requiredRoles }); 
 
   // Показуємо спіннер під час завантаження
   if (isLoading) {
+    console.log('Still loading...'); 
     return (
       <div className="loading-container">
         <div className="spinner"></div>
@@ -32,27 +34,26 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // Якщо потрібна авторизація, але користувач не авторизований
   if (requireAuth && !isAuthenticated) {
+    console.log('Not authenticated, redirecting to login'); 
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   // Якщо користувач авторизований, але немає доступу за роллю
   if (isAuthenticated && user && requiredRoles.length > 0 && !requiredRoles.includes(user.role)) {
-    return <Navigate to="/" replace />;
-  }
-
-  // Якщо потрібна верифікація, але користувач не верифікований
-  if (requireVerification && user && !user.isVerified) {
     return (
       <div className="verification-container">
         <h2 className="verification-title">
-          Підтвердження облікового запису
+          Немає доступу
         </h2>
         <p className="verification-description">
-          Для доступу до цієї сторінки необхідно підтвердити ваш обліковий запис через email.
+          У вас немає необхідних прав для доступу до цієї сторінки.
         </p>
-        <p className="verification-hint">
-          Перевірте вашу пошту та перейдіть за посиланням для підтвердження.
-        </p>
+        <button 
+          onClick={() => navigate(-1)}
+          className="back-button"
+        >
+          Повернутися назад
+        </button>
       </div>
     );
   }

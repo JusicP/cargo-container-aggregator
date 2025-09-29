@@ -7,10 +7,19 @@ const MyAccountPage: React.FC = () => {
 
   const getRoleDisplayName = (role: string) => {
     switch (role) {
-      case 'buyer': return 'Покупець';
-      case 'seller': return 'Продавець';
+      case 'user': return 'Користувач';
       case 'admin': return 'Адміністратор';
+      case 'guest': return 'Гість';
       default: return 'Користувач';
+    }
+  };
+
+  const getStatusDisplayName = (status: string) => {
+    switch (status) {
+      case 'ACTIVE': return '✅ Активний';
+      case 'INACTIVE': return '⚠️ Неактивний';
+      case 'BANNED': return '🚫 Заблокований';
+      default: return status;
     }
   };
 
@@ -23,16 +32,15 @@ const MyAccountPage: React.FC = () => {
         borderRadius: '8px', 
         marginBottom: '2rem' 
       }}>
+        <p><strong>Ім'я:</strong> {user?.name}</p>
         <p><strong>Email:</strong> {user?.email}</p>
+        <p><strong>Телефон:</strong> {user?.phone_number}</p>
+        {user?.company_name && (
+          <p><strong>Компанія:</strong> {user.company_name}</p>
+        )}
         <p><strong>Роль:</strong> {getRoleDisplayName(user?.role || '')}</p>
-        <p><strong>Статус верифікації:</strong> 
-          <span style={{ 
-            color: user?.isVerified ? 'green' : 'orange',
-            marginLeft: '0.5rem'
-          }}>
-            {user?.isVerified ? '✅ Підтверджено' : '⚠️ Не підтверджено'}
-          </span>
-        </p>
+        <p><strong>Статус:</strong> {getStatusDisplayName(user?.status || '')}</p>
+        <p><strong>Дата реєстрації:</strong> {user?.registration_date ? new Date(user.registration_date).toLocaleDateString('uk-UA') : '-'}</p>
       </div>
 
       <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
@@ -58,7 +66,8 @@ const MyAccountPage: React.FC = () => {
           ⚙️ Налаштування
         </Link>
 
-        {(user?.role === 'buyer' || user?.role === 'seller') && (
+        {/* Користувачі можуть і продавати, і купляти */}
+        {user?.role === 'user' && (
           <>
             <Link to="/myaccount/listings/active" style={{ 
               display: 'block', 
@@ -81,21 +90,19 @@ const MyAccountPage: React.FC = () => {
             }}>
               ⏳ На розгляді
             </Link>
-          </>
-        )}
 
-        {user?.role === 'seller' && (
-          <Link to="/create-listing" style={{ 
-            display: 'block', 
-            padding: '1rem', 
-            background: '#28a745', 
-            color: 'white',
-            textDecoration: 'none', 
-            borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-          }}>
-            ➕ Створити оголошення
-          </Link>
+            <Link to="/create-listing" style={{ 
+              display: 'block', 
+              padding: '1rem', 
+              background: '#28a745', 
+              color: 'white',
+              textDecoration: 'none', 
+              borderRadius: '8px',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}>
+              ➕ Створити оголошення
+            </Link>
+          </>
         )}
 
         {user?.role === 'admin' && (

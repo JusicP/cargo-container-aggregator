@@ -58,11 +58,11 @@ const AppRouterContent: React.FC = () => {
         } 
       />
       
-      {/* Оголошення в акаунті - доступні тільки покупцям і продавцям */}
+      {/* Оголошення в акаунті - доступні для користувачів (user може і купляти, і продавати) */}
       <Route 
         path="/myaccount/listings/active" 
         element={
-          <ProtectedRoute requiredRoles={['buyer', 'seller']}>
+          <ProtectedRoute requiredRoles={['user']}>
             <ActiveListingsPage />
           </ProtectedRoute>
         } 
@@ -70,7 +70,7 @@ const AppRouterContent: React.FC = () => {
       <Route 
         path="/myaccount/listings/pending" 
         element={
-          <ProtectedRoute requiredRoles={['buyer', 'seller']}>
+          <ProtectedRoute requiredRoles={['user']}>
             <PendingListingsPage />
           </ProtectedRoute>
         } 
@@ -78,7 +78,7 @@ const AppRouterContent: React.FC = () => {
       <Route 
         path="/myaccount/listings/rejected" 
         element={
-          <ProtectedRoute requiredRoles={['buyer', 'seller']}>
+          <ProtectedRoute requiredRoles={['user']}>
             <RejectedListingsPage />
           </ProtectedRoute>
         } 
@@ -86,7 +86,7 @@ const AppRouterContent: React.FC = () => {
       <Route 
         path="/myaccount/listings/deleted" 
         element={
-          <ProtectedRoute requiredRoles={['buyer', 'seller']}>
+          <ProtectedRoute requiredRoles={['user']}>
             <DeletedListingsPage />
           </ProtectedRoute>
         } 
@@ -110,14 +110,11 @@ const AppRouterContent: React.FC = () => {
         } 
       />
       
-      {/* Створення оголошення - тільки для продавців з верифікацією */}
+      {/* Створення оголошення - тільки для користувачів */}
       <Route 
         path="/create-listing" 
         element={
-          <ProtectedRoute 
-            requiredRoles={['seller']} 
-            requireVerification={true}
-          >
+          <ProtectedRoute requiredRoles={['user']}>
             <CreateListingPage />
           </ProtectedRoute>
         } 
@@ -125,7 +122,7 @@ const AppRouterContent: React.FC = () => {
       <Route 
         path="/create-listing/success" 
         element={
-          <ProtectedRoute requiredRoles={['seller']}>
+          <ProtectedRoute requiredRoles={['user']}>
             <CreateListingSuccessPage />
           </ProtectedRoute>
         } 
@@ -138,7 +135,7 @@ const AppRouterContent: React.FC = () => {
       <Route 
         path="/listing/:id/analytics" 
         element={
-          <ProtectedRoute requiredRoles={['seller', 'admin']}>
+          <ProtectedRoute requiredRoles={['user', 'admin']}>
             <ListingAnalyticsPage />
           </ProtectedRoute>
         } 
@@ -148,7 +145,7 @@ const AppRouterContent: React.FC = () => {
       <Route 
         path="/listing/:id/edit" 
         element={
-          <ProtectedRoute requiredRoles={['seller', 'admin']}>
+          <ProtectedRoute requiredRoles={['user', 'admin']}>
             <EditListingPage />
           </ProtectedRoute>
         } 
