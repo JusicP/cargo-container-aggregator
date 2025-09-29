@@ -3,15 +3,19 @@ from passlib.context import CryptContext  # Library for secure password hashing
 from jose import jwt, JWTError  # For creating and verifying JSON Web Tokens (JWTs)
 from typing import Optional  # For optional function parameters
 import secrets  # For generating cryptographically secure random strings
-
+import os
 # ==========================
 # Configuration Variables
 # ==========================
 
-SECRET_KEY = "secret-key"  # Secret key used to sign JWTs;
-ALGORITHM = "HS256"  # Algorithm used for JWT signing: HMAC + SHA-256
-ACCESS_TOKEN_EXPIRE_MINUTES = 15  # Access tokens are short-lived: 15 minutes by default
-REFRESH_TOKEN_EXPIRE_DAYS = 30  # Refresh tokens are long-lived: 30 days by default
+# ======================================================
+# Environment variables
+# ======================================================
+SECRET_KEY = os.getenv("SECRET_KEY", "supersecret")
+ALGORITHM = os.getenv("ALGORITHM", "HS256")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 15))
+REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", 30))
+
 
 # ==========================
 # Password Hashing
@@ -89,9 +93,9 @@ def create_access_token(
     # Encode and sign the JWT
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
-# ==========================
-# Refresh Token Generation
-# ==========================
+# ======================================================
+# JWT utils
+# ======================================================
 
 def create_refresh_token() -> str:
     """
@@ -101,3 +105,5 @@ def create_refresh_token() -> str:
         str: URL-safe base64 encoded random string.
     """
     return secrets.token_urlsafe(64)  # Generates 64 bytes of secure random data
+
+

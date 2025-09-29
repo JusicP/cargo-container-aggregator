@@ -1,178 +1,218 @@
-
-from fastapi import APIRouter
-# from fastapi.security import OAuth2PasswordRequestForm
-from pydantic import BaseModel
-from fastapi import FastAPI, Depends, HTTPException, status, Response, Cookie
-from sqlalchemy.orm import Session
-from sqlalchemy import select
+# server/auth/routes.py
 from datetime import datetime, timedelta
-from server.models.refresh_token import RefreshToken
-from server.models.user import User
-from server.database.connection import async_session_maker 
-from server.auth.utils import hash_password, verify_password, create_access_token, create_refresh_token, REFRESH_TOKEN_EXPIRE_DAYS
-from pydantic import BaseModel
-from typing import Optional
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+import secrets
+from typing import Annotated, List
+
+from fastapi import APIRouter, Depends, HTTPException, status
 from jose import jwt, JWTError
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
-
+from server.database.connection import generate_async_session
+from server.models.user import User
+from server.models.refresh_token import RefreshToken
+from server.auth.utils import (
+    SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES,
+    REFRESH_TOKEN_EXPIRE_DAYS, create_access_token,
+    hash_password, verify_password
+)
+from pydantic import BaseModel
 
 router = APIRouter(prefix="/auth")
 
-class LoginRequest(BaseModel):
-    username_or_email: str
+# -------------------------------
+# Pydantic Schemas
+# -------------------------------
+class LoginIn(BaseModel):
+    email: str
     password: str
 
-@router.post("/login")
-async def login(req: LoginRequest):
-    if req.username_or_email == "test" and req.password == "123":
-        return {"access_token": "fake-jwt-token", "token_type": "bearer"}
-    raise HTTPException(status_code=401, detail="Invalid credentials")
-    #return {"status": "ok"}
+class TokenOut(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+
+class RefreshTokenOut(BaseModel):
+    id: int
+    user_id: int
+    issued_at: datetime
+    expires_at: datetime
+    revoked: bool
+    token: str
+    class Config:
+        orm_mode = True
 
 
+# ===============================
+# LOGIN
+# ===============================
+@router.post("/login", response_model=TokenOut)
+async def login(
+    data: LoginIn,
+    db: Annotated[AsyncSession, Depends(generate_async_session)]
+):
+    # Find user by email
+    result = await db.execute(select(User).where(User.email == data.email))
+    user: User | None = result.scalar_one_or_none()
+
+    # Validate credentials
+    if not user or not verify_password(data.password, user.password):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+
+    # Check status
+    if user.status != "active":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User inactive")
+
+    # Create short-lived access token
+    access_token = create_access_token(subject=str(user.id), extra={"role": user.role})
+
+    # Create long-lived refresh token (store only the hash in DB)
+    refresh_token_plain = secrets.token_urlsafe(64)
+    hashed_refresh_token = hash_password(refresh_token_plain)
+    expires_at = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+
+    db_token = RefreshToken(
+        user_id=user.id,
+        token=hashed_refresh_token,
+        issued_at=datetime.utcnow(),
+        expires_at=expires_at,
+        revoked=False
+    )
+    db.add(db_token)
+    await db.commit()
+
+    # Return tokens to frontend
+    return {"access_token": access_token, "refresh_token": refresh_token_plain, "token_type": "bearer"}
 
 
+# ===============================
+# REFRESH ACCESS TOKEN
+# ===============================
+@router.post("/refresh", response_model=TokenOut)
+async def refresh_token(
+    refresh_token_in: str,
+    db: Annotated[AsyncSession, Depends(generate_async_session)]
+):
+    """
+    Accepts a refresh token, validates it against the DB,
+    and returns a new access + refresh token pair.
+    """
+
+    if not refresh_token_in:
+        raise HTTPException(status_code=401, detail="No refresh token provided")
+
+    # Search for refresh token in DB
+    result = await db.execute(select(RefreshToken))
+    tokens = result.scalars().all()
+    db_token = None
+    for t in tokens:
+        if verify_password(refresh_token_in, t.token):
+            db_token = t
+            break
+
+    # Validate refresh token
+    if not db_token or db_token.revoked or db_token.expires_at < datetime.utcnow():
+        raise HTTPException(status_code=401, detail="Invalid or expired refresh token")
+
+    # Get the user
+    result = await db.execute(select(User).where(User.id == db_token.user_id))
+    user = result.scalar_one_or_none()
+    if not user or user.status != "active":
+        raise HTTPException(status_code=401, detail="User inactive or blocked")
+
+    # Issue new access token
+    access_token = create_access_token(subject=str(user.id), extra={"role": user.role})
+
+    # Rotate refresh token (invalidate old one by replacing it)
+    new_refresh_token_plain = secrets.token_urlsafe(64)
+    db_token.token = hash_password(new_refresh_token_plain)
+    db_token.issued_at = datetime.utcnow()
+    db_token.expires_at = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    await db.commit()
+
+    return {
+        "access_token": access_token,
+        "refresh_token": new_refresh_token_plain,
+        "token_type": "bearer"
+    }
 
 
+# ===============================
+# LOGOUT
+# ===============================
+@router.post("/logout")
+async def logout(
+    refresh_token_in: str,
+    db: Annotated[AsyncSession, Depends(generate_async_session)]
+):
+    """
+    Logout revokes the given refresh token.
+    Access token does not need to be revoked (it will expire soon anyway).
+    """
 
-# security = HTTPBearer()  # For Bearer token authentication
+    if refresh_token_in:
+        result = await db.execute(select(RefreshToken))
+        tokens = result.scalars().all()
+        for t in tokens:
+            if verify_password(refresh_token_in, t.token):
+                t.revoked = True
+        await db.commit()
 
-# # ------------------------------
-# # Pydantic Schemas
-# # ------------------------------
-# from pydantic import BaseModel
+    return {"detail": "Logged out successfully"}
 
-# class LoginIn(BaseModel):
-#     """Schema for login input"""
-#     identifier: str  # Can be email or username
-#     password: str
 
-# class TokenOut(BaseModel):
-#     """Schema for token output"""
-#     access_token: str
-#     token_type: str = "bearer"
+# ===============================
+# Dependencies
+# ===============================
+async def get_current_user(
+    token: str,
+    db: Annotated[AsyncSession, Depends(generate_async_session)]
+) -> User:
+    """
+    Dependency to extract and validate current user from access token.
+    """
 
-# # ------------------------------
-# # Login Route
-# # ------------------------------
-# @router.post("/login", response_model=TokenOut)
-# def login(data: LoginIn, response: Response, session: Session = Depends(lambda: Session())):
-#     """
-#     User login endpoint.
-#     - Accepts email or username (identifier) and password.
-#     - Verifies credentials.
-#     - Creates access and refresh tokens.
-#     - Stores refresh token in database and sets it as an HttpOnly cookie.
-#     """
+    credentials_exception = HTTPException(
+        status_code=401, detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"}
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: str | None = payload.get("sub")
+        if not user_id:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
 
-#     # Query for user by email OR username
-#     user = session.execute(
-#         select(User).where((User.email == data.identifier) | (User.name == data.identifier))
-#     ).scalar_one_or_none()
+    result = await db.execute(select(User).where(User.id == int(user_id)))
+    user: User | None = result.scalar_one_or_none()
+    if not user or user.status in ("suspended", "blocked"):
+        raise HTTPException(status_code=401, detail="User blocked or suspended")
+    return user
 
-#     # Check if user exists and password matches
-#     if not user or not verify_password(data.password, user.password):
-#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
-#     # Ensure user is active
-#     if user.status != "active":
-#         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User inactive")
+async def get_current_admin(
+    current_user: Annotated[User, Depends(get_current_user)]
+) -> User:
+    """
+    Dependency to check if current user is an admin.
+    """
+    if not current_user.is_admin():
+        raise HTTPException(status_code=403, detail="Admins only")
+    return current_user
 
-#     # Generate access token (JWT) and refresh token
-#     access_token = create_access_token(subject=str(user.id), extra={"role": user.role})
-#     refresh_token = create_refresh_token()
-#     expires_at = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
 
-#     # Save refresh token in database
-#     rt = RefreshToken(user_id=user.id, token=refresh_token, expires_at=expires_at)
-#     session.add(rt)
-#     session.commit()
-
-#     # Set refresh token as HttpOnly, secure cookie
-#     response.set_cookie(
-#         key="refresh_token",
-#         value=refresh_token,
-#         httponly=True,
-#         secure=True,
-#         samesite="strict",
-#         max_age=REFRESH_TOKEN_EXPIRE_DAYS * 24 * 3600
-#     )
-
-#     return {"access_token": access_token, "token_type": "bearer"}
-
-# # ------------------------------
-# # Refresh Access Token Route
-# # ------------------------------
-# @router.post("/refresh", response_model=TokenOut)
-# def refresh(response: Response, refresh_token: Optional[str] = Cookie(None), session: Session = Depends(lambda: Session())):
-#     """
-#     Refresh access token using a valid refresh token.
-#     - Checks if refresh token exists, is not revoked, and is not expired.
-#     - Issues a new access token.
-#     """
-
-#     if not refresh_token:
-#         raise HTTPException(status_code=401, detail="No refresh token provided")
-
-#     rt = session.execute(select(RefreshToken).where(RefreshToken.token == refresh_token)).scalar_one_or_none()
-#     if not rt or rt.revoked or rt.expires_at < datetime.utcnow():
-#         raise HTTPException(status_code=401, detail="Invalid or expired refresh token")
-
-#     user = session.get(User, rt.user_id)
-#     if not user:
-#         raise HTTPException(status_code=401, detail="Invalid token user")
-
-#     new_access_token = create_access_token(subject=str(user.id), extra={"role": user.role})
-#     return {"access_token": new_access_token, "token_type": "bearer"}
-
-# # ------------------------------
-# # Logout Route
-# # ------------------------------
-# @router.post("/logout")
-# def logout(response: Response, refresh_token: Optional[str] = Cookie(None), session: Session = Depends(lambda: Session())):
-#     """
-#     Logout endpoint.
-#     - Revokes refresh token in database.
-#     - Deletes refresh token cookie from client.
-#     """
-#     if refresh_token:
-#         rt = session.execute(select(RefreshToken).where(RefreshToken.token == refresh_token)).scalar_one_or_none()
-#         if rt:
-#             rt.revoked = True
-#             session.add(rt)
-#             session.commit()
-#         response.delete_cookie("refresh_token")
-#     return {"ok": True}
-
-# # ------------------------------
-# # Protected Route Dependency
-# # ------------------------------
-# def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security), session: Session = Depends(lambda: Session())):
-#     """
-#     Dependency to retrieve the current authenticated user.
-#     - Verifies JWT access token.
-#     - Returns User object if valid and active.
-#     """
-#     token = credentials.credentials
-#     try:
-#         payload = jwt.decode(token, "super-secret-key-change-in-prod", algorithms=["HS256"])
-#         user_id = int(payload.get("sub"))
-#     except JWTError:
-#         raise HTTPException(status_code=401, detail="Invalid token")
-
-#     user = session.get(User, user_id)
-#     if not user or user.status != "active":
-#         raise HTTPException(status_code=401, detail="User not found or inactive")
-#     return user
-
-# # ------------------------------
-# # Example Protected Route
-# # ------------------------------
-# @router.get("/protected")
-# def protected_route(current_user: User = Depends(get_current_user)):
-#     """
-#     Example of a protected route.
-#     Returns information about the currently authenticated user.
-#     """
-#     return {"hello": current_user.email, "user_id": current_user.id, "role": current_user.role}
+# ===============================
+# Endpoint to list all refresh tokens
+# ===============================
+@router.get("/refresh-tokens", response_model=List[RefreshTokenOut])
+async def list_all_refresh_tokens(
+    admin: Annotated[User, Depends(get_current_admin)],
+    db: Annotated[AsyncSession, Depends(generate_async_session)]
+):
+    """
+    Admin-only endpoint to list all refresh tokens in the system.
+    """
+    result = await db.execute(select(RefreshToken))
+    tokens = result.scalars().all()
+    return tokens
