@@ -4,13 +4,29 @@ from sqlalchemy import select, delete
 from passlib.context import CryptContext
 from server.models.user import User
 from server.models.refresh_token import RefreshToken
-from server.auth.utils import create_refresh_token, hash_refresh_token, REFRESH_TOKEN_EXPIRE_DAYS
+from server.auth.utils import create_refresh_token, REFRESH_TOKEN_EXPIRE_DAYS, verify_password
 # Password context for hashing refresh tokens (reuse bcrypt)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def hash_refresh_token(token: str) -> str:
     """Store only hashed refresh tokens in DB"""
     return pwd_context.hash(token)
+
+
+async def get_refresh_token_from_db(
+    session: AsyncSession,
+    refresh_token_in: str
+) -> RefreshToken | None:
+    """
+    Look up a refresh token in the database by comparing hashes.
+    Returns the matching RefreshToken object if found, otherwise None.
+    """
+    result = await session.execute(select(RefreshToken))
+    tokens = result.scalars().all()
+    for t in tokens:
+        if verify_password(refresh_token_in, t.token):
+            return t
+    return None
 
 
 # ==========================

@@ -18,6 +18,9 @@ from server.auth.utils import (
 )
 from pydantic import BaseModel
 
+from server.services.refresh_token_service import get_refresh_token_from_db
+from server.services.user_service import get_user_by_email, get_user_by_id
+
 router = APIRouter(prefix="/auth")
 
 # -------------------------------
@@ -51,9 +54,9 @@ async def login(
     data: LoginIn,
     db: Annotated[AsyncSession, Depends(generate_async_session)]
 ):
+    print(data)
     # Find user by email
-    result = await db.execute(select(User).where(User.email == data.email))
-    user: User | None = result.scalar_one_or_none()
+    user = await get_user_by_email(db ,data.email)
 
     # Validate credentials
     if not user or not verify_password(data.password, user.password):
@@ -102,21 +105,14 @@ async def refresh_token(
         raise HTTPException(status_code=401, detail="No refresh token provided")
 
     # Search for refresh token in DB
-    result = await db.execute(select(RefreshToken))
-    tokens = result.scalars().all()
-    db_token = None
-    for t in tokens:
-        if verify_password(refresh_token_in, t.token):
-            db_token = t
-            break
+    db_token = await get_refresh_token_from_db(db, refresh_token_in)
 
     # Validate refresh token
     if not db_token or db_token.revoked or db_token.expires_at < datetime.utcnow():
         raise HTTPException(status_code=401, detail="Invalid or expired refresh token")
 
     # Get the user
-    result = await db.execute(select(User).where(User.id == db_token.user_id))
-    user = result.scalar_one_or_none()
+    user = await get_user_by_id(db, db_token.user_id)
     if not user or user.status != "active":
         raise HTTPException(status_code=401, detail="User inactive or blocked")
 
