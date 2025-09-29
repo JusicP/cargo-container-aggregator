@@ -1,7 +1,7 @@
 from datetime import datetime
 from fastapi import APIRouter
 
-from server.schemas.user import UserCreate, UserGet, UserUpdate, UserRole, UserStatus, UserUpdate, UserRole, UserStatus
+from server.schemas.user import UserRegister, UserGet, UserUpdate, UserRole, UserStatus, UserUpdate, UserRole, UserStatus
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -50,7 +50,8 @@ async def get_me():
 
 
 @router.post("/register", response_model=UserGet)
-async def register_user(user: UserCreate):
+async def register_user(user: UserRegister):
+    # TODO: create UserCreate schema object based on current UserRegister object
     return {
         "id": 3,
         "name": user.name,
