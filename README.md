@@ -10,6 +10,18 @@ pip install -r server/requirements.txt
 uvicorn server.main:app --reload --port 8001
 ```
 
+## Запуск frontend
+```
+# Переходимо в директорію з фронтендом
+cd frontend
+
+# Встановлюємо всі необхідні залежності
+npm install
+
+# Запускаємо дев-сервер у режимі розробки
+npm run dev
+```
+
 ## Документація 
 
 ### API
