@@ -29,7 +29,7 @@ class Listing(Base):
 
     original_url: Mapped[str | None] = mapped_column(String(2048))
 
-    status: Mapped[str] = mapped_column(String(64)) # active|pending|rejected|deleted
+    status: Mapped[str] = mapped_column(String(64), default="active") # active|pending|rejected|deleted
 
     analytics = relationship("ListingAnalytics", uselist=False, back_populates="listing")
     history = relationship("ListingHistory", back_populates="listing", cascade="all, delete-orphan")
