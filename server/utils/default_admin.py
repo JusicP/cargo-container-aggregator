@@ -1,5 +1,5 @@
 import os
-from server.schemas.user import UserCreate
+from server.schemas.user import UserCreate, UserRole
 from server.services.user_service import create_user, get_user_by_email
 
 async def ensure_superuser(session):
@@ -23,7 +23,7 @@ async def ensure_superuser(session):
     )
 
     user_data = user_create.model_dump()
-    user_data["role"] = "admin"
+    user_data["role"] = UserRole.ADMIN
 
     await create_user(session, UserCreate(**user_data))
     print(f"Superuser {email} created")

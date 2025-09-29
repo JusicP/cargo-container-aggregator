@@ -8,7 +8,7 @@ from sqlalchemy import select
 from datetime import datetime, timedelta
 from server.models.refresh_token import RefreshToken
 from server.models.user import User
-from server.database.db import async_session_maker 
+from server.database.connection import async_session_maker 
 from server.auth.utils import hash_password, verify_password, create_access_token, create_refresh_token, REFRESH_TOKEN_EXPIRE_DAYS
 from pydantic import BaseModel
 from typing import Optional

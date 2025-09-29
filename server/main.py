@@ -7,6 +7,14 @@ from server.routes import auth, user, listings, favorites, parserListings, analy
 from server.database.connection import async_engine, Base, async_session_maker
 from server.utils.default_admin import ensure_superuser
 
+from dotenv import load_dotenv
+import os
+
+# load variables from .env
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///:memory:") # default value
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
