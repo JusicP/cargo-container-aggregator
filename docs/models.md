@@ -1,105 +1,87 @@
-# ER діаграма
 ```mermaid
 erDiagram
-    User {
-      uuid id
-      string name
-      string email
-      string password
-      enum role "user|admin"
-      datetime registration_date
-      enum status "active|suspended|blocked"
-      string phone_number
-      string company_name "optional (seller)"
-    }
+  users {
+    INTEGER id PK
+    INTEGER avatar_photo_id FK "nullable"
+    VARCHAR(64) company_name "nullable"
+    VARCHAR(340) email UK
+    VARCHAR(128) name
+    VARCHAR password
+    VARCHAR(16) phone_number
+    DATETIME registration_date
+    VARCHAR(32) role
+    VARCHAR(32) status
+  }
 
-    UserPhoto {
-      uuid id
-      uuid user_id
-      string url
-      datetime uploaded_at
-    }
+  listings {
+    INTEGER id PK
+    INTEGER user_id FK "nullable"
+    DATETIME addition_date
+    DATETIME approval_date "nullable"
+    VARCHAR(64) condition
+    VARCHAR(128) container_type
+    VARCHAR currency "nullable"
+    VARCHAR(2048) description
+    VARCHAR(128) location
+    VARCHAR(2048) original_url "nullable"
+    FLOAT price "nullable"
+    VARCHAR(7) ral_color "nullable"
+    VARCHAR(64) status
+    VARCHAR(128) title
+    VARCHAR(64) type
+    DATETIME updated_at "nullable"
+  }
 
-    Listing {
-      uuid id
-      uuid user_id "seller"
-      string title
-      text description
-      enum container_type "20ft|40ft|40hc|reefer|tank|other"
-      enum condition "new|used"
-      enum type "sale|rent"
-      decimal price
-      enum currency "USD|EUR|UAH"
-      string location
-      string ral_color "optional"
-      datetime addition_date
-      datetime approval_date "optional"
-      datetime updated_at "optional"
-      string original_url "if external"
-      enum status "active|pending|rejected|deleted"
-    }
+  listings_photo {
+    INTEGER id PK
+    INTEGER listing_id FK
+    INTEGER photo_id FK
+    DATETIME addition_date
+    BOOLEAN is_main
+  }
 
-    ListingPhoto {
-      uuid id
-      uuid listing_id
-      string url
-      datetime uploaded_at
-      bool is_main "optional"
-    }
+  user_favorite_listings {
+    INTEGER listing_id PK,FK
+    INTEGER user_id PK,FK
+    DATETIME addition_date
+  }
 
-    UserFavoriteListing {
-      uuid user_id
-      uuid listing_id
-      datetime addition_date
-    }
+  user_photos {
+    INTEGER id PK
+    INTEGER user_id FK "nullable"
+    VARCHAR(2048) filename "nullable"
+    DATETIME uploaded_at
+  }
 
-    ListingParser {
-      uuid id
-      string company_name
-      string method "optional"
-      string url
-      string location
-      enum container_type "20ft|40ft|40hc|reefer|tank|other"
-      enum condition "new|used"
-      enum type "sale|rent"
-      datetime addition_date
-      datetime last_started_at "optional"
-      datetime last_finished_at "optional"
-      enum status "idle|running|success|error"
-      string error_message "optional"
-    }
+  listings_analytics {
+    INTEGER listing_id PK,FK
+    FLOAT average_price "nullable"
+    INTEGER contacts
+    INTEGER favorties
+    FLOAT max_price "nullable"
+    FLOAT min_price "nullable"
+    JSON price_trend
+    DATETIME updated_at
+    INTEGER views
+  }
 
-    ListingAnalytics {
-      uuid listing_id
-      decimal average_price
-      decimal min_price "optional"
-      decimal max_price "optional"
-      json price_trend "time series, ціна по днях"
-      int views
-      int contacts
-      int favorites
-      datetime updated_at
-    }
+  listings_history {
+    INTEGER id PK
+    INTEGER listing_id FK
+    DATETIME addition_date
+    INTEGER contacts
+    INTEGER favorites
+    FLOAT price "nullable"
+    INTEGER views
+  }
 
-    ListingHistory {
-      uuid id
-      uuid listing_id
-      decimal price "optional"
-      int views
-      int contacts
-      int favorites
-      datetime addition_date
-    }
-
-    %% Relations
-    User ||--o{ Listing : "sells"
-    User ||--o{ UserPhoto : "uploads"
-    User ||--o{ UserFavoriteListing : "marks"
-    UserFavoriteListing }o--|| Listing : "refers to"
-
-    Listing ||--o{ ListingPhoto : "has"
-    Listing ||--o{ ListingAnalytics : "feeds"
-    Listing ||--o{ ListingHistory : "records history"
-    ListingParser ||--o{ Listing : "imports"
-
+  user_photos ||--o{ users : avatar_photo_id
+  users ||--o{ listings : user_id
+  listings ||--o{ listings_photo : listing_id
+  user_photos ||--o{ listings_photo : photo_id
+  users ||--o{ user_favorite_listings : user_id
+  listings ||--o{ user_favorite_listings : listing_id
+  users ||--o{ user_photos : user_id
+  listings ||--o{ listings_analytics : listing_id
+  listings ||--o{ listings_history : listing_id
 ```
