@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone  # For working with timestamps and token expiration
 from passlib.context import CryptContext  # Library for secure password hashing
-from jose import jwt  # For creating and verifying JSON Web Tokens (JWTs)
+from jose import jwt, JWTError  # For creating and verifying JSON Web Tokens (JWTs)
 import secrets  # For generating cryptographically secure random strings
 import os
 
@@ -102,4 +102,21 @@ def create_refresh_token() -> str:
     """
     return secrets.token_urlsafe(64)  # Generates 64 bytes of secure random data
 
+def decode_token(token: str) -> dict:
+    """
+    Decode and verify a JWT access token.
 
+    Args:
+        token (str): Encoded JWT token from client.
+
+    Returns:
+        dict: Decoded payload if valid.
+
+    Raises:
+        ValueError: If the token is invalid or expired.
+    """
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload
+    except JWTError as e:
+        raise ValueError(f"Invalid or expired token: {e}")
