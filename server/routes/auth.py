@@ -18,10 +18,14 @@ from server.auth.utils import (
 )
 from pydantic import BaseModel
 
+from server.security.oauth2 import OAuth2PasswordBearerWithCookie
 from server.services.refresh_token_service import get_refresh_token_from_db
 from server.services.user_service import get_user_by_email, get_user_by_id
 
 router = APIRouter(prefix="/auth")
+oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="auth/token")
+
+
 
 # -------------------------------
 # Pydantic Schemas
@@ -93,8 +97,8 @@ async def login(
 # ===============================
 @router.post("/refresh", response_model=TokenOut)
 async def refresh_token(
-    refresh_token_in: str,
-    db: Annotated[AsyncSession, Depends(generate_async_session)]
+    db: Annotated[AsyncSession, Depends(generate_async_session)],
+    refresh_token_in: str = Depends(oauth2_scheme)
 ):
     """
     Accepts a refresh token, validates it against the DB,
@@ -138,8 +142,8 @@ async def refresh_token(
 # ===============================
 @router.post("/logout")
 async def logout(
-    refresh_token_in: str,
-    db: Annotated[AsyncSession, Depends(generate_async_session)]
+    db: Annotated[AsyncSession, Depends(generate_async_session)],
+    refresh_token_in: str = Depends(oauth2_scheme)
 ):
     """
     Logout revokes the given refresh token.
@@ -160,42 +164,42 @@ async def logout(
 # ===============================
 # Dependencies
 # ===============================
-async def get_current_user(
-    token: str,
-    db: Annotated[AsyncSession, Depends(generate_async_session)]
-) -> User:
-    """
-    Dependency to extract and validate current user from access token.
-    """
+# async def get_current_user(
+#     token: str,
+#     db: Annotated[AsyncSession, Depends(generate_async_session)]
+# ) -> User:
+#     """
+#     Dependency to extract and validate current user from access token.
+#     """
 
-    credentials_exception = HTTPException(
-        status_code=401, detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"}
-    )
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id: str | None = payload.get("sub")
-        if not user_id:
-            raise credentials_exception
-    except JWTError:
-        raise credentials_exception
+#     credentials_exception = HTTPException(
+#         status_code=401, detail="Could not validate credentials",
+#         headers={"WWW-Authenticate": "Bearer"}
+#     )
+#     try:
+#         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+#         user_id: str | None = payload.get("sub")
+#         if not user_id:
+#             raise credentials_exception
+#     except JWTError:
+#         raise credentials_exception
 
-    result = await db.execute(select(User).where(User.id == int(user_id)))
-    user: User | None = result.scalar_one_or_none()
-    if not user or user.status in ("suspended", "blocked"):
-        raise HTTPException(status_code=401, detail="User blocked or suspended")
-    return user
+#     result = await db.execute(select(User).where(User.id == int(user_id)))
+#     user: User | None = result.scalar_one_or_none()
+#     if not user or user.status in ("suspended", "blocked"):
+#         raise HTTPException(status_code=401, detail="User blocked or suspended")
+#     return user
 
 
-async def get_current_admin(
-    current_user: Annotated[User, Depends(get_current_user)]
-) -> User:
-    """
-    Dependency to check if current user is an admin.
-    """
-    if not current_user.is_admin():
-        raise HTTPException(status_code=403, detail="Admins only")
-    return current_user
+# async def get_current_admin(
+#     current_user: Annotated[User, Depends(get_current_user)]
+# ) -> User:
+#     """
+#     Dependency to check if current user is an admin.
+#     """
+#     if not current_user.is_admin():
+#         raise HTTPException(status_code=403, detail="Admins only")
+#     return current_user
 
 
 # ===============================
@@ -203,7 +207,7 @@ async def get_current_admin(
 # ===============================
 @router.get("/refresh-tokens", response_model=List[RefreshTokenOut])
 async def list_all_refresh_tokens(
-    admin: Annotated[User, Depends(get_current_admin)],
+    #admin: Annotated[User, Depends(get_current_admin)],
     db: Annotated[AsyncSession, Depends(generate_async_session)]
 ):
     """
