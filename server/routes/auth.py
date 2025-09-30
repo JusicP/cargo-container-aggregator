@@ -1,12 +1,16 @@
 # server/auth/routes.py
+
 from datetime import datetime, timedelta
 import secrets
 from typing import Annotated, List
 
+from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import JSONResponse
 from jose import jwt, JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from pydantic import BaseModel
 
 from server.database.connection import generate_async_session
 from server.models.user import User
@@ -16,64 +20,135 @@ from server.auth.utils import (
     REFRESH_TOKEN_EXPIRE_DAYS, create_access_token,
     hash_password, verify_password
 )
-from pydantic import BaseModel
-
 from server.security.oauth2 import OAuth2PasswordBearerWithCookie
 from server.services.refresh_token_service import get_refresh_token_from_db
 from server.services.user_service import get_user_by_email, get_user_by_id
 
+# ==============================
+# Router & OAuth2 Scheme
+# ==============================
 router = APIRouter(prefix="/auth")
+
+# Custom OAuth2 scheme that extracts both access token (from Authorization header)
+# and refresh token (from HttpOnly cookie)
 oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="auth/token")
 
 
-
-# -------------------------------
+# ==============================
 # Pydantic Schemas
-# -------------------------------
+# ==============================
 class LoginIn(BaseModel):
+    """
+    Schema for login endpoint via JSON body.
+    """
     email: str
     password: str
 
+
 class TokenOut(BaseModel):
+    """
+    Response schema for any endpoint that issues tokens.
+    """
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
 
+
 class RefreshTokenOut(BaseModel):
+    """
+    Admin-viewable schema for refresh tokens in the database.
+    """
     id: int
     user_id: int
     issued_at: datetime
     expires_at: datetime
     revoked: bool
     token: str
+
     class Config:
-        orm_mode = True
+        orm_mode = True  # allows SQLAlchemy models to be returned directly
 
 
-# ===============================
-# LOGIN
-# ===============================
+# ==============================
+# TOKEN ENDPOINT (OAuth2 Password Flow)
+# ==============================
+@router.post("/token")
+async def token(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    db: Annotated[AsyncSession, Depends(generate_async_session)]
+):
+    """
+    Standard OAuth2 Password Flow endpoint.
+    
+    Accepts:
+        - form_data with 'username' and 'password' fields (username = email)
+    
+    Returns:
+        - access token in JSON response
+        - refresh token in HttpOnly cookie (secure, not accessible from frontend JS)
+    """
+    # Look up user in DB by email
+    user = await get_user_by_email(db, form_data.username)
+    if not user or not verify_password(form_data.password, user.password):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    # Create short-lived access token
+    access_token = create_access_token(subject=str(user.id), extra={"role": user.role})
+
+    # Create long-lived refresh token and hash it for storage in DB
+    refresh_token_plain = secrets.token_urlsafe(64)
+    hashed_refresh_token = hash_password(refresh_token_plain)
+    db_token = RefreshToken(
+        user_id=user.id,
+        token=hashed_refresh_token,
+        issued_at=datetime.utcnow(),
+        expires_at=datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
+        revoked=False
+    )
+    db.add(db_token)
+    await db.commit()
+
+    # Return access token in JSON and refresh token in HttpOnly cookie
+    response = JSONResponse(content={"access_token": access_token, "token_type": "bearer"})
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token_plain,
+        httponly=True,       # prevents JS access
+        secure=True,         # enable in production for HTTPS
+        samesite="lax",
+        max_age=REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
+    )
+    return response
+
+
+# ==============================
+# LOGIN ENDPOINT (JSON Login)
+# ==============================
 @router.post("/login", response_model=TokenOut)
 async def login(
     data: LoginIn,
     db: Annotated[AsyncSession, Depends(generate_async_session)]
 ):
-    print(data)
+    """
+    Alternative login endpoint that accepts JSON body with email/password.
+    This endpoint returns both access and refresh tokens in JSON (refresh token
+    not stored in cookie in this version, can be updated to match /token flow).
+    """
     # Find user by email
-    user = await get_user_by_email(db ,data.email)
+    user = await get_user_by_email(db, data.email)
 
     # Validate credentials
     if not user or not verify_password(data.password, user.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
-    # Check status
+    # Check if the user is active
     if user.status != "active":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User inactive")
 
-    # Create short-lived access token
+    # Generate access token
     access_token = create_access_token(subject=str(user.id), extra={"role": user.role})
 
-    # Create long-lived refresh token (store only the hash in DB)
+    # Generate refresh token and hash for DB
     refresh_token_plain = secrets.token_urlsafe(64)
     hashed_refresh_token = hash_password(refresh_token_plain)
     expires_at = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
@@ -88,130 +163,109 @@ async def login(
     db.add(db_token)
     await db.commit()
 
-    # Return tokens to frontend
-    return {"access_token": access_token, "refresh_token": refresh_token_plain, "token_type": "bearer"}
+    # Return both tokens in JSON
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token_plain,
+        "token_type": "bearer"
+    }
 
 
-# ===============================
-# REFRESH ACCESS TOKEN
-# ===============================
+# ==============================
+# REFRESH ENDPOINT
+# ==============================
 @router.post("/refresh", response_model=TokenOut)
-async def refresh_token(
-    db: Annotated[AsyncSession, Depends(generate_async_session)],
-    refresh_token_in: str = Depends(oauth2_scheme)
+async def refresh(
+    tokens: dict = Depends(oauth2_scheme),
+    db: AsyncSession = Depends(generate_async_session)
 ):
     """
-    Accepts a refresh token, validates it against the DB,
-    and returns a new access + refresh token pair.
+    Refresh endpoint that issues a new access token and rotates the refresh token.
+    
+    - Reads the refresh token from HttpOnly cookie
+    - Validates it against the DB
+    - Returns new access token in JSON
+    - Sets new refresh token in cookie
     """
-
+    refresh_token_in = tokens["refresh_token"]
     if not refresh_token_in:
         raise HTTPException(status_code=401, detail="No refresh token provided")
 
-    # Search for refresh token in DB
+    # Look up refresh token in DB
     db_token = await get_refresh_token_from_db(db, refresh_token_in)
-
-    # Validate refresh token
     if not db_token or db_token.revoked or db_token.expires_at < datetime.utcnow():
         raise HTTPException(status_code=401, detail="Invalid or expired refresh token")
 
-    # Get the user
+    # Retrieve user associated with the refresh token
     user = await get_user_by_id(db, db_token.user_id)
     if not user or user.status != "active":
         raise HTTPException(status_code=401, detail="User inactive or blocked")
 
-    # Issue new access token
+    # Issue a new access token
     access_token = create_access_token(subject=str(user.id), extra={"role": user.role})
 
-    # Rotate refresh token (invalidate old one by replacing it)
+    # Rotate refresh token for security
     new_refresh_token_plain = secrets.token_urlsafe(64)
     db_token.token = hash_password(new_refresh_token_plain)
     db_token.issued_at = datetime.utcnow()
     db_token.expires_at = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
     await db.commit()
 
-    return {
-        "access_token": access_token,
-        "refresh_token": new_refresh_token_plain,
-        "token_type": "bearer"
-    }
+    # Return new access token and set refresh token cookie
+    response = JSONResponse(content={"access_token": access_token, "token_type": "bearer"})
+    response.set_cookie(
+        key="refresh_token",
+        value=new_refresh_token_plain,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=REFRESH_TOKEN_EXPIRE_DAYS*24*60*60
+    )
+    return response
 
 
-# ===============================
-# LOGOUT
-# ===============================
+# ==============================
+# LOGOUT ENDPOINT
+# ==============================
 @router.post("/logout")
 async def logout(
-    db: Annotated[AsyncSession, Depends(generate_async_session)],
-    refresh_token_in: str = Depends(oauth2_scheme)
+    tokens: dict = Depends(oauth2_scheme),
+    db: AsyncSession = Depends(generate_async_session)
 ):
     """
-    Logout revokes the given refresh token.
-    Access token does not need to be revoked (it will expire soon anyway).
+    Logout endpoint revokes the user's refresh token.
+    
+    - Reads refresh token from HttpOnly cookie
+    - Marks the corresponding DB entry as revoked
+    - Deletes the cookie from the client
     """
-
+    refresh_token_in = tokens["refresh_token"]
     if refresh_token_in:
         result = await db.execute(select(RefreshToken))
-        tokens = result.scalars().all()
-        for t in tokens:
+        for t in result.scalars().all():
             if verify_password(refresh_token_in, t.token):
                 t.revoked = True
         await db.commit()
 
-    return {"detail": "Logged out successfully"}
+    # Remove cookie on client
+    response = JSONResponse(content={"detail": "Logged out successfully"})
+    response.delete_cookie("refresh_token")
+    return response
 
 
-# ===============================
-# Dependencies
-# ===============================
-# async def get_current_user(
-#     token: str,
-#     db: Annotated[AsyncSession, Depends(generate_async_session)]
-# ) -> User:
-#     """
-#     Dependency to extract and validate current user from access token.
-#     """
-
-#     credentials_exception = HTTPException(
-#         status_code=401, detail="Could not validate credentials",
-#         headers={"WWW-Authenticate": "Bearer"}
-#     )
-#     try:
-#         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-#         user_id: str | None = payload.get("sub")
-#         if not user_id:
-#             raise credentials_exception
-#     except JWTError:
-#         raise credentials_exception
-
-#     result = await db.execute(select(User).where(User.id == int(user_id)))
-#     user: User | None = result.scalar_one_or_none()
-#     if not user or user.status in ("suspended", "blocked"):
-#         raise HTTPException(status_code=401, detail="User blocked or suspended")
-#     return user
-
-
-# async def get_current_admin(
-#     current_user: Annotated[User, Depends(get_current_user)]
-# ) -> User:
-#     """
-#     Dependency to check if current user is an admin.
-#     """
-#     if not current_user.is_admin():
-#         raise HTTPException(status_code=403, detail="Admins only")
-#     return current_user
-
-
-# ===============================
-# Endpoint to list all refresh tokens
-# ===============================
+# ==============================
+# ADMIN ENDPOINT: List all refresh tokens
+# ==============================
 @router.get("/refresh-tokens", response_model=List[RefreshTokenOut])
 async def list_all_refresh_tokens(
-    #admin: Annotated[User, Depends(get_current_admin)],
+    # Uncomment the following line to enable admin-only access
+    # admin: Annotated[User, Depends(get_current_admin)],
     db: Annotated[AsyncSession, Depends(generate_async_session)]
 ):
     """
-    Admin-only endpoint to list all refresh tokens in the system.
+    Admin-only endpoint to list all refresh tokens stored in the database.
+    
+    Useful for monitoring, debugging, or managing tokens.
     """
     result = await db.execute(select(RefreshToken))
     tokens = result.scalars().all()
