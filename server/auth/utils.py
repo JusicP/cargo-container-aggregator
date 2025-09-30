@@ -51,7 +51,7 @@ def verify_password(plain: str, hashed: str) -> bool:
 # ==========================
 
 def create_access_token(
-    subject: str,  # Typically user ID or email; stored in JWT 'sub' claim
+    user_id: int,  # user ID; stored in JWT 'sub' claim
     expires_delta: timedelta | None = None,  # Optional custom expiration duration
     extra: dict | None = None  # Optional additional claims, e.g., roles or permissions
 ):
@@ -79,7 +79,7 @@ def create_access_token(
     now = datetime.now(timezone.utc)
     expire = now + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     payload = {
-        "sub": str(subject),  # User identifier
+        "sub": str(user_id),  # User identifier
         "iat": now,           # Issued at timestamp
         "exp": expire         # Expiration timestamp
     }

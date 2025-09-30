@@ -77,7 +77,7 @@ async def login(
     if user.status != "active":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User inactive")
 
-    access_token = create_access_token(subject=str(user.id), extra={"role": user.role})
+    access_token = create_access_token(user_id=user.id, extra={"role": user.role})
     refresh_token = await create_refresh_token_for_user(db, user)
     
     response.set_cookie(
@@ -137,7 +137,7 @@ async def refresh(
         raise HTTPException(status_code=401, detail="User inactive or blocked")
 
     # Issue a new access token
-    access_token = create_access_token(subject=str(user.id), extra={"role": user.role})
+    access_token = create_access_token(user_id=user.id, extra={"role": user.role})
 
     # Rotate refresh token for security
     new_refresh_token_plain = secrets.token_urlsafe(64)
