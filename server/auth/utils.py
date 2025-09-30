@@ -1,12 +1,8 @@
-from datetime import datetime, timedelta  # For working with timestamps and token expiration
+from datetime import datetime, timedelta, timezone  # For working with timestamps and token expiration
 from passlib.context import CryptContext  # Library for secure password hashing
-from jose import jwt, JWTError  # For creating and verifying JSON Web Tokens (JWTs)
-from typing import Optional  # For optional function parameters
+from jose import jwt  # For creating and verifying JSON Web Tokens (JWTs)
 import secrets  # For generating cryptographically secure random strings
 import os
-# ==========================
-# Configuration Variables
-# ==========================
 
 # ======================================================
 # Environment variables
@@ -56,8 +52,8 @@ def verify_password(plain: str, hashed: str) -> bool:
 
 def create_access_token(
     subject: str,  # Typically user ID or email; stored in JWT 'sub' claim
-    expires_delta: Optional[timedelta] = None,  # Optional custom expiration duration
-    extra: dict = None  # Optional additional claims, e.g., roles or permissions
+    expires_delta: timedelta | None = None,  # Optional custom expiration duration
+    extra: dict | None = None  # Optional additional claims, e.g., roles or permissions
 ):
     """
     Creates a signed JWT access token.
@@ -80,7 +76,7 @@ def create_access_token(
     Returns:
         str: Encoded JWT token as a string.
     """
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     expire = now + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     payload = {
         "sub": str(subject),  # User identifier

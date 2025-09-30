@@ -1,10 +1,10 @@
 import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, delete
+from sqlalchemy import select
 from passlib.context import CryptContext
 from server.models.user import User
 from server.models.refresh_token import RefreshToken
-from server.auth.utils import create_refresh_token, REFRESH_TOKEN_EXPIRE_DAYS, verify_password
+from server.auth.utils import create_refresh_token, REFRESH_TOKEN_EXPIRE_DAYS, hash_password, verify_password
 # Password context for hashing refresh tokens (reuse bcrypt)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -43,7 +43,7 @@ async def create_refresh_token_for_user(
     """
     token = create_refresh_token()
     hashed_token = hash_refresh_token(token)
-    now = datetime.datetime.utcnow()
+    now = datetime.datetime.now(datetime.timezone.utc)
     expires_at = now + (expires_delta or datetime.timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS))
 
     db_token = RefreshToken(
@@ -80,7 +80,7 @@ async def get_refresh_token(
         if verify_refresh_token(token, db_token.token):
             if db_token.revoked:
                 return None
-            if db_token.expires_at < datetime.datetime.utcnow():
+            if db_token.expires_at_aware < datetime.datetime.now(datetime.timezone.utc):
                 return None
             return db_token
     return None
@@ -89,9 +89,11 @@ async def get_refresh_token(
 # ==========================
 # Revoke a refresh token
 # ==========================
-async def revoke_refresh_token(session: AsyncSession, db_token: RefreshToken):
-    db_token.revoked = True
-    await session.commit()
+async def revoke_refresh_token(session: AsyncSession, token: str):
+    db_token = await get_refresh_token(session, token)
+    if db_token:
+        db_token.revoked = True
+        await session.commit()
 
 
 # ==========================
@@ -104,4 +106,13 @@ async def revoke_all_refresh_tokens_for_user(session: AsyncSession, user: User):
         token.revoked = True
     await session.commit()
 
+async def rotate_refresh_token(session: AsyncSession, refresh_token: str, new_token: str):
+    token = await get_refresh_token(session, refresh_token)
+    if not token:
+        raise ValueError("No refresh token found")
+    
+    token.token = hash_password(new_token)
+    token.issued_at = datetime.datetime.now(datetime.timezone.utc)
+    token.expires_at = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    await session.commit()
 

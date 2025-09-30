@@ -4,11 +4,8 @@ from fastapi.security import OAuth2
 from fastapi.security.utils import get_authorization_scheme_param
 from fastapi.openapi.models import OAuthFlows
 
+
 class OAuth2PasswordBearerWithCookie(OAuth2):
-    """
-    Retrieve the access token from the Authorization header
-    and refresh the token from the "refresh_token" cookie.
-    """
     def __init__(
         self,
         tokenUrl: str,
@@ -18,19 +15,31 @@ class OAuth2PasswordBearerWithCookie(OAuth2):
     ):
         if not scopes:
             scopes = {}
-        flows = OAuthFlows(password=cast(Any, {"tokenUrl": tokenUrl, "scopes": scopes}))
+        flows = OAuthFlows(
+            password=cast(Any, {"tokenUrl": tokenUrl, "scopes": scopes})
+        )
         super().__init__(flows=flows, scheme_name=scheme_name, auto_error=auto_error)
 
-    async def __call__(self, request: Request) -> dict[str, str | None]:
-        # Access token from header
+    async def __call__(
+        self, request: Request
+    ) -> str | None:
         header_authorization: str | None = request.headers.get("Authorization")
-        header_scheme, header_param = get_authorization_scheme_param(header_authorization)
-        access_token: str | None = header_param if header_scheme.lower() == "bearer" else None
+        cookie_authorization: str | None = request.cookies.get("access_token")
+        header_scheme, header_param = get_authorization_scheme_param(
+            header_authorization
+        )
+        cookie_scheme, cookie_param = get_authorization_scheme_param(
+            cookie_authorization
+        )
+        scheme = param = None
+        if header_scheme.lower() == "bearer":
+            scheme = header_scheme
+            param = header_param
+        elif cookie_scheme.lower() == "bearer":
+            scheme = cookie_scheme
+            param = cookie_param
 
-        # Refresh token from cookie
-        refresh_token: str | None = request.cookies.get("refresh_token")
-
-        if not access_token and not refresh_token:
+        if not scheme or scheme.lower() != "bearer":
             if self.auto_error:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
@@ -38,6 +47,5 @@ class OAuth2PasswordBearerWithCookie(OAuth2):
                     headers={"WWW-Authenticate": "Bearer"},
                 )
             else:
-                return {"access_token": None, "refresh_token": None}
-
-        return {"access_token": access_token, "refresh_token": refresh_token}
+                return None
+        return param

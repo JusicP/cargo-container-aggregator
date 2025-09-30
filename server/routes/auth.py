@@ -1,27 +1,21 @@
 # server/auth/routes.py
 
-from datetime import datetime, timedelta
+from datetime import datetime, timezone
 import secrets
 from typing import Annotated, List
 
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, Form, HTTPException, Request, Response, status
 from fastapi.responses import JSONResponse
-from jose import jwt, JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from pydantic import BaseModel
 
 from server.database.connection import generate_async_session
-from server.models.user import User
 from server.models.refresh_token import RefreshToken
-from server.auth.utils import (
-    SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES,
-    REFRESH_TOKEN_EXPIRE_DAYS, create_access_token,
-    hash_password, verify_password
-)
+from server.auth.utils import REFRESH_TOKEN_EXPIRE_DAYS, create_access_token, verify_password
 from server.security.oauth2 import OAuth2PasswordBearerWithCookie
-from server.services.refresh_token_service import get_refresh_token_from_db
+from server.services.refresh_token_service import get_refresh_token_from_db, revoke_refresh_token, rotate_refresh_token, create_refresh_token_for_user
 from server.services.user_service import get_user_by_email, get_user_by_id
 
 # ==============================
@@ -30,21 +24,13 @@ from server.services.user_service import get_user_by_email, get_user_by_id
 router = APIRouter(prefix="/auth")
 
 # Custom OAuth2 scheme that extracts both access token (from Authorization header)
-# and refresh token (from HttpOnly cookie)
-oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="auth/token")
+# and refresh token (from HttpOnly cookie) if no Authorization header
+oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="auth/login")
 
 
 # ==============================
 # Pydantic Schemas
 # ==============================
-class LoginIn(BaseModel):
-    """
-    Schema for login endpoint via JSON body.
-    """
-    email: str
-    password: str
-
-
 class TokenOut(BaseModel):
     """
     Response schema for any endpoint that issues tokens.
@@ -70,103 +56,51 @@ class RefreshTokenOut(BaseModel):
 
 
 # ==============================
-# TOKEN ENDPOINT (OAuth2 Password Flow)
-# ==============================
-@router.post("/token")
-async def token(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-    db: Annotated[AsyncSession, Depends(generate_async_session)]
-):
-    """
-    Standard OAuth2 Password Flow endpoint.
-    
-    Accepts:
-        - form_data with 'username' and 'password' fields (username = email)
-    
-    Returns:
-        - access token in JSON response
-        - refresh token in HttpOnly cookie (secure, not accessible from frontend JS)
-    """
-    # Look up user in DB by email
-    user = await get_user_by_email(db, form_data.username)
-    if not user or not verify_password(form_data.password, user.password):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-
-    # Create short-lived access token
-    access_token = create_access_token(subject=str(user.id), extra={"role": user.role})
-
-    # Create long-lived refresh token and hash it for storage in DB
-    refresh_token_plain = secrets.token_urlsafe(64)
-    hashed_refresh_token = hash_password(refresh_token_plain)
-    db_token = RefreshToken(
-        user_id=user.id,
-        token=hashed_refresh_token,
-        issued_at=datetime.utcnow(),
-        expires_at=datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
-        revoked=False
-    )
-    db.add(db_token)
-    await db.commit()
-
-    # Return access token in JSON and refresh token in HttpOnly cookie
-    response = JSONResponse(content={"access_token": access_token, "token_type": "bearer"})
-    response.set_cookie(
-        key="refresh_token",
-        value=refresh_token_plain,
-        httponly=True,       # prevents JS access
-        secure=True,         # enable in production for HTTPS
-        samesite="lax",
-        max_age=REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
-    )
-    return response
-
-
-# ==============================
 # LOGIN ENDPOINT (JSON Login)
 # ==============================
 @router.post("/login", response_model=TokenOut)
 async def login(
-    data: LoginIn,
-    db: Annotated[AsyncSession, Depends(generate_async_session)]
+    response: Response,
+    credentials: OAuth2PasswordRequestForm = Depends(),
+    db = Depends(generate_async_session)
 ):
     """
     Alternative login endpoint that accepts JSON body with email/password.
     This endpoint returns both access and refresh tokens in JSON (refresh token
     not stored in cookie in this version, can be updated to match /token flow).
     """
-    # Find user by email
-    user = await get_user_by_email(db, data.email)
+    user = await get_user_by_email(db, credentials.username)
 
-    # Validate credentials
-    if not user or not verify_password(data.password, user.password):
+    if not user or not verify_password(credentials.password, user.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
-    # Check if the user is active
     if user.status != "active":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User inactive")
 
-    # Generate access token
     access_token = create_access_token(subject=str(user.id), extra={"role": user.role})
-
-    # Generate refresh token and hash for DB
-    refresh_token_plain = secrets.token_urlsafe(64)
-    hashed_refresh_token = hash_password(refresh_token_plain)
-    expires_at = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
-
-    db_token = RefreshToken(
-        user_id=user.id,
-        token=hashed_refresh_token,
-        issued_at=datetime.utcnow(),
-        expires_at=expires_at,
-        revoked=False
+    refresh_token = await create_refresh_token_for_user(db, user)
+    
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+        secure=False,
+        samesite="lax",
+        max_age=REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
     )
-    db.add(db_token)
-    await db.commit()
 
-    # Return both tokens in JSON
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        secure=False,
+        samesite="lax",
+        max_age=REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
+    )
+
     return {
         "access_token": access_token,
-        "refresh_token": refresh_token_plain,
+        "refresh_token": refresh_token,
         "token_type": "bearer"
     }
 
@@ -176,7 +110,8 @@ async def login(
 # ==============================
 @router.post("/refresh", response_model=TokenOut)
 async def refresh(
-    tokens: dict = Depends(oauth2_scheme),
+    request: Request,
+    _: dict = Depends(oauth2_scheme),
     db: AsyncSession = Depends(generate_async_session)
 ):
     """
@@ -187,17 +122,17 @@ async def refresh(
     - Returns new access token in JSON
     - Sets new refresh token in cookie
     """
-    refresh_token_in = tokens["refresh_token"]
+    refresh_token_in = request.cookies.get("refresh_token")
     if not refresh_token_in:
         raise HTTPException(status_code=401, detail="No refresh token provided")
 
     # Look up refresh token in DB
-    db_token = await get_refresh_token_from_db(db, refresh_token_in)
-    if not db_token or db_token.revoked or db_token.expires_at < datetime.utcnow():
+    db_refresh_token = await get_refresh_token_from_db(db, refresh_token_in)
+    if not db_refresh_token or db_refresh_token.revoked or db_refresh_token.expires_at_aware < datetime.now(timezone.utc):
         raise HTTPException(status_code=401, detail="Invalid or expired refresh token")
 
     # Retrieve user associated with the refresh token
-    user = await get_user_by_id(db, db_token.user_id)
+    user = await get_user_by_id(db, db_refresh_token.user_id)
     if not user or user.status != "active":
         raise HTTPException(status_code=401, detail="User inactive or blocked")
 
@@ -206,10 +141,7 @@ async def refresh(
 
     # Rotate refresh token for security
     new_refresh_token_plain = secrets.token_urlsafe(64)
-    db_token.token = hash_password(new_refresh_token_plain)
-    db_token.issued_at = datetime.utcnow()
-    db_token.expires_at = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
-    await db.commit()
+    await rotate_refresh_token(db, refresh_token_in, new_refresh_token_plain)
 
     # Return new access token and set refresh token cookie
     response = JSONResponse(content={"access_token": access_token, "token_type": "bearer"})
@@ -229,7 +161,9 @@ async def refresh(
 # ==============================
 @router.post("/logout")
 async def logout(
-    tokens: dict = Depends(oauth2_scheme),
+    request: Request,
+    response: Response,
+    _: dict = Depends(oauth2_scheme),
     db: AsyncSession = Depends(generate_async_session)
 ):
     """
@@ -239,18 +173,14 @@ async def logout(
     - Marks the corresponding DB entry as revoked
     - Deletes the cookie from the client
     """
-    refresh_token_in = tokens["refresh_token"]
+    # revoke refresh token
+    refresh_token_in = request.cookies.get("refresh_token")
     if refresh_token_in:
-        result = await db.execute(select(RefreshToken))
-        for t in result.scalars().all():
-            if verify_password(refresh_token_in, t.token):
-                t.revoked = True
-        await db.commit()
+        await revoke_refresh_token(db, refresh_token_in)
 
     # Remove cookie on client
-    response = JSONResponse(content={"detail": "Logged out successfully"})
     response.delete_cookie("refresh_token")
-    return response
+    return {"detail": "Logged out successfully"}
 
 
 # ==============================

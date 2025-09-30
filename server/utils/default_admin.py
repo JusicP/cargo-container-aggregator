@@ -1,7 +1,7 @@
 import os
-from server.schemas.user import UserCreate, UserRole
+from server.schemas.user import UserCreate
 from server.services.user_service import create_user, get_user_by_email
-from server.auth.utils import hash_password
+
 async def ensure_superuser(session):
     email = os.getenv("SUPERUSER_EMAIL", "admin@example.com")
     password = os.getenv("SUPERUSER_PASSWORD", "12345678")
