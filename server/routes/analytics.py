@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 from fastapi import APIRouter
+=======
+from fastapi import APIRouter, Depends
+>>>>>>> 7d09c76 (api with fake datas)
 from typing import List
 import datetime
 
