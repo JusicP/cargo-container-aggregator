@@ -19,6 +19,7 @@ async def ensure_superuser(session):
         phone_number="0000000000",
         company_name=None,
         avatar_photo_id=None,
+<<<<<<< HEAD
         role="admin"
     )
 
@@ -30,4 +31,10 @@ async def ensure_superuser(session):
 
     await create_user(session, UserCreate(**user_data))
 >>>>>>> 01487e2 (db migration setup)
+=======
+        role="user"
+    )
+
+    await create_user(session, user_create)
+>>>>>>> d6a8784 (Server: create `UserRegister` and `UserCreate` schema on top of it to allow specifying `role` field)
     print(f"Superuser {email} created")
