@@ -5,9 +5,15 @@ pytest-asyncio==1.1.0
 passlib==1.7.4
 python-jose==3.5.0
 <<<<<<< HEAD
+<<<<<<< HEAD
 alembic==1.16.5
 pymysql==1.1.1
 python-dotenv==1.1.1
 bcrypt==4.0.1
 =======
 >>>>>>> 18dee23 (conflicts)
+=======
+alembic==1.16.5
+pymysql==1.1.1
+python-dotenv==1.1.1
+>>>>>>> 01487e2 (db migration setup)

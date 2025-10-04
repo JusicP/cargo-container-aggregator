@@ -53,13 +53,9 @@ async def create_parser_listing(listing: ListingParserCreate):
 async def update_parser_listing(id: int, listing: ListingParserCreate):
     return ListingParserGet(
         **listing.dict(),
-<<<<<<< HEAD
         addition_date=datetime.now(),
         last_started_at=datetime.now(),
-=======
-        addition_date=datetime.utcnow(),
-        last_started_at=datetime.utcnow(),
->>>>>>> 7d09c76 (api with fake datas)
+
         last_finished_at=None,
         status="UPD",
         error_message=""

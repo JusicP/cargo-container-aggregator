@@ -7,8 +7,12 @@ from server.database.connection import Base
 =======
 from sqlalchemy import String, Integer, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
+<<<<<<< HEAD
 from server.database.db import Base
 >>>>>>> 18dee23 (conflicts)
+=======
+from server.database.connection import Base
+>>>>>>> 01487e2 (db migration setup)
 
 class RefreshToken(Base):
     __tablename__ = "refresh_tokens"
