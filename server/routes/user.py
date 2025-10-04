@@ -1,11 +1,7 @@
 from datetime import datetime
 from fastapi import APIRouter
 
-<<<<<<< HEAD
 from server.schemas.user import UserRegister, UserGet, UserUpdate, UserRole, UserStatus, UserUpdate, UserRole, UserStatus
-=======
-from server.schemas.user import UserCreate, UserGet, UserUpdate, UserRole, UserStatus, UserUpdate, UserRole, UserStatus
->>>>>>> 7d09c76 (api with fake datas)
 
 router = APIRouter(prefix="/users", tags=["users"])
 
