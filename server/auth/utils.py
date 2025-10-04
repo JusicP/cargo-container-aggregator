@@ -19,7 +19,7 @@ from passlib.context import CryptContext  # Library for secure password hashing
 from jose import jwt, JWTError  # For creating and verifying JSON Web Tokens (JWTs)
 from typing import Optional  # For optional function parameters
 import secrets  # For generating cryptographically secure random strings
-
+import os
 # ==========================
 # Configuration Variables
 # ==========================

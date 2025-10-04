@@ -5,7 +5,7 @@ from alembic import context
 
 # Import your Base where all models are registered
 # Make sure to replace 'myapp.db' with your actual module path
-from myapp.db import Base  
+from server.database.connection import Base  
 
 # Alembic Config object, gives access to values from alembic.ini
 config = context.config

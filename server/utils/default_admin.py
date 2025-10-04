@@ -1,5 +1,5 @@
 import os
-from server.schemas.user import UserCreate, UserRole
+from server.schemas.user import UserCreate
 from server.services.user_service import create_user, get_user_by_email
 
 async def ensure_superuser(session):
@@ -19,22 +19,8 @@ async def ensure_superuser(session):
         phone_number="0000000000",
         company_name=None,
         avatar_photo_id=None,
-<<<<<<< HEAD
         role="admin"
     )
 
-<<<<<<< HEAD
     await create_user(session, user_create)
-=======
-    user_data = user_create.model_dump()
-    user_data["role"] = UserRole.ADMIN
-
-    await create_user(session, UserCreate(**user_data))
->>>>>>> 01487e2 (db migration setup)
-=======
-        role="user"
-    )
-
-    await create_user(session, user_create)
->>>>>>> d6a8784 (Server: create `UserRegister` and `UserCreate` schema on top of it to allow specifying `role` field)
     print(f"Superuser {email} created")
