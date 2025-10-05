@@ -19,7 +19,7 @@ class Listing(Base):
     type: Mapped[str] = mapped_column(String(64)) # sale, rent
 
     price: Mapped[float | None]
-    currency: Mapped[str | None]
+    currency: Mapped[str | None] = mapped_column(String(128))
     location: Mapped[str] = mapped_column(String(128))
     ral_color: Mapped[str | None] = mapped_column(String(7)) # RAL0000
 

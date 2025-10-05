@@ -16,7 +16,7 @@ class User(Base):
 
     name: Mapped[str] = mapped_column(String(128))
     email: Mapped[str] = mapped_column(String(340), unique=True)
-    password: Mapped[str]
+    password: Mapped[str] = mapped_column(String(2048))
     role: Mapped[str] = mapped_column(String(32), default="user") # user, admin
     registration_date: Mapped[datetime.datetime] = mapped_column(default=datetime.datetime.now(datetime.timezone.utc))
     status: Mapped[str] = mapped_column(String(32), default="active") # active, suspended, blocked
