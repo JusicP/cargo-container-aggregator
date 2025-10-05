@@ -1,106 +1,86 @@
-import uuid
-from datetime import datetime
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
+from fastapi.params import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from server.database.connection import generate_async_session
 from server.schemas.user import UserCreate, UserGet, UserUpdate, UserRole, UserStatus
+from server.services.user_service import get_all_users, create_user, get_user_by_id, update_user
 
 router = APIRouter(prefix="/users", tags=["users"])
 
+CURRENT_USER_ID = 1
+
 
 @router.get("/", response_model=list[UserGet])
-async def get_users():
-    return [
-        {
-            "id": 1,
-            "name": "admin",
-            "email": "admin@gmail.com",
-            "phone_number": "+380991112233",
-            "company_name": None,
-            "role": UserRole.ADMIN,
-            "registration_date": datetime.utcnow(),
-            "status": UserStatus.ACTIVE,
-        },
-        {
-            "id": 2,
-            "name": "user1",
-            "email": "user1@gmail.com",
-            "phone_number": "+380991112234",
-            "company_name": "Strawberry",
-            "role": UserRole.USER,
-            "registration_date": datetime.utcnow(),
-            "status": UserStatus.ACTIVE,
-            "avatar_photo_id": None,
-        },
-    ]
+async def get_users(session: AsyncSession = Depends(generate_async_session)):
+    users = await get_all_users(session)
+    return users
 
 
 @router.get("/me", response_model=UserGet)
-async def get_me():
-    return {
-        "id": 1,
-        "name": "user1",
-        "email": "user1@gmail.com",
-        "phone_number": "+380991112234",
-        "company_name": "Strawberry",
-        "role": UserRole.USER,
-        "registration_date": datetime.utcnow(),
-        "status": UserStatus.ACTIVE,
-        "avatar_photo_id": None,
-    }
+async def get_me(session: AsyncSession = Depends(generate_async_session)):
+    try:
+        user = await get_user_by_id(session, CURRENT_USER_ID)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        return user
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.post("/register", response_model=UserGet)
-async def register_user(user: UserCreate):
-    return {
-        "id": 3,
-        "name": user.name,
-        "email": user.email,
-        "phone_number": user.phone_number,
-        "company_name": user.company_name,
-        "role": UserRole.USER,
-        "registration_date": datetime.utcnow(),
-        "status": UserStatus.ACTIVE,
-    }
-
+async def register_user(
+    user: UserCreate,
+    session: AsyncSession = Depends(generate_async_session),
+):
+    try:
+        await create_user(session, user)
+        return user
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @router.put("/me", response_model=UserGet)
-async def update_me(user: UserUpdate):
-    return {
-        "id": 4,
-        "name": user.name,
-        "email": user.email,
-        "phone_number": user.phone_number,
-        "company_name": user.company_name,
-        "role": UserRole.USER,
-        "registration_date": datetime.utcnow(),
-        "status": UserStatus.ACTIVE,
-    }
+async def update_me(
+    user_update: UserUpdate,
+    session: AsyncSession = Depends(generate_async_session),
+):
+    try:
+        updated_user = await update_user(session, CURRENT_USER_ID, user_update)
+
+        if not updated_user:
+            updated_user = await get_user_by_id(session, CURRENT_USER_ID)
+
+        return updated_user
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.get("/{id}", response_model=UserGet)
-async def get_user(id: int):
-    return {
-        "id": id,
-        "name": f"User-{id}",
-        "email": f"user{id}@gmail.com",
-        "phone_number": "+380994445566",
-        "company_name": None,
-        "role": UserRole.USER,
-        "registration_date": datetime.utcnow(),
-        "status": UserStatus.ACTIVE,
-    }
+async def get_user(id: int, session: AsyncSession = Depends(generate_async_session)):
+    try:
+        user = await get_user_by_id(session, id)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        return user
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.put("/{id}", response_model=UserGet)
-async def update_user(id: int, user: UserUpdate):
-    return {
-        "id": id,
-        "name": user.name or f"User-{id}",
-        "email": user.email or f"user{id}@gmail.com",
-        "phone_number": user.phone_number,
-        "company_name": user.company_name,
-        "avatar_photo_id": user.avatar_photo_id,
-        "role": UserRole.USER,
-        "registration_date": datetime.utcnow(),
-        "status": UserStatus.ACTIVE,
-    }
+async def user_update(
+    id: int,
+    user_update: UserUpdate,
+    session: AsyncSession = Depends(generate_async_session),
+):
+    try:
+        existing_user = await get_user_by_id(session, id)
+        if not existing_user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        await update_user(session, id, user_update)
+
+        updated_user = await get_user_by_id(session, id)
+        return updated_user
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
