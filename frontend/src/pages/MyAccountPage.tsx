@@ -27,7 +27,7 @@ const MyAccountPage: React.FC = () => {
     <div style={{ padding: '2rem' }}>
       <h1>Мій акаунт</h1>
       <div style={{ 
-        background: '#f5f5f5', 
+        background: 'rgba(0,0,0,0.1)', 
         padding: '1rem', 
         borderRadius: '8px', 
         marginBottom: '2rem' 
