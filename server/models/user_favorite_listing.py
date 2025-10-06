@@ -2,7 +2,7 @@ import datetime
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from server.database.connection import Base
+from server.database.base import Base
 from server.models.listing import Listing
 
 

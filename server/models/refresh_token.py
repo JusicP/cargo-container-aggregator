@@ -2,7 +2,7 @@
 import datetime
 from sqlalchemy import String, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
-from server.database.connection import Base
+from server.database.base import Base
 
 class RefreshToken(Base):
     __tablename__ = "refresh_tokens"

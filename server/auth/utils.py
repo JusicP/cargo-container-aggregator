@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 from datetime import datetime, timedelta, timezone  # For working with timestamps and token expiration
 from passlib.context import CryptContext  # Library for secure password hashing
 from jose import jwt, JWTError  # For creating and verifying JSON Web Tokens (JWTs)
@@ -13,22 +12,6 @@ ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 15))
 REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", 30))
 
-=======
-from datetime import datetime, timedelta  # For working with timestamps and token expiration
-from passlib.context import CryptContext  # Library for secure password hashing
-from jose import jwt, JWTError  # For creating and verifying JSON Web Tokens (JWTs)
-from typing import Optional  # For optional function parameters
-import secrets  # For generating cryptographically secure random strings
-import os
-# ==========================
-# Configuration Variables
-# ==========================
-
-SECRET_KEY = "secret-key"  # Secret key used to sign JWTs;
-ALGORITHM = "HS256"  # Algorithm used for JWT signing: HMAC + SHA-256
-ACCESS_TOKEN_EXPIRE_MINUTES = 15  # Access tokens are short-lived: 15 minutes by default
-REFRESH_TOKEN_EXPIRE_DAYS = 30  # Refresh tokens are long-lived: 30 days by default
->>>>>>> 18dee23 (conflicts)
 
 # ==========================
 # Password Hashing
@@ -68,15 +51,9 @@ def verify_password(plain: str, hashed: str) -> bool:
 # ==========================
 
 def create_access_token(
-<<<<<<< HEAD
     user_id: int,  # user ID; stored in JWT 'sub' claim
     expires_delta: timedelta | None = None,  # Optional custom expiration duration
     extra: dict | None = None  # Optional additional claims, e.g., roles or permissions
-=======
-    subject: str,  # Typically user ID or email; stored in JWT 'sub' claim
-    expires_delta: Optional[timedelta] = None,  # Optional custom expiration duration
-    extra: dict = None  # Optional additional claims, e.g., roles or permissions
->>>>>>> 18dee23 (conflicts)
 ):
     """
     Creates a signed JWT access token.
@@ -99,17 +76,10 @@ def create_access_token(
     Returns:
         str: Encoded JWT token as a string.
     """
-<<<<<<< HEAD
     now = datetime.now(timezone.utc)
     expire = now + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     payload = {
         "sub": str(user_id),  # User identifier
-=======
-    now = datetime.utcnow()
-    expire = now + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
-    payload = {
-        "sub": str(subject),  # User identifier
->>>>>>> 18dee23 (conflicts)
         "iat": now,           # Issued at timestamp
         "exp": expire         # Expiration timestamp
     }
@@ -119,15 +89,9 @@ def create_access_token(
     # Encode and sign the JWT
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
-<<<<<<< HEAD
 # ======================================================
 # JWT utils
 # ======================================================
-=======
-# ==========================
-# Refresh Token Generation
-# ==========================
->>>>>>> 18dee23 (conflicts)
 
 def create_refresh_token() -> str:
     """
@@ -137,7 +101,6 @@ def create_refresh_token() -> str:
         str: URL-safe base64 encoded random string.
     """
     return secrets.token_urlsafe(64)  # Generates 64 bytes of secure random data
-<<<<<<< HEAD
 
 def decode_token(token: str) -> dict:
     """
@@ -157,5 +120,3 @@ def decode_token(token: str) -> dict:
         return payload
     except JWTError as e:
         raise ValueError(f"Invalid or expired token: {e}")
-=======
->>>>>>> 18dee23 (conflicts)
