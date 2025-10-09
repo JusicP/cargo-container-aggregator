@@ -2,7 +2,6 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 
-from server.models.user import User
 from server.schemas.user import UserCreate, UserUpdate
 from server.services.user_service import (
     create_user,

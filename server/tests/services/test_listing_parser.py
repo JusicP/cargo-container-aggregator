@@ -24,7 +24,6 @@ async def test_create_listing_parser(session: AsyncSession):
         condition="used",
         type="sale",
         currency="UAH",
-        ral_color=None
     )
     parser = await create_listing_parser(session, parser_data)
     assert parser.id is not None
@@ -43,7 +42,6 @@ async def test_get_all_and_by_id_parser(session: AsyncSession):
         condition="new",
         type="rent",
         currency="USD",
-        ral_color="#FFFFFF"
     )
     parser = await create_listing_parser(session, parser_data)
 
@@ -66,7 +64,6 @@ async def test_update_listing_parser(session: AsyncSession):
         condition="used",
         type="sale",
         currency="EUR",
-        ral_color=None
     )
     parser = await create_listing_parser(session, parser_data)
 
@@ -79,7 +76,6 @@ async def test_update_listing_parser(session: AsyncSession):
         condition="new",
         type="rent",
         currency="EUR",
-        ral_color="#000000",
         addition_date=parser.addition_date,
         last_started_at=None,
         last_finished_at=None,
@@ -102,7 +98,6 @@ async def test_delete_listing_parser(session: AsyncSession):
         condition="new",
         type="sale",
         currency="USD",
-        ral_color=None
     )
     parser = await create_listing_parser(session, parser_data)
     await delete_listing_parser(session, parser.id)
@@ -123,7 +118,6 @@ async def test_update_nonexistent_listing_parser(session: AsyncSession):
         condition="new",
         type="sale",
         currency="USD",
-        ral_color=None,
         addition_date=datetime.datetime.now(datetime.timezone.utc),
         last_started_at=None,
         last_finished_at=None,

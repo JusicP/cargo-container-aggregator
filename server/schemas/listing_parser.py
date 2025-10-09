@@ -13,15 +13,18 @@ class ListingParserBase(BaseModel):
     type: str = Field(max_length=64)
 
     currency: str = Field(max_length=3)
-    ral_color: str | None
 
 class ListingParserGet(ListingParserBase):
     addition_date: datetime.datetime
     last_started_at: datetime.datetime | None
     last_finished_at: datetime.datetime | None
 
-    status: str = Field(max_length=3)
+    status: str = Field(max_length=64)
     error_message: str = Field(max_length=256)
 
 class ListingParserCreate(ListingParserBase):
     pass
+
+class ListingParserUpdate(ListingParserBase):
+    status: str = Field(max_length=64)
+    error_message: str = Field(max_length=256)
