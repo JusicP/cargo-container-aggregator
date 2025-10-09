@@ -28,7 +28,7 @@ async def create_listing(session: AsyncSession, user_id: int, listing_create: Li
     await session.commit()
     await session.refresh(listing)
 
-    await create_listing_photos(session, listing_id=listing.id, photo_ids=listing_create.photos)
+    await create_listing_photos(session, listing_id=listing.id, listing_photos=listing_create.photos)
 
     return listing
 
@@ -53,7 +53,7 @@ async def create_or_update_listings(session: AsyncSession, listings_create: list
         await session.flush()
         await session.refresh(listing)
 
-        await create_listing_photos(session, listing_id=listing.id, photo_ids=listing_create.photos)
+        await create_listing_photos(session, listing_id=listing.id, listing_photos=listing_create.photos)
 
     await session.commit()
 
