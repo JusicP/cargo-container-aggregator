@@ -27,8 +27,16 @@ async def test_create_and_get_user(session: AsyncSession):
 
     user = await get_user_by_id(session, 1)
     assert user is not None
-    for field in ["name", "password", "email", "phone_number", "company_name"]:
-        assert getattr(user, field) == getattr(user_data, field)
+    for field in user_data.model_fields.keys():
+        # special case for password
+        if field == "password":
+            assert user.password != user_data.password
+        else: 
+            assert getattr(user, field) == getattr(user_data, field)
+    
+    assert user.status == "active"
+    assert not user.avatar_photo_id
+    assert user.registration_date
 
 @pytest.mark.asyncio
 async def test_get_all_users(session: AsyncSession):
