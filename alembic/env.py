@@ -7,6 +7,27 @@ from server.database.base import Base
 from server.database.sync_connection import sync_engine 
 import server.models
 
+
+from sqlalchemy.engine import url as sa_url
+import pymysql
+
+def create_database_if_not_exists(database_url: str):
+    url_obj = sa_url.make_url(database_url)
+    database_name = url_obj.database
+
+    url_without_db = url_obj.set(database=None)
+    
+    connection = pymysql.connect(
+        host=url_obj.host,
+        user=url_obj.username,
+        password=url_obj.password,
+        port=url_obj.port or 3306
+    )
+    with connection.cursor() as cursor:
+        cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{database_name}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;")
+    connection.close()
+
+
 load_dotenv()
 
 config = context.config
@@ -53,4 +74,5 @@ def run_migrations_online():
 if context.is_offline_mode():
     run_migrations_offline()
 else:
+    create_database_if_not_exists(DATABASE_URL)
     run_migrations_online()

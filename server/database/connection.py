@@ -7,11 +7,7 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-print("*****************************************")
-print(DATABASE_URL)
-print("*****************************************")
 
-# Подключение для MySQL (aiomysql)
 async_engine = create_async_engine(
     DATABASE_URL,
     echo=True,
