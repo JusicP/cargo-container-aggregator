@@ -22,16 +22,31 @@ SYNC_DATABASE_URL = os.getenv("SYNC_DATABASE_URL")
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    if "sqlite" not in DATABASE_URL and SYNC_DATABASE_URL:
-        run_migrations()
-    async with async_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+async def lifespan(app: FastAPI):
+    print(">>> Lifespan start")
 
+    if "sqlite" not in DATABASE_URL and SYNC_DATABASE_URL:
+        print(">>> Running migrations...")
+        import asyncio, concurrent.futures
+        from server.database.migrations_runner import run_migrations
+        loop = asyncio.get_running_loop()
+        with concurrent.futures.ThreadPoolExecutor() as pool:
+            await loop.run_in_executor(pool, run_migrations)
+        print(">>> Migrations done")
+    else:
+        print(">>> Creating all tables via metadata...")
+        async with async_engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        print(">>> Tables created")
+
+    print(">>> Creating default superuser...")
     async with async_session_maker() as session:
         await ensure_superuser(session)
+    print(">>> Superuser ensured")
 
     yield
+    print(">>> Lifespan exit")
+
 
 app = FastAPI(
     title="Cargo Container Aggregator",
