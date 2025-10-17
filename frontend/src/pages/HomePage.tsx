@@ -1,7 +1,7 @@
-import "./App.css";
+import "../App.css";
 import {useState} from "react";
-import background from "./assets/background.png";
-import './index.css'
+import background from "../assets/background.png";
+import '../index.css'
 
 
 function App() {
@@ -177,6 +177,29 @@ function App() {
                 </div>
             </div>
 
+
+            <footer className="footer">
+                <div className="footer-content">
+                    <div className="footer-brand">
+                        <h2>Cargo Containers</h2>
+                        <p>Купівля та оренда контейнерів онлайн</p>
+                    </div>
+                    <nav className="footer-nav">
+                        <a href="#">Про нас</a>
+                        <a href="#">Контакти</a>
+                        <a href="#">Оголошення</a>
+                    </nav>
+                    <div className="footer-social">
+                        <a href="#"><img src="google-icon.svg" alt="Google"/></a>
+                        <a href="#"><img src="facebook-icon.svg" alt="Facebook"/></a>
+                        <a href="#"><img src="twitter-icon.svg" alt="Twitter"/></a>
+                        <a href="mailto:contact@cargocontainers.com">contact@cargocontainers.com</a>
+                    </div>
+                </div>
+                <div className="footer-bottom">
+                    <p>© 2023 Cargo Containers. Усі права захищені.</p>
+                </div>
+            </footer>
         </div>
 
     );
