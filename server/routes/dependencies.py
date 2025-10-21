@@ -50,7 +50,7 @@ def get_current_user(role: str = "user"):
             )
 
         # Role check
-        if role == "admin" and user.role(user, "role", "user") != "admin":
+        if role == "admin" and user.role != "admin":
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Insufficient privileges",
