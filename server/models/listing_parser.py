@@ -23,5 +23,9 @@ class ListingParser(Base):
     last_started_at: Mapped[datetime.datetime | None]
     last_finished_at: Mapped[datetime.datetime | None]
 
+<<<<<<< HEAD
     status: Mapped[str] = mapped_column(String(64), default="done") # running, error, done
+=======
+    status: Mapped[str] = mapped_column(String(64), default="done")
+>>>>>>> test/crud
     error_message: Mapped[str | None] = mapped_column(String(256))

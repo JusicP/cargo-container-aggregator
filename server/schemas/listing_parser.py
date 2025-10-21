@@ -11,7 +11,6 @@ class ListingParserBase(BaseModel):
     container_type: str = Field(max_length=128)
     condition: str = Field(max_length=64)
     type: str = Field(max_length=64)
-
     currency: str = Field(max_length=3)
 
 class ListingParserGet(ListingParserBase):
