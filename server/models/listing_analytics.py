@@ -22,8 +22,7 @@ class ListingAnalytics(Base):
 
     views: Mapped[int] = mapped_column(default=0)
     contacts: Mapped[int] = mapped_column(default=0)
-    favorties: Mapped[int] = mapped_column(default=0)
-
+    favorites: Mapped[int] = mapped_column(default=0)
     updated_at: Mapped[datetime.datetime]
 
     listing: Mapped[Listing] = relationship("Listing", viewonly=True)
