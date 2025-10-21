@@ -17,10 +17,11 @@ class ListingParser(Base):
     container_type: Mapped[str] = mapped_column(String(128)) # 20ft, 40ft...
     condition: Mapped[str] = mapped_column(String(64)) # new, used
     type: Mapped[str] = mapped_column(String(64)) # sale, rent
+    currency: Mapped[str] = mapped_column(String(3))
 
     addition_date: Mapped[datetime.datetime] = mapped_column(default=datetime.datetime.now(datetime.timezone.utc))
     last_started_at: Mapped[datetime.datetime | None]
     last_finished_at: Mapped[datetime.datetime | None]
 
-    status: Mapped[str] = mapped_column(String(16))
+    status: Mapped[str] = mapped_column(String(64), default="done")
     error_message: Mapped[str | None] = mapped_column(String(256))

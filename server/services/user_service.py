@@ -13,6 +13,9 @@ async def create_user(session: AsyncSession, user_create: UserCreate):
     session.add(user)
     
     await session.commit()
+    await session.refresh(user)  
+    
+    return user 
 
 async def get_all_users(session: AsyncSession):
     result = await session.execute(select(User))
