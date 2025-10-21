@@ -15,14 +15,8 @@ async def create_user(session: AsyncSession, user_create: UserCreate):
     session.add(user)
     
     await session.commit()
-<<<<<<< HEAD
     await session.refresh(user)
     return user
-=======
-    await session.refresh(user)  
-    
-    return user 
->>>>>>> test/crud
 
 async def get_all_users(session: AsyncSession):
     result = await session.execute(select(User))

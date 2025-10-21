@@ -24,25 +24,8 @@ async def update_listing_parser(session: AsyncSession, parser_id: int, parser_up
     if not parser:
         raise ValueError("Listing parser doesn't exist")
 
-<<<<<<< HEAD
     for key, value in parser_update.model_dump(exclude_unset=True).items():
         setattr(parser, key, value)
-=======
-    parser.company_name = parser_get.company_name
-    parser.method = parser_get.method
-    parser.url = parser_get.url
-    parser.location = parser_get.location
-    parser.container_type = parser_get.container_type
-    parser.condition = parser_get.condition
-    parser.type = parser_get.type
-    parser.currency = parser_get.currency
-
-    parser.addition_date = parser_get.addition_date
-    parser.last_started_at = parser_get.last_started_at
-    parser.last_finished_at = parser_get.last_finished_at
-    parser.status = parser_get.status
-    parser.error_message = parser_get.error_message
->>>>>>> test/crud
 
     await session.commit()
     await session.refresh(parser)

@@ -24,10 +24,7 @@ async def test_create_listing_parser(session: AsyncSession):
         condition="used",
         type="sale",
         currency="UAH",
-<<<<<<< HEAD
-=======
         error_message=""
->>>>>>> test/crud
     )
     parser = await create_listing_parser(session, parser_data)
     assert parser.id is not None
@@ -47,10 +44,7 @@ async def test_get_all_and_by_id_parser(session: AsyncSession):
         condition="new",
         type="rent",
         currency="USD",
-<<<<<<< HEAD
-=======
         error_message=""
->>>>>>> test/crud
     )
     parser = await create_listing_parser(session, parser_data)
 
@@ -73,10 +67,7 @@ async def test_update_listing_parser(session: AsyncSession):
         condition="used",
         type="sale",
         currency="EUR",
-<<<<<<< HEAD
-=======
         error_message=""
->>>>>>> test/crud
     )
     parser = await create_listing_parser(session, parser_data)
 
@@ -112,10 +103,7 @@ async def test_delete_listing_parser(session: AsyncSession):
         condition="new",
         type="sale",
         currency="USD",
-<<<<<<< HEAD
-=======
         error_message=""
->>>>>>> test/crud
     )
     parser = await create_listing_parser(session, parser_data)
     await delete_listing_parser(session, parser.id)
