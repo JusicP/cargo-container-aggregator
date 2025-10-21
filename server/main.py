@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
-from server.routes import auth, user, listings, favorites, parserListings, analytics
+from server.routes import auth, user, listings, favorites, parserListings, analytics, user_photo_router
 from server.database.connection import async_engine, async_session_maker
 from server.database.base import Base
 
@@ -60,3 +60,4 @@ app.include_router(listings.router)
 app.include_router(favorites.router)
 app.include_router(parserListings.router)
 app.include_router(analytics.router)
+app.include_router(user_photo_router.router)

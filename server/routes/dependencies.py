@@ -6,7 +6,7 @@ from server.auth.utils import decode_token
 from server.services.user_service import get_user_by_id
 from server.models.user import User
 from server.database.connection import generate_async_session
-from auth import oauth2_scheme
+from server.routes.auth import oauth2_scheme
 
 
 
