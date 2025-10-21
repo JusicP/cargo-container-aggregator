@@ -6,12 +6,12 @@ async def ensure_superuser(session):
     email = os.getenv("SUPERUSER_EMAIL", "admin@example.com")
     password = os.getenv("SUPERUSER_PASSWORD", "12345678")
     name = os.getenv("SUPERUSER_NAME", "Admin")
-
+    print("trying to get user")
     existing_user = await get_user_by_email(session, email)
     if existing_user:
         print(f"Superuser {email} already exists")
         return
-
+    print("user do not exist")
     user_create = UserCreate(
         name=name,
         email=email,
