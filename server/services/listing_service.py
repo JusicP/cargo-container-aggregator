@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.models.listing import Listing
 from server.models.user import User
+from server.services.listing_history_service import create_listing_history
 from server.services.listing_photo_service import create_listing_photos
 from server.schemas.listing import ListingCreate, ListingGet
 
@@ -29,6 +30,7 @@ async def create_listing(session: AsyncSession, user_id: int, listing_create: Li
     await session.refresh(listing)
 
     await create_listing_photos(session, listing_id=listing.id, listing_photos=listing_create.photos)
+    await create_listing_history(session, listing)
 
     return listing
 
@@ -98,6 +100,9 @@ async def update_listing(session: AsyncSession, user: User, listing_id: int, lis
 
     await session.commit()
     await session.refresh(listing)
+
+    await create_listing_history(session, listing)
+
     return listing
 
 
