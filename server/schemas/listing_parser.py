@@ -13,15 +13,29 @@ class ListingParserBase(BaseModel):
     type: str = Field(max_length=64)
 
     currency: str = Field(max_length=3)
-    ral_color: str | None
 
 class ListingParserGet(ListingParserBase):
     addition_date: datetime.datetime
     last_started_at: datetime.datetime | None
     last_finished_at: datetime.datetime | None
 
-    status: str = Field(max_length=3)
+    status: str = Field(max_length=64)
     error_message: str = Field(max_length=256)
 
 class ListingParserCreate(ListingParserBase):
     pass
+
+class ListingParserUpdate(ListingParserBase):
+    company_name: str | None = Field(default=None, max_length=64)
+    method: str | None = Field(default=None, max_length=64)
+    url: str | None = Field(default=None, max_length=2048)
+    location: str | None = Field(default=None, max_length=128)
+    container_type: str | None = Field(default=None, max_length=128)
+    condition: str | None = Field(default=None, max_length=64)
+    type: str | None = Field(default=None, max_length=64)
+    currency: str | None = Field(default=None, max_length=3)
+
+    status: str | None = Field(default=None, max_length=64)
+    error_message: str | None = Field(default=None, max_length=256)
+    last_started_at: datetime.datetime | None = None
+    last_finished_at: datetime.datetime | None = None
