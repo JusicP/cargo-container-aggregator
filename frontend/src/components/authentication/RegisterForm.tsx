@@ -47,18 +47,18 @@ export default function RegisterForm() {
 
     return(
         <form onSubmit={handleSubmit(onSubmit)} className="w-80 px-20 flex flex-col items-center">
-            <div>
+            <div className="w-60">
                 <Field.Root required>
                     <Field.Label fontSize="11px">
                         Ім'я користувача <Field.RequiredIndicator />
                     </Field.Label>
                     <Input
                         placeholder="username"
-                        size="2xs"
+                        size="xs"
                     />
                 </Field.Root>
             </div>
-            <div>
+            <div className="w-60">
                 <Field.Root required>
                     <Field.Label fontSize="11px">
                         Пошта <Field.RequiredIndicator />
@@ -67,14 +67,14 @@ export default function RegisterForm() {
                         <Input
                             {...register("email")}
                             placeholder="email@example.com"
-                            size="2xs"
+                            size="xs"
                         />
                     </InputGroup>
                 </Field.Root>
                 {errors.email && <p role="alert">{errors.email.message}</p>}
             </div>
 
-            <div>
+            <div className="w-60">
                 <Field.Root required>
                     <Field.Label fontSize="11px">
                         Пароль <Field.RequiredIndicator />
@@ -84,7 +84,7 @@ export default function RegisterForm() {
                             value={password}
                             onChange={(e) => setPassword(e.currentTarget.value)}
                             placeholder="password"
-                            size="2xs"
+                            size="xs"
                         />
                         <PasswordStrengthMeter value={strength} />
                     </Stack>
@@ -92,19 +92,19 @@ export default function RegisterForm() {
                 {errors.password && <p role="alert">{errors.password.message}</p>}
             </div>
 
-            <div>
+            <div className="w-60">
                 <Field.Root required>
                     <Field.Label fontSize="11px">
                         Підтвердити пароль <Field.RequiredIndicator />
                     </Field.Label>
                     <PasswordInput
                         placeholder="password"
-                        size="2xs"
+                        size="xs"
                     />
                 </Field.Root>
             </div>
 
-            <div>
+            <div className="w-60">
                 <Field.Root required>
                     <Field.Label fontSize="11px">
                         Телефон <Field.RequiredIndicator />
@@ -112,13 +112,13 @@ export default function RegisterForm() {
                     <InputGroup startElement={<Telephone size={13} color="#27272A" />}>
                         <Input
                             placeholder="+380123456789"
-                            size="2xs"
+                            size="xs"
                         />
                     </InputGroup>
                 </Field.Root>
             </div>
 
-            <div>
+            <div className="w-60">
                 <Field.Root required>
                     <Field.Label fontSize="11px">
                         Назва компанії
@@ -126,16 +126,16 @@ export default function RegisterForm() {
                     <InputGroup startElement={<Briefcase size={13} color="#27272A" />}>
                         <Input
                             placeholder="Назва компанії"
-                            size="2xs"
+                            size="xs"
                         />
                     </InputGroup>
                 </Field.Root>
             </div>
 
-            <Box paddingY="3">
+            <Box paddingY="7">
                 <Button
                     type="submit"
-                    size="xs"
+                    size="sm"
                 >
                     Реєстація
                 </Button>
