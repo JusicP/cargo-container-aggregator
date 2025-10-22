@@ -142,7 +142,6 @@ export const PasswordStrengthMeter = React.forwardRef<
           />
         ))}
       </HStack>
-      {label && <HStack textStyle="xs">{label}</HStack>}
     </Stack>
   )
 })

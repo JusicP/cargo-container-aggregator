@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/password-input"
 import { useMemo, useState } from "react"
 import { Button } from "@chakra-ui/react"
+import { Envelope, Telephone, Briefcase } from "@mynaui/icons-react";
 
 const strengthOptions: Options<string> = [
     { id: 1, value: "weak", minDiversity: 0, minLength: 0 },
@@ -48,13 +49,24 @@ export default function RegisterForm() {
             <div>
                 <Field.Root required>
                     <Field.Label>
-                        Email <Field.RequiredIndicator />
+                        Ім'я користувача <Field.RequiredIndicator />
                     </Field.Label>
-                    <InputGroup endAddon=".com">
+                    <Input
+                        placeholder="username"
+                        size="xs"
+                    />
+                </Field.Root>
+            </div>
+            <div>
+                <Field.Root required>
+                    <Field.Label>
+                        Пошта <Field.RequiredIndicator />
+                    </Field.Label>
+                    <InputGroup startElement={<Envelope size={16} color="#27272A" />}>
                         <Input
                             {...register("email")}
-                            placeholder="email@email"
-                            size="sm"
+                            placeholder="email@example.com"
+                            size="xs"
                         />
                     </InputGroup>
                 </Field.Root>
@@ -64,14 +76,14 @@ export default function RegisterForm() {
             <div>
                 <Field.Root required>
                     <Field.Label>
-                        Password <Field.RequiredIndicator />
+                        Пароль <Field.RequiredIndicator />
                     </Field.Label>
                     <Stack gap="3" className="w-full">
                         <PasswordInput
                             value={password}
                             onChange={(e) => setPassword(e.currentTarget.value)}
-                            placeholder="Enter your password"
-                            size="sm"
+                            placeholder="password"
+                            size="xs"
                         />
                         <PasswordStrengthMeter value={strength} />
                     </Stack>
@@ -79,11 +91,47 @@ export default function RegisterForm() {
                 {errors.password && <p role="alert">{errors.password.message}</p>}
             </div>
 
-            <Button
-                type="submit"
-            >
-                Реєстація
-            </Button>
+            <div>
+                <Field.Root required>
+                    <Field.Label>
+                        Підтвердити пароль <Field.RequiredIndicator />
+                    </Field.Label>
+                    <PasswordInput
+                        placeholder="password"
+                        size="xs"
+                    />
+                </Field.Root>
+            </div>
+
+            <div>
+                <Field.Root required>
+                    <Field.Label>
+                        Телефон <Field.RequiredIndicator />
+                    </Field.Label>
+                    <InputGroup startElement={<Telephone size={16} color="#27272A" />}>
+                        <Input
+                            placeholder="+380123456789"
+                            size="xs"
+                        />
+                    </InputGroup>
+                </Field.Root>
+            </div>
+
+            <div>
+                <Field.Root required>
+                    <Field.Label>
+                        Назва компанії
+                    </Field.Label>
+                    <InputGroup startElement={<Briefcase size={16} color="#27272A" />}>
+                        <Input
+                            placeholder="Назва компанії"
+                            size="xs"
+                        />
+                    </InputGroup>
+                </Field.Root>
+            </div>
+
+            <Button type="submit">Реєстація</Button>
         </form>
     )
 }
