@@ -12,6 +12,7 @@ import {
 import { useMemo, useState } from "react"
 import { Button } from "@chakra-ui/react"
 import { Envelope, Telephone, Briefcase } from "@mynaui/icons-react";
+import { Box } from "@chakra-ui/react"
 
 const strengthOptions: Options<string> = [
     { id: 1, value: "weak", minDiversity: 0, minLength: 0 },
@@ -45,28 +46,28 @@ export default function RegisterForm() {
     }, [password])
 
     return(
-        <form onSubmit={handleSubmit(onSubmit)} className="w-80 px-20">
+        <form onSubmit={handleSubmit(onSubmit)} className="w-80 px-20 flex flex-col items-center">
             <div>
                 <Field.Root required>
-                    <Field.Label>
+                    <Field.Label fontSize="11px">
                         Ім'я користувача <Field.RequiredIndicator />
                     </Field.Label>
                     <Input
                         placeholder="username"
-                        size="xs"
+                        size="2xs"
                     />
                 </Field.Root>
             </div>
             <div>
                 <Field.Root required>
-                    <Field.Label>
+                    <Field.Label fontSize="11px">
                         Пошта <Field.RequiredIndicator />
                     </Field.Label>
-                    <InputGroup startElement={<Envelope size={16} color="#27272A" />}>
+                    <InputGroup startElement={<Envelope size={13} color="#27272A" />}>
                         <Input
                             {...register("email")}
                             placeholder="email@example.com"
-                            size="xs"
+                            size="2xs"
                         />
                     </InputGroup>
                 </Field.Root>
@@ -75,7 +76,7 @@ export default function RegisterForm() {
 
             <div>
                 <Field.Root required>
-                    <Field.Label>
+                    <Field.Label fontSize="11px">
                         Пароль <Field.RequiredIndicator />
                     </Field.Label>
                     <Stack gap="3" className="w-full">
@@ -83,7 +84,7 @@ export default function RegisterForm() {
                             value={password}
                             onChange={(e) => setPassword(e.currentTarget.value)}
                             placeholder="password"
-                            size="xs"
+                            size="2xs"
                         />
                         <PasswordStrengthMeter value={strength} />
                     </Stack>
@@ -93,25 +94,25 @@ export default function RegisterForm() {
 
             <div>
                 <Field.Root required>
-                    <Field.Label>
+                    <Field.Label fontSize="11px">
                         Підтвердити пароль <Field.RequiredIndicator />
                     </Field.Label>
                     <PasswordInput
                         placeholder="password"
-                        size="xs"
+                        size="2xs"
                     />
                 </Field.Root>
             </div>
 
             <div>
                 <Field.Root required>
-                    <Field.Label>
+                    <Field.Label fontSize="11px">
                         Телефон <Field.RequiredIndicator />
                     </Field.Label>
-                    <InputGroup startElement={<Telephone size={16} color="#27272A" />}>
+                    <InputGroup startElement={<Telephone size={13} color="#27272A" />}>
                         <Input
                             placeholder="+380123456789"
-                            size="xs"
+                            size="2xs"
                         />
                     </InputGroup>
                 </Field.Root>
@@ -119,19 +120,26 @@ export default function RegisterForm() {
 
             <div>
                 <Field.Root required>
-                    <Field.Label>
+                    <Field.Label fontSize="11px">
                         Назва компанії
                     </Field.Label>
-                    <InputGroup startElement={<Briefcase size={16} color="#27272A" />}>
+                    <InputGroup startElement={<Briefcase size={13} color="#27272A" />}>
                         <Input
                             placeholder="Назва компанії"
-                            size="xs"
+                            size="2xs"
                         />
                     </InputGroup>
                 </Field.Root>
             </div>
 
-            <Button type="submit">Реєстація</Button>
+            <Box paddingY="3">
+                <Button
+                    type="submit"
+                    size="xs"
+                >
+                    Реєстація
+                </Button>
+            </Box>
         </form>
     )
 }
