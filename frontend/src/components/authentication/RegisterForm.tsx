@@ -13,6 +13,8 @@ import { useMemo, useState } from "react"
 import { Button } from "@chakra-ui/react"
 import { Envelope, Telephone, Briefcase } from "@mynaui/icons-react";
 import { Box } from "@chakra-ui/react"
+import { Text } from "@chakra-ui/react"
+import { Link } from "@chakra-ui/react"
 
 const strengthOptions: Options<string> = [
     { id: 1, value: "weak", minDiversity: 0, minLength: 0 },
@@ -46,8 +48,8 @@ export default function RegisterForm() {
     }, [password])
 
     return(
-        <form onSubmit={handleSubmit(onSubmit)} className="w-80 px-20 flex flex-col items-center">
-            <div className="w-60">
+        <form onSubmit={handleSubmit(onSubmit)} className="w-150 flex flex-col items-center">
+            <div className="w-[65%]">
                 <Field.Root required>
                     <Field.Label fontSize="11px">
                         Ім'я користувача <Field.RequiredIndicator />
@@ -58,7 +60,7 @@ export default function RegisterForm() {
                     />
                 </Field.Root>
             </div>
-            <div className="w-60">
+            <div className="w-[65%]">
                 <Field.Root required>
                     <Field.Label fontSize="11px">
                         Пошта <Field.RequiredIndicator />
@@ -74,7 +76,7 @@ export default function RegisterForm() {
                 {errors.email && <p role="alert">{errors.email.message}</p>}
             </div>
 
-            <div className="w-60">
+            <div className="w-[65%]">
                 <Field.Root required>
                     <Field.Label fontSize="11px">
                         Пароль <Field.RequiredIndicator />
@@ -92,7 +94,7 @@ export default function RegisterForm() {
                 {errors.password && <p role="alert">{errors.password.message}</p>}
             </div>
 
-            <div className="w-60">
+            <div className="w-[65%]">
                 <Field.Root required>
                     <Field.Label fontSize="11px">
                         Підтвердити пароль <Field.RequiredIndicator />
@@ -104,7 +106,7 @@ export default function RegisterForm() {
                 </Field.Root>
             </div>
 
-            <div className="w-60">
+            <div className="w-[65%]">
                 <Field.Root required>
                     <Field.Label fontSize="11px">
                         Телефон <Field.RequiredIndicator />
@@ -118,7 +120,7 @@ export default function RegisterForm() {
                 </Field.Root>
             </div>
 
-            <div className="w-60">
+            <div className="w-[65%]">
                 <Field.Root required>
                     <Field.Label fontSize="11px">
                         Назва компанії
@@ -140,6 +142,18 @@ export default function RegisterForm() {
                     Реєстація
                 </Button>
             </Box>
+
+            <Text textStyle="xs" color="gray.400">
+                Вже маєш акаунт на платформі?
+            </Text>
+            <Link
+                href="#"
+                variant="underline"
+                textStyle="xs"
+                color="gray.400"
+            >
+                Увійти
+            </Link>
         </form>
     )
 }
