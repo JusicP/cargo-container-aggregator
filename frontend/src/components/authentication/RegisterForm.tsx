@@ -13,8 +13,6 @@ import { useMemo, useState } from "react"
 import { Button } from "@chakra-ui/react"
 import { Envelope, Telephone, Briefcase } from "@mynaui/icons-react";
 import { Box } from "@chakra-ui/react"
-import { Text } from "@chakra-ui/react"
-import { Link } from "@chakra-ui/react"
 
 const strengthOptions: Options<string> = [
     { id: 1, value: "weak", minDiversity: 0, minLength: 0 },
@@ -48,7 +46,7 @@ export default function RegisterForm() {
     }, [password])
 
     return(
-        <form onSubmit={handleSubmit(onSubmit)} className="w-150 flex flex-col items-center">
+        <form onSubmit={handleSubmit(onSubmit)} className="w-150 flex flex-col items-center gap-3">
             <div className="w-[65%]">
                 <Field.Root required>
                     <Field.Label fontSize="11px">
@@ -134,26 +132,15 @@ export default function RegisterForm() {
                 </Field.Root>
             </div>
 
-            <Box paddingY="7">
+            <Box paddingTop="6">
                 <Button
                     type="submit"
                     size="sm"
+                    className="w-35 font-thin tracking-[1px]"
                 >
-                    Реєстація
+                    Реєстрація
                 </Button>
             </Box>
-
-            <Text textStyle="xs" color="gray.400">
-                Вже маєш акаунт на платформі?
-            </Text>
-            <Link
-                href="#"
-                variant="underline"
-                textStyle="xs"
-                color="gray.400"
-            >
-                Увійти
-            </Link>
         </form>
     )
 }
