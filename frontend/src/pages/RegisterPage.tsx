@@ -7,11 +7,11 @@ export default function RegisterPage() {
     return (
         <PageLayout>
             <div className="bg-white h-screen px-20 flex flex-col items-center justify-center">
-                <div className="flex flex-col items-center">
+                <div className="flex flex-col items-center !mb-5">
                     <SvgLogo width={100} height={100} />
-                    <div className="flex flex-col items-center gap-0.5">
-                        <h1 className="text-[#52525B] text-[30px] font-black">CONTAINERS</h1>
-                        <h3 className="text-[#A7AFB7] text-[15px]">REGISTER</h3>
+                    <div className="flex flex-col items-center leading-tight">
+                        <Text fontSize="30px" fontWeight="black" color="#52525B">CONTAINERS</Text>
+                        <Text fontSize="15px" fontWeight="semibold" color="#A7AFB7" className="!-mt-2">REGISTER</Text>
                     </div>
                 </div>
                 <RegisterForm />

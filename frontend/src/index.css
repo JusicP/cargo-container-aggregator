@@ -1,10 +1,5 @@
 @import "tailwindcss";
 
-:root {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
@@ -12,8 +7,5 @@
   }
   a:hover {
     color: #FD7F16;
-  }
-  button {
-    /*background-color: #f9f9f9;*/
   }
 }
