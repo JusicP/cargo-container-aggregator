@@ -1,0 +1,99 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "search": "Search"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "loginTitle": "Login to System",
+    "registerTitle": "Registration",
+    "loginError": "Invalid email or password",
+    "registerError": "Registration error",
+    "loginSuccess": "Successfully logged in",
+    "logoutSuccess": "You have been logged out"
+  },
+  "roles": {
+    "buyer": "Buyer",
+    "seller": "Seller",
+    "admin": "Administrator",
+    "guest": "Guest"
+  },
+  "navigation": {
+    "home": "Home",
+    "myAccount": "My Account",
+    "createListing": "Create Listing",
+    "adminPanel": "Admin Panel",
+    "profile": "Profile",
+    "settings": "Settings"
+  },
+  "myAccount": {
+    "title": "My Account",
+    "email": "Email",
+    "role": "Role",
+    "verificationStatus": "Verification Status",
+    "verified": "Verified",
+    "notVerified": "Not Verified",
+    "general": "General",
+    "myListings": "My Listings",
+    "quickActions": "Quick Actions"
+  },
+  "listings": {
+    "active": "Active Listings",
+    "pending": "Pending Review",
+    "rejected": "Rejected",
+    "deleted": "Deleted",
+    "create": "Create Listing",
+    "edit": "Edit Listing",
+    "analytics": "Listing Analytics",
+    "createNew": "Create New Listing"
+  },
+  "admin": {
+    "panel": "Admin Panel",
+    "listings": "Listings Management",
+    "users": "Users",
+    "parser": "Parser",
+    "logs": "Logs",
+    "onlyForAdmins": "For Administrators Only"
+  },
+  "verification": {
+    "title": "Account Verification",
+    "description": "To access this page, you need to verify your account via email.",
+    "hint": "Check your email and follow the confirmation link."
+  },
+  "homePage": {
+    "title": "Home Page",
+    "welcome": "Welcome to the Cargo Container Management System!",
+    "authSection": "Authentication",
+    "authDescription": "Log in to access your account.",
+    "greeting": "Hello",
+    "yourRole": "Your role",
+    "status": "Status",
+    "testAccounts": "Test Accounts",
+    "testingSystem": "Testing System",
+    "passwordAny": "Password: any"
+  },
+  "errors": {
+    "notFound": "Page Not Found",
+    "accessDenied": "Access Denied",
+    "serverError": "Server Error",
+    "networkError": "Network Error"
+  }
+}
