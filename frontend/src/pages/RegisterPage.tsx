@@ -10,8 +10,24 @@ export default function RegisterPage() {
                 <div className="flex flex-col items-center !mb-5">
                     <SvgLogo width={100} height={100} />
                     <div className="flex flex-col items-center leading-tight">
-                        <Text fontSize="30px" fontWeight="black" color="#52525B">CONTAINERS</Text>
-                        <Text fontSize="15px" fontWeight="semibold" color="#A7AFB7" className="!-mt-2">REGISTER</Text>
+                        <Text
+                            fontSize="27px"
+                            fontWeight="semibold"
+                            color="#52525B"
+                            fontFamily="heading"
+                            letterSpacing="tight"
+                        >
+                            CONTAINERS
+                        </Text>
+                        <Text
+                            fontSize="12px"
+                            fontWeight="semibold"
+                            color="#A7AFB7"
+                            className="!-mt-2"
+                            fontFamily="heading"
+                        >
+                            REGISTRATION
+                        </Text>
                     </div>
                 </div>
                 <RegisterForm />
