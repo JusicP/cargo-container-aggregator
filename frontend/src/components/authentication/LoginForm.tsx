@@ -71,7 +71,7 @@ export default function LoginForm() {
                     boxShadow="custom"
                     fontWeight="450"
                 >
-                    Реєстрація
+                    Увійти
                 </Button>
             </Box>
         </form>

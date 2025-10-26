@@ -36,7 +36,7 @@ export default function RegisterPage() {
                         Вже маєш акаунт на платформі?
                     </Text>
                     <Link
-                        href="#"
+                        href="/login"
                         variant="underline"
                         textStyle="xs"
                         color="gray.400"

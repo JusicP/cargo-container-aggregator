@@ -33,15 +33,15 @@ export default function LoginPage() {
                 <LoginForm />
                 <Box paddingTop="4" className="flex flex-col items-center gap-0.5">
                     <Text textStyle="xs" color="gray.400">
-                        Вже маєш акаунт на платформі?
+                        Не реєстрував акаунт платформі раніше?
                     </Text>
                     <Link
-                        href="#"
+                        href="/register"
                         variant="underline"
                         textStyle="xs"
                         color="gray.400"
                     >
-                        Увійти
+                        Зареєструватись
                     </Link>
                 </Box>
             </div>
