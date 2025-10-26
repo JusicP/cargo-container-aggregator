@@ -8,7 +8,7 @@ export default function RegisterPage() {
         <PageLayout>
             <div className="bg-white h-screen px-20 flex flex-col items-center justify-center">
                 <div className="flex flex-col items-center !mb-5">
-                    <SvgLogo width={100} height={100} />
+                    <SvgLogo width={110} height={110} className="!-mb-2" />
                     <div className="flex flex-col items-center leading-tight">
                         <Text
                             fontSize="27px"
@@ -31,7 +31,7 @@ export default function RegisterPage() {
                     </div>
                 </div>
                 <RegisterForm />
-                <Box paddingTop="6" className="flex flex-col items-center gap-0.5">
+                <Box paddingTop="4" className="flex flex-col items-center gap-0.5">
                     <Text textStyle="xs" color="gray.400">
                         Вже маєш акаунт на платформі?
                     </Text>

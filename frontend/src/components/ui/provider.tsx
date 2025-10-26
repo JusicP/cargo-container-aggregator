@@ -1,6 +1,6 @@
 "use client"
 
-import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
+import { ChakraProvider } from "@chakra-ui/react"
 import {
   ColorModeProvider,
   type ColorModeProviderProps,
@@ -15,6 +15,16 @@ const system = createSystem(defaultConfig, {
         heading: { value: "Alexandria Variable" },
         body: { value: "system-ui, sans-serif" },
         system: { value: "system-ui, sans-serif" },
+      },
+    },
+    semanticTokens: {
+      shadows: {
+        custom: {
+          value: {
+            _light: "0 3px 6px 0 rgba(0, 0, 0, 0.25)",
+            _dark: "0 3px 6px 0 rgba(0, 0, 0, 0.25)",
+          },
+        },
       },
     },
   },

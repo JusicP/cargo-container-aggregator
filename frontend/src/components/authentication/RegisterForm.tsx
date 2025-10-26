@@ -49,7 +49,7 @@ export default function RegisterForm() {
         <form onSubmit={handleSubmit(onSubmit)} className="w-150 flex flex-col items-center gap-3">
             <div className="w-[65%]">
                 <Field.Root required>
-                    <Field.Label fontSize="11px">
+                    <Field.Label fontSize="11px" fontWeight="bolder">
                         Ім'я користувача <Field.RequiredIndicator />
                     </Field.Label>
                     <Input
@@ -60,10 +60,10 @@ export default function RegisterForm() {
             </div>
             <div className="w-[65%]">
                 <Field.Root required>
-                    <Field.Label fontSize="11px">
+                    <Field.Label fontSize="11px" fontWeight="bolder">
                         Пошта <Field.RequiredIndicator />
                     </Field.Label>
-                    <InputGroup startElement={<Envelope size={13} color="#27272A" />}>
+                    <InputGroup startElement={<Envelope size={13} color="#68686A" />}>
                         <Input
                             {...register("email")}
                             placeholder="email@example.com"
@@ -76,7 +76,7 @@ export default function RegisterForm() {
 
             <div className="w-[65%]">
                 <Field.Root required>
-                    <Field.Label fontSize="11px">
+                    <Field.Label fontSize="11px" fontWeight="bolder">
                         Пароль <Field.RequiredIndicator />
                     </Field.Label>
                     <Stack gap="3" className="w-full">
@@ -94,7 +94,7 @@ export default function RegisterForm() {
 
             <div className="w-[65%]">
                 <Field.Root required>
-                    <Field.Label fontSize="11px">
+                    <Field.Label fontSize="11px" fontWeight="bolder">
                         Підтвердити пароль <Field.RequiredIndicator />
                     </Field.Label>
                     <PasswordInput
@@ -106,10 +106,10 @@ export default function RegisterForm() {
 
             <div className="w-[65%]">
                 <Field.Root required>
-                    <Field.Label fontSize="11px">
+                    <Field.Label fontSize="11px" fontWeight="bolder">
                         Телефон <Field.RequiredIndicator />
                     </Field.Label>
-                    <InputGroup startElement={<Telephone size={13} color="#27272A" />}>
+                    <InputGroup startElement={<Telephone size={13} color="#68686A" />}>
                         <Input
                             placeholder="+380123456789"
                             size="xs"
@@ -120,10 +120,10 @@ export default function RegisterForm() {
 
             <div className="w-[65%]">
                 <Field.Root required>
-                    <Field.Label fontSize="11px">
+                    <Field.Label fontSize="11px" fontWeight="bolder">
                         Назва компанії
                     </Field.Label>
-                    <InputGroup startElement={<Briefcase size={13} color="#27272A" />}>
+                    <InputGroup startElement={<Briefcase size={13} color="#68686A" />}>
                         <Input
                             placeholder="Назва компанії"
                             size="xs"
@@ -137,6 +137,8 @@ export default function RegisterForm() {
                     type="submit"
                     size="sm"
                     className="w-35 font-thin tracking-[1px]"
+                    boxShadow="custom"
+                    fontWeight="450"
                 >
                     Реєстрація
                 </Button>
