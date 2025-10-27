@@ -1,7 +1,4 @@
-import {useForm} from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {registerUserSchema, type registerUser} from "../../schemas/authUserSchema.ts";
-import DOMPurify from "dompurify";
+// layout imports
 import { Field, Input, InputGroup, Text } from "@chakra-ui/react"
 import { Stack } from "@chakra-ui/react"
 import { type Options, passwordStrength } from "check-password-strength"
@@ -14,6 +11,13 @@ import { Button } from "@chakra-ui/react"
 import { Envelope, Telephone, Briefcase } from "@mynaui/icons-react";
 import { Box } from "@chakra-ui/react"
 
+// form controls & api
+import {useForm} from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {registerUserSchema, type registerUser} from "@/schemas/authUserSchema.ts";
+import DOMPurify from "dompurify";
+import {useSignUpUser} from "@/services/api/auth.ts";
+
 const strengthOptions: Options<string> = [
     { id: 1, value: "weak", minDiversity: 0, minLength: 0 },
     { id: 2, value: "medium", minDiversity: 2, minLength: 6 },
@@ -22,6 +26,7 @@ const strengthOptions: Options<string> = [
 ]
 
 export default function RegisterForm() {
+    const signUpUser = useSignUpUser()
     const { handleSubmit,register, formState: { errors } } = useForm({
         resolver: zodResolver(registerUserSchema),
     })
@@ -37,8 +42,14 @@ export default function RegisterForm() {
     const onSubmit = async (data: registerUser) => {
         try{
             const sanitizedData = sanitizeAll(data);
-            const { repeatPassword, ...payload } = sanitizedData;
-            console.log(payload);
+            const { repeatPassword, ...rest } = sanitizedData;
+            const credentials = {
+                ...rest,
+                avatar_photo_id: 0,
+                role: "user",
+            }
+            console.log(credentials);
+            await signUpUser.mutateAsync(credentials);
         } catch (error) {
             console.error("Registration error:", error);
         }
