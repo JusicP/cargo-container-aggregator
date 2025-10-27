@@ -25,20 +25,26 @@ export default function RegisterForm() {
     const { handleSubmit,register, formState: { errors } } = useForm({
         resolver: zodResolver(registerUserSchema),
     })
-    const sanitizeInput = (value: string) => DOMPurify.sanitize(value);
+
+    const sanitizeAll = (data: Record<string, unknown>) =>
+        Object.fromEntries(
+            Object.entries(data).map(([key, value]) => [
+                key,
+                typeof value === "string" ? DOMPurify.sanitize(value) : value,
+            ])
+        );
 
     const onSubmit = async (data: registerUser) => {
         try{
-            const sanitizedEmail = sanitizeInput(data.email);
-            const sanitizedPassword = sanitizeInput(data.password);
-            console.log(sanitizedEmail, sanitizedPassword);
-            //endpoint API call & preprocess data
+            const sanitizedData = sanitizeAll(data);
+            const { repeatPassword, ...payload } = sanitizedData;
+            console.log(payload);
         } catch (error) {
-            
+            console.error("Registration error:", error);
         }
     }
-    const [password, setPassword] = useState("")
 
+    const [password, setPassword] = useState("")
     const strength = useMemo(() => {
         if (!password) return 0
         const result = passwordStrength(password, strengthOptions)
@@ -53,10 +59,12 @@ export default function RegisterForm() {
                         Ім'я користувача <Field.RequiredIndicator />
                     </Field.Label>
                     <Input
+                        {...register("name")}
                         placeholder="username"
                         size="xs"
                     />
                 </Field.Root>
+                {errors.name && <p role="alert">{errors.name.message}</p>}
             </div>
             <div className="w-[65%]">
                 <Field.Root required>
@@ -81,6 +89,7 @@ export default function RegisterForm() {
                     </Field.Label>
                     <Stack gap="3" className="w-full">
                         <PasswordInput
+                            {...register("password")}
                             value={password}
                             onChange={(e) => setPassword(e.currentTarget.value)}
                             placeholder="password"
@@ -98,10 +107,12 @@ export default function RegisterForm() {
                         Підтвердити пароль <Field.RequiredIndicator />
                     </Field.Label>
                     <PasswordInput
+                        {...register("repeatPassword")}
                         placeholder="password"
                         size="xs"
                     />
                 </Field.Root>
+                {errors.repeatPassword && <p role="alert">{errors.repeatPassword.message}</p>}
             </div>
 
             <div className="w-[65%]">
@@ -111,20 +122,23 @@ export default function RegisterForm() {
                     </Field.Label>
                     <InputGroup startElement={<Telephone size={13} color="#68686A" />}>
                         <Input
+                            {...register("phone_number")}
                             placeholder="+380123456789"
                             size="xs"
                         />
                     </InputGroup>
                 </Field.Root>
+                {errors.phone_number && <p role="alert">{errors.phone_number.message}</p>}
             </div>
 
             <div className="w-[65%]">
-                <Field.Root required>
+                <Field.Root>
                     <Field.Label fontSize="11px" fontWeight="bolder">
                         Назва компанії
                     </Field.Label>
                     <InputGroup startElement={<Briefcase size={13} color="#68686A" />}>
                         <Input
+                            {...register("company_name")}
                             placeholder="Назва компанії"
                             size="xs"
                         />
