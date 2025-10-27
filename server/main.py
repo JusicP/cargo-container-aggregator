@@ -7,6 +7,7 @@ from typing import AsyncIterator
 from server.routes import auth, user, listings, favorites, parserListings, analytics, user_photo_router
 from server.database.connection import async_engine, async_session_maker
 from server.database.base import Base
+from server.scheduler.listing_analytics_job import start_scheduler
 
 from server.utils.default_admin import ensure_superuser
 from server.database.migrations_runner import run_migrations
@@ -61,3 +62,8 @@ app.include_router(favorites.router)
 app.include_router(parserListings.router)
 app.include_router(analytics.router)
 app.include_router(user_photo_router.router)
+
+@app.on_event("startup")
+async def startup_event():
+    start_scheduler()
+    print("Scheduler started")
