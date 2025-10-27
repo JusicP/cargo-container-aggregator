@@ -2,7 +2,7 @@ import {useForm} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {registerUserSchema, type registerUser} from "../../schemas/authUserSchema.ts";
 import DOMPurify from "dompurify";
-import { Field, Input, InputGroup } from "@chakra-ui/react"
+import { Field, Input, InputGroup, Text } from "@chakra-ui/react"
 import { Stack } from "@chakra-ui/react"
 import { type Options, passwordStrength } from "check-password-strength"
 import {
@@ -64,7 +64,7 @@ export default function RegisterForm() {
                         size="xs"
                     />
                 </Field.Root>
-                {errors.name && <p role="alert">{errors.name.message}</p>}
+                {errors.name && <Text role="alert" textStyle="xs" color="red.500">{errors.name.message}</Text>}
             </div>
             <div className="w-[65%]">
                 <Field.Root required>
@@ -79,7 +79,7 @@ export default function RegisterForm() {
                         />
                     </InputGroup>
                 </Field.Root>
-                {errors.email && <p role="alert">{errors.email.message}</p>}
+                {errors.email && <Text role="alert" textStyle="xs" color="red.500">{errors.email.message}</Text>}
             </div>
 
             <div className="w-[65%]">
@@ -98,7 +98,7 @@ export default function RegisterForm() {
                         <PasswordStrengthMeter value={strength} />
                     </Stack>
                 </Field.Root>
-                {errors.password && <p role="alert">{errors.password.message}</p>}
+                {errors.password && <Text role="alert" textStyle="xs" color="red.500">{errors.password.message}</Text>}
             </div>
 
             <div className="w-[65%]">
@@ -112,7 +112,7 @@ export default function RegisterForm() {
                         size="xs"
                     />
                 </Field.Root>
-                {errors.repeatPassword && <p role="alert">{errors.repeatPassword.message}</p>}
+                {errors.repeatPassword && <Text role="alert" textStyle="xs" color="red.500">{errors.repeatPassword.message}</Text>}
             </div>
 
             <div className="w-[65%]">
@@ -128,7 +128,7 @@ export default function RegisterForm() {
                         />
                     </InputGroup>
                 </Field.Root>
-                {errors.phone_number && <p role="alert">{errors.phone_number.message}</p>}
+                {errors.phone_number && <Text role="alert" textStyle="xs" color="red.500">{errors.phone_number.message}</Text>}
             </div>
 
             <div className="w-[65%]">
@@ -144,6 +144,7 @@ export default function RegisterForm() {
                         />
                     </InputGroup>
                 </Field.Root>
+                {errors.company_name && <Text role="alert" textStyle="xs" color="red.500">{errors.company_name.message}</Text>}
             </div>
 
             <Box paddingTop="6">
