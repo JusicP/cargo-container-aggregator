@@ -1,6 +1,7 @@
 import datetime
 from enum import Enum
 from pydantic import BaseModel, Field
+from typing import Annotated
 
 
 class UserRole(str, Enum):
@@ -21,7 +22,7 @@ class UserBase(BaseModel):
 
 class UserRegister(UserBase):
     password: str = Field(max_length=128)
-    avatar_photo_id: int | None = Field(None, exclude=True) # don't allow to set avatar_photo_id on creation, we allow it after creation only
+    avatar_photo_id: Annotated[int | None, Field(default=None, exclude=True)] # don't allow to set avatar_photo_id on creation, we allow it after creation only
 
 class UserCreate(UserRegister):
     role: str = "user"
