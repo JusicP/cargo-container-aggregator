@@ -29,8 +29,11 @@ export const registerUserSchema = z.object({
 export type registerUser = z.infer<typeof registerUserSchema>
 
 export const loginUserSchema = z.object({
-    name: z.string()
-        .max(128, {message: "Задовге ім'я"})
+    email: z.string()
+        .min(5, { message: "Email занадто короткий" })
+        .max(340, { message: "Email задовгий" })
+        .email({ message: "Невірний формат email" })
+        .toLowerCase()
         .trim(),
     password: z.string()
         .trim()

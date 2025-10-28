@@ -33,13 +33,19 @@ export const useSignUpUser = () => {
     })
 }
 
-export type SignInReqBody = Pick<SignUpReqBody, "name" | "password">;
-
 export const useSignInUser = () => {
     return useMutation({
-        mutationFn: async (credentials: SignInReqBody) => {
+        mutationFn: async (credentials: FormData) => {
             console.log(credentials);
-            const { data } = await defaultAxiosInstance.post("/auth/login", credentials);
+            const { data } = await defaultAxiosInstance.post(
+                "/auth/login",
+                credentials,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data"
+                    }
+                }
+            );
             return data;
         },
         onSuccess: () => {
