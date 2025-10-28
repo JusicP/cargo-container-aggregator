@@ -1,10 +1,30 @@
 .app-root {
     width: 100%;
-    min-height: 100vh; /* вместо height: 100vh */
-    overflow: visible; /* вместо hidden */
+    min-height: 100vh;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: scroll; /* или fixed если нужно фиксированное */
+}
+.hero-section {
+    width: 1440px;
+    height: 609px;
+    background-image: url('./assets/background.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 245px 140px;
+    margin: 100px auto;
+    box-sizing: border-box;
+    opacity: 1;
 }
 
-/* Остальные ваши стили остаются без изменений */
 .site-header {
     background-color: #101D29;
     padding: 20px 40px;
@@ -33,12 +53,18 @@
     font-weight: 400;
 }
 
+
 .hero-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 60px 80px;
-    flex: 1;
+    flex: 1; /* Это важно для растягивания на доступное пространство */
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    box-sizing: border-box;
+
 }
 
 .hero-left {
@@ -321,3 +347,4 @@
     border-radius: 4px;
     cursor: pointer;
 }
+/*футер*/
