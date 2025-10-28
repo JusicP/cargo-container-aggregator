@@ -4,11 +4,18 @@ import './index.css'
 import App from './App.tsx'
 // connecting Chakra UI library - icons & components
 import { Provider } from "@/components/ui/provider"
+// adding custom alexandria font
+import '@fontsource-variable/alexandria/index.css';
+// api - query packages
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query"
 
+const queryClient = new QueryClient({})
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-      <Provider>
-          <App />
-      </Provider>
+      <QueryClientProvider client={queryClient}>
+          <Provider>
+              <App />
+          </Provider>
+      </QueryClientProvider>
   </StrictMode>,
 )
