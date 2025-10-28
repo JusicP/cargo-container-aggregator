@@ -1,5 +1,5 @@
 // layout imports
-import {Field, Input, Text} from "@chakra-ui/react"
+import {Field, Input, InputGroup, Text} from "@chakra-ui/react"
 import { Stack } from "@chakra-ui/react"
 import { PasswordInput } from "@/components/ui/password-input"
 import { useState } from "react"
@@ -12,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {loginUserSchema, type loginUser} from "@/schemas/authUserSchema.ts";
 import DOMPurify from "dompurify";
 import {useSignInUser} from "@/services/api/auth.ts";
+import {Envelope} from "@mynaui/icons-react";
 
 export default function LoginForm() {
     const signInUser = useSignInUser()
@@ -22,12 +23,11 @@ export default function LoginForm() {
 
     const onSubmit = async (data: loginUser) => {
         try{
-            const sanitizedData = {
-                name: sanitizeInput(data.name),
-                password: sanitizeInput(data.password),
-            };
-            console.log(sanitizedData);
-            await signInUser.mutateAsync(sanitizedData);
+            const formData = new FormData();
+            formData.append('username', sanitizeInput(data.email));
+            formData.append('password', sanitizeInput(data.password));
+            console.log(formData);
+            await signInUser.mutateAsync(formData);
         } catch (error) {
 
         }
@@ -39,15 +39,17 @@ export default function LoginForm() {
             <div className="w-[65%]">
                 <Field.Root required>
                     <Field.Label fontSize="11px" fontWeight="bolder">
-                        Ім'я користувача
+                        Пошта <Field.RequiredIndicator />
                     </Field.Label>
-                    <Input
-                        {...register("name")}
-                        placeholder="username"
-                        size="xs"
-                    />
+                    <InputGroup startElement={<Envelope size={13} color="#68686A" />}>
+                        <Input
+                            {...register("email")}
+                            placeholder="email@example.com"
+                            size="xs"
+                        />
+                    </InputGroup>
                 </Field.Root>
-                {errors.name && <Text role="alert" textStyle="xs" color="red.500">{errors.name.message}</Text>}
+                {errors.email && <Text role="alert" textStyle="xs" color="red.500">{errors.email.message}</Text>}
             </div>
 
             <div className="w-[65%]">
