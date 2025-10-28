@@ -15,7 +15,7 @@ import {useSignInUser} from "@/services/api/auth.ts";
 
 export default function LoginForm() {
     const signInUser = useSignInUser()
-    const { handleSubmit,register, formState: { errors } } = useForm({
+    const { handleSubmit,register, formState: { errors, isSubmitting } } = useForm({
         resolver: zodResolver(loginUserSchema),
     })
     const sanitizeInput = (value: string) => DOMPurify.sanitize(value);
@@ -76,7 +76,7 @@ export default function LoginForm() {
                     boxShadow="custom"
                     fontWeight="450"
                 >
-                    Увійти
+                    {isSubmitting ? "Вхід..." : "Увійти"}
                 </Button>
             </Box>
         </form>

@@ -27,7 +27,7 @@ const strengthOptions: Options<string> = [
 
 export default function RegisterForm() {
     const signUpUser = useSignUpUser()
-    const { handleSubmit,register, formState: { errors } } = useForm({
+    const { handleSubmit,register, formState: { errors, isSubmitting } } = useForm({
         resolver: zodResolver(registerUserSchema),
     })
 
@@ -166,7 +166,7 @@ export default function RegisterForm() {
                     boxShadow="custom"
                     fontWeight="450"
                 >
-                    Реєстрація
+                    {isSubmitting ? "Обробка..." : "Реєстрація"}
                 </Button>
             </Box>
         </form>
