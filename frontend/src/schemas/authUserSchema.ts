@@ -27,3 +27,15 @@ export const registerUserSchema = z.object({
         path: ["repeatPassword"],
 })
 export type registerUser = z.infer<typeof registerUserSchema>
+
+export const loginUserSchema = z.object({
+    name: z.string()
+        .max(128, {message: "Задовге ім'я"})
+        .trim(),
+    password: z.string()
+        .trim()
+        .min(6, { message: 'Пароль закороткий' })
+        .max(128, { message: 'Пароль задовгий' }),
+});
+
+export type loginUser = z.infer<typeof loginUserSchema>;

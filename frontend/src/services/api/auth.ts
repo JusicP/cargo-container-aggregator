@@ -16,7 +16,8 @@ export const useSignUpUser = () => {
     return useMutation({
         mutationFn: async (credentials: SignUpReqBody) => {
             console.log(credentials);
-            await defaultAxiosInstance.post("/users/register", credentials);
+            const { data } = await defaultAxiosInstance.post("/users/register", credentials);
+            return data;
         },
         onSuccess: () => {
             console.log("User registered successfully!");
@@ -31,3 +32,26 @@ export const useSignUpUser = () => {
         }
     })
 }
+
+export type SignInReqBody = Pick<SignUpReqBody, "name" | "password">;
+
+export const useSignInUser = () => {
+    return useMutation({
+        mutationFn: async (credentials: SignInReqBody) => {
+            console.log(credentials);
+            const { data } = await defaultAxiosInstance.post("/auth/login", credentials);
+            return data;
+        },
+        onSuccess: () => {
+            console.log("User logged in successfully!");
+        },
+        onError: (err: any) => {
+            if (axios.isAxiosError(err)) {
+                console.log(err.status);
+                console.error(err.response);
+            } else {
+                console.error(err);
+            }
+        },
+    });
+};

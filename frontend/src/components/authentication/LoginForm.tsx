@@ -1,27 +1,33 @@
-import {useForm} from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {registerUserSchema, type registerUser} from "../../schemas/authUserSchema.ts";
-import DOMPurify from "dompurify";
-import { Field, Input, InputGroup } from "@chakra-ui/react"
+// layout imports
+import {Field, Input, Text} from "@chakra-ui/react"
 import { Stack } from "@chakra-ui/react"
 import { PasswordInput } from "@/components/ui/password-input"
 import { useState } from "react"
 import { Button } from "@chakra-ui/react"
-import { Envelope } from "@mynaui/icons-react";
 import { Box } from "@chakra-ui/react"
 
+// form controls $ api
+import {useForm} from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {loginUserSchema, type loginUser} from "@/schemas/authUserSchema.ts";
+import DOMPurify from "dompurify";
+import {useSignInUser} from "@/services/api/auth.ts";
+
 export default function LoginForm() {
+    const signInUser = useSignInUser()
     const { handleSubmit,register, formState: { errors } } = useForm({
-        resolver: zodResolver(registerUserSchema),
+        resolver: zodResolver(loginUserSchema),
     })
     const sanitizeInput = (value: string) => DOMPurify.sanitize(value);
 
-    const onSubmit = async (data: registerUser) => {
+    const onSubmit = async (data: loginUser) => {
         try{
-            const sanitizedEmail = sanitizeInput(data.email);
-            const sanitizedPassword = sanitizeInput(data.password);
-            console.log(sanitizedEmail, sanitizedPassword);
-            //endpoint API call & preprocess data
+            const sanitizedData = {
+                name: sanitizeInput(data.name),
+                password: sanitizeInput(data.password),
+            };
+            console.log(sanitizedData);
+            await signInUser.mutateAsync(sanitizedData);
         } catch (error) {
 
         }
@@ -33,17 +39,15 @@ export default function LoginForm() {
             <div className="w-[65%]">
                 <Field.Root required>
                     <Field.Label fontSize="11px" fontWeight="bolder">
-                        Пошта
+                        Ім'я користувача
                     </Field.Label>
-                    <InputGroup startElement={<Envelope size={13} color="#68686A" />}>
-                        <Input
-                            {...register("email")}
-                            placeholder="email@example.com"
-                            size="xs"
-                        />
-                    </InputGroup>
+                    <Input
+                        {...register("name")}
+                        placeholder="username"
+                        size="xs"
+                    />
                 </Field.Root>
-                {errors.email && <p role="alert">{errors.email.message}</p>}
+                {errors.name && <Text role="alert" textStyle="xs" color="red.500">{errors.name.message}</Text>}
             </div>
 
             <div className="w-[65%]">
@@ -53,6 +57,7 @@ export default function LoginForm() {
                     </Field.Label>
                     <Stack gap="3" className="w-full">
                         <PasswordInput
+                            {...register("password")}
                             value={password}
                             onChange={(e) => setPassword(e.currentTarget.value)}
                             placeholder="password"
@@ -60,7 +65,7 @@ export default function LoginForm() {
                         />
                     </Stack>
                 </Field.Root>
-                {errors.password && <p role="alert">{errors.password.message}</p>}
+                {errors.password && <Text role="alert" textStyle="xs" color="red.500">{errors.password.message}</Text>}
             </div>
 
             <Box paddingTop="6">
