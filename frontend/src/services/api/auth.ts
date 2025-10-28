@@ -2,19 +2,20 @@ import {useMutation} from "@tanstack/react-query";
 import axios from "axios";
 import {defaultAxiosInstance} from "@/services/axiosInstances.ts"
 
-const signUpReqBody = {
-    "name": "string",
-    "email": "string",
-    "phone_number": "string",
-    "company_name": "string",
-    "avatar_photo_id": 0,
-    "password": "string",
-    "role": "user"
+export interface SignUpReqBody {
+    name: string;
+    email: string;
+    password: string;
+    phone_number: string;
+    company_name?: string;
+    avatar_photo_id?: number;
+    role: "user";
 }
 
 export const useSignUpUser = () => {
     return useMutation({
-        mutationFn: async (credentials: typeof signUpReqBody) => {
+        mutationFn: async (credentials: SignUpReqBody) => {
+            console.log(credentials);
             await defaultAxiosInstance.post("/users/register", credentials);
         },
         onSuccess: () => {

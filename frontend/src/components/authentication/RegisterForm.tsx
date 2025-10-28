@@ -16,7 +16,7 @@ import {useForm} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {registerUserSchema, type registerUser} from "@/schemas/authUserSchema.ts";
 import DOMPurify from "dompurify";
-import {useSignUpUser} from "@/services/api/auth.ts";
+import {useSignUpUser, type SignUpReqBody} from "@/services/api/auth.ts";
 
 const strengthOptions: Options<string> = [
     { id: 1, value: "weak", minDiversity: 0, minLength: 0 },
@@ -42,12 +42,12 @@ export default function RegisterForm() {
     const onSubmit = async (data: registerUser) => {
         try{
             const sanitizedData = sanitizeAll(data);
-            const { repeatPassword, ...rest } = sanitizedData;
-            const credentials = {
-                ...rest,
+            const { repeatPassword, ...restData } = sanitizedData;
+            const credentials: SignUpReqBody = {
+                ...(restData as Omit<SignUpReqBody, "avatar_photo_id" | "role">),
                 avatar_photo_id: 0,
                 role: "user",
-            }
+            };
             console.log(credentials);
             await signUpUser.mutateAsync(credentials);
         } catch (error) {
