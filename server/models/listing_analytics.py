@@ -2,7 +2,7 @@ import datetime
 from sqlalchemy import JSON, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from server.database.connection import Base
+from server.database.base import Base
 from server.models.listing import Listing
 
 
@@ -22,8 +22,7 @@ class ListingAnalytics(Base):
 
     views: Mapped[int] = mapped_column(default=0)
     contacts: Mapped[int] = mapped_column(default=0)
-    favorties: Mapped[int] = mapped_column(default=0)
-
+    favorites: Mapped[int] = mapped_column(default=0)
     updated_at: Mapped[datetime.datetime]
 
     listing: Mapped[Listing] = relationship("Listing", viewonly=True)

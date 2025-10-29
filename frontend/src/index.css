@@ -1,3 +1,5 @@
+// look closer to styling
+// Nastya
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -56,6 +58,8 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+// Nastya
+@import "tailwindcss";
 
 @media (prefers-color-scheme: light) {
   :root {
@@ -63,9 +67,6 @@ button:focus-visible {
     background-color: #ffffff;
   }
   a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
+    color: #FD7F16;
   }
 }

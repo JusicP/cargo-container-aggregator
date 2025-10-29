@@ -1,8 +1,8 @@
 import datetime
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from server.database.connection import Base
+from server.database.base import Base
 
 
 class ListingPhoto(Base):
@@ -10,8 +10,10 @@ class ListingPhoto(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     listing_id: Mapped[int] = mapped_column(ForeignKey("listings.id", ondelete="CASCADE"))
-    url: Mapped[str] = mapped_column(String(2048))
+    photo_id: Mapped[int] = mapped_column(ForeignKey("user_photos.id", ondelete="CASCADE"))
+    
     is_main: Mapped[bool] = mapped_column(default=False)
-    uploaded_at: Mapped[datetime.datetime] = mapped_column(default=datetime.datetime.now(datetime.timezone.utc))
+    addition_date: Mapped[datetime.datetime] = mapped_column(default=datetime.datetime.now(datetime.timezone.utc))
 
     listing = relationship("Listing", back_populates="photos")
+    photo = relationship("UserPhoto")

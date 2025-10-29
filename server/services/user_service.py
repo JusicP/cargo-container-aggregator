@@ -1,6 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from server.auth.utils import hash_password
 from server.schemas.user import UserCreate, UserUpdate
 from server.models.user import User
 
@@ -10,9 +11,12 @@ async def create_user(session: AsyncSession, user_create: UserCreate):
     await check_single_phone_number(session, None, user_create.phone_number)
     
     user = User(**user_create.model_dump())
+    user.password = hash_password(user.password)
     session.add(user)
     
     await session.commit()
+    await session.refresh(user)
+    return user
 
 async def get_all_users(session: AsyncSession):
     result = await session.execute(select(User))

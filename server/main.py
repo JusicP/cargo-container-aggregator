@@ -1,26 +1,69 @@
-from contextlib import asynccontextmanager
-import logging
-from typing import AsyncIterator
+import os
+from dotenv import load_dotenv
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
+from typing import AsyncIterator
 
-from server.routes import auth, user
+from server.routes import auth, user, listings, favorites, parserListings, analytics, user_photo_router
+from server.database.connection import async_engine, async_session_maker
+from server.database.base import Base
+from server.scheduler.listing_analytics_job import start_scheduler
 
-logger = logging.getLogger("server")
+from server.utils.default_admin import ensure_superuser
+from server.database.migrations_runner import run_migrations
+
+
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
+SYNC_DATABASE_URL = os.getenv("SYNC_DATABASE_URL")
+
+
+
+
 
 @asynccontextmanager
-async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-    """
-    FastAPI lifespan.
-    """
-    # TODO: init scheduler (apscheduler), alembic automigration, intial start (inserts initial data, maybe users, to db)
+async def lifespan(app: FastAPI):
+    print(">>> Lifespan start")
+
+    if "sqlite" not in DATABASE_URL and SYNC_DATABASE_URL:
+        print(">>> Running migrations...")
+        import asyncio, concurrent.futures
+        from server.database.migrations_runner import run_migrations
+        loop = asyncio.get_running_loop()
+        with concurrent.futures.ThreadPoolExecutor() as pool:
+            await loop.run_in_executor(pool, run_migrations)
+        print(">>> Migrations done")
+    else:
+        print(">>> Creating all tables via metadata...")
+        async with async_engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        print(">>> Tables created")
+
+    print(">>> Creating default superuser...")
+    async with async_session_maker() as session:
+        await ensure_superuser(session)
+    print(">>> Superuser ensured")
+
     yield
-    # TODO: shutdown scheduler
+    print(">>> Lifespan exit")
+
 
 app = FastAPI(
-    lifespan=lifespan,
-    title="server",
+    title="Cargo Container Aggregator",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 app.include_router(auth.router)
 app.include_router(user.router)
+app.include_router(listings.router)
+app.include_router(favorites.router)
+app.include_router(parserListings.router)
+app.include_router(analytics.router)
+app.include_router(user_photo_router.router)
+
+@app.on_event("startup")
+async def startup_event():
+    start_scheduler()
+    print("Scheduler started")
