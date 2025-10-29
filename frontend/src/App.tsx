@@ -1,6 +1,8 @@
-import React from 'react';
+import "./App.css";
+import {useState} from "react";
+import background from "./assets/background.png";
+import './index.css'
 import AppRouter from './router/AppRouter';
-import './App.css';
 
 const App: React.FC = () => {
   return (
