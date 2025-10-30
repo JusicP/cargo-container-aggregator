@@ -12,6 +12,7 @@ from server.scheduler.listing_analytics_job import start_scheduler
 from server.utils.default_admin import ensure_superuser
 from server.database.migrations_runner import run_migrations
 
+from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 
@@ -53,6 +54,19 @@ app = FastAPI(
     title="Cargo Container Aggregator",
     version="1.0.0",
     lifespan=lifespan,
+)
+
+origins = [
+    os.getenv("FRONTEND_URL"),
+    os.getenv("FRONTEND_URL_IP"),
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(auth.router)
