@@ -4,9 +4,9 @@ import ProtectedRoute from '../components/ProtectedRoute';
 import { useAuth } from '../contexts/AuthContext';
 
 // Імпорти компонентів сторінок
-import HomePage from '../pages/HomePage';
-import LoginPage from '../pages/LoginPage';
-import RegisterPage from '../pages/RegisterPage';
+import HomePage from '../pages/homepage/HomePage.tsx';
+import LoginPage from '../pages/auth/LoginPage.tsx';
+import RegisterPage from '../pages/auth/RegisterPage.tsx';
 import MyAccountPage from '../pages/MyAccountPage';
 import ActiveListingsPage from '../pages/myaccount/ActiveListingsPage';
 import PendingListingsPage from '../pages/myaccount/PendingListingsPage';

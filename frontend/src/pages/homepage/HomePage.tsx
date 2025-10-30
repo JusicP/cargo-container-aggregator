@@ -1,7 +1,6 @@
-import "../App.css";
 import {useState} from "react";
-import background from "../assets/background.png";
-import '../index.css'
+import background from "@/assets/background.png";
+import '@/pages/homepage/homepage.css'
 
 
 function App() {
@@ -9,8 +8,7 @@ function App() {
     const colors = ['#bada55', '#bada55', '#bada55', '#bada55', '#bada55'];
     return (
         <div
-
-            className="app-root"
+            className="app-root homepage"
             style={{
                 backgroundImage: `url(${background})`,
                 backgroundSize: "cover",
