@@ -320,6 +320,8 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
+}
+
 html, body, #root {
     background-color: #f5f5f5;
 }
