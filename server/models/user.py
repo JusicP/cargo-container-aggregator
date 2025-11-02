@@ -5,6 +5,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from server.database.base import Base
 
 from typing import TYPE_CHECKING
+
+from .notification import UserNotification
+
 if TYPE_CHECKING:
     from .user_photo import UserPhoto
     from .user_favorite_listing import UserFavoriteListing
@@ -35,6 +38,13 @@ class User(Base):
         foreign_keys="UserPhoto.user_id",
         cascade="all, delete-orphan"
     )
+
+    notifications: Mapped[list["UserNotification"]] = relationship(
+        "UserNotification",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
 
     def is_admin(self) -> bool:
         return self.role == "admin"
