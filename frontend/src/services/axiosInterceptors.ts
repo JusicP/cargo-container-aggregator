@@ -1,4 +1,4 @@
-//import {defaultAxiosInstance} from "./axiosInstances.ts";
+import { refreshAccessTokenRequest } from "@/services/auth-api";
 import type {AxiosError, InternalAxiosRequestConfig, AxiosResponse, AxiosRequestConfig} from "axios";
 import axios from "axios";
 
@@ -14,16 +14,12 @@ export const requestInterceptor =
         const { method, url } = config;
 
         const accessToken = sessionStorage.getItem("accessToken")
-        if (accessToken) {
-            //setting token inside headers
-            config.headers['Authorization'] = `Bearer ${accessToken}`;
-        } else {
-            //waiting for backend implementation -- call to refresh token
-            /*
-                const newAccessToken = defaultAxiosInstance.put()
-                sessionStorage.setItem("accessToken", newAccessToken);
-            */
+        if (!accessToken) {
+            const newAccessToken = await refreshAccessTokenRequest();
+            sessionStorage.setItem("accessToken", newAccessToken);
         }
+        //setting token inside headers
+        config.headers['Authorization'] = `Bearer ${accessToken}`;
         //logging for debugging purposes (development mode)
         logOnDev(`[axios API] ${method?.toUpperCase()} ${url} | Request`);
         if (method === "get") {
@@ -52,6 +48,7 @@ async (error: AxiosError | Error) => {
         const { message } = error;
         const { method, url } = error.config as AxiosRequestConfig;
         const { status } = error.response as AxiosResponse ?? {};
+        const originalRequest = error.config as any;
 
         //logging for debugging purposes (development mode)
         logOnDev(
@@ -59,9 +56,24 @@ async (error: AxiosError | Error) => {
         );
         switch (status) {
             case 401: {
-                //unauthenticated user, expired token
-                sessionStorage.removeItem("accessToken");
-                //navigate user (when router will be done)
+                if(!originalRequest._retry) {
+                    originalRequest._retry = true;
+
+                }
+                try {
+                    const newAccessToken = await refreshAccessTokenRequest();
+
+                    if (newAccessToken) {
+                        sessionStorage.setItem("accessToken", newAccessToken);
+                        // retry the original request
+                        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                        return axios(originalRequest);
+                    }
+                } catch (refreshError) {
+                    console.error("Session expired or refresh failed. Redirecting to login.");
+                    sessionStorage.removeItem("accessToken");
+                    window.location.href = "/login";
+                }
                 break;
             }
             case 403: {
