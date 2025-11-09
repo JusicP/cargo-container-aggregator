@@ -99,7 +99,7 @@ def upgrade() -> None:
     sa.Column('price_trend', sa.JSON(), nullable=False),
     sa.Column('views', sa.Integer(), nullable=False),
     sa.Column('contacts', sa.Integer(), nullable=False),
-    sa.Column('favorties', sa.Integer(), nullable=False),
+    sa.Column('favorities', sa.Integer(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['listing_id'], ['listings.id'], name='fk_listing_analytics_listing_id', ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('listing_id')
