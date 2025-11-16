@@ -1,5 +1,5 @@
 import type { Listing } from "@/services/api/listings";
-import { Box, Card, Flex, IconButton, Text } from "@chakra-ui/react";
+import { Box, Card, Flex, IconButton, Link, Text } from "@chakra-ui/react";
 import { ArrowUpRight } from "@mynaui/icons-react";
 import container from "@/assets/container.png";
 
@@ -46,7 +46,8 @@ export function ListingCard({ listing }: { listing: Listing }) {
             <Card.Footer zIndex={2}>
                 <Flex bgColor="#F5F5F5" width="100%" padding={3} justifyContent="space-between" borderRadius="md">
                     <Text>{listing.title}</Text>
-                    <IconButton size="md" paddingRight={5} paddingLeft={5}><ArrowUpRight/></IconButton>
+                    {/* лінк чомусь фарбує інонку в синій колір -_- */}
+                    <IconButton as={Link} size="md" paddingRight={5} paddingLeft={5} href={`/listing/${listing.id}`}><ArrowUpRight/></IconButton>
                 </Flex>
             </Card.Footer>
         </Card.Root>
