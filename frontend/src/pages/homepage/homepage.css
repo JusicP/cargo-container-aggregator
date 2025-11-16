@@ -41,24 +41,6 @@
     line-height: 1.1;
 }
 
-.homepage button {
-    border-radius: 8px;
-    border: 1px solid transparent;
-    padding: 0.6em 1.2em;
-    font-size: 1em;
-    font-weight: 500;
-    font-family: inherit;
-    background-color: #1a1a1a;
-    cursor: pointer;
-    transition: border-color 0.25s;
-}
-.homepage button:hover {
-    border-color: #646cff;
-}
-.homepage button:focus,
-.homepage button:focus-visible {
-    outline: 4px auto -webkit-focus-ring-color;
-}
 
 /* Остальные ваши стили остаются без изменений */
 .homepage .site-header {
@@ -133,22 +115,11 @@
     color: white;
     width: 452px;
     margin-bottom: 20px;
-    white-space: pre-line;
-    text-align: left;
 }
 
 .homepage .cta-btn {
-    background-color: #ff6600;
-    color: white;
-    font-size: 18px;
-    padding: 17px 32px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+    background-color: #FD7F16;
     transition: background-color 0.3s ease;
-    margin-top: 12px;
-    align-self: flex-start;
-    margin-left: 300px;
 }
 
 .homepage .cta-btn:hover {
@@ -179,11 +150,10 @@
     font-size: 24px;
     font-weight: bold;
     color: black;
-    margin-bottom: 20px;
 }
 
 .homepage .filter-section {
-    margin-bottom: 20px;
+    margin-bottom: 3px;
     color: black;
 }
 
@@ -291,7 +261,6 @@
 .homepage .divider {
     height: 1px;
     background: #e5e5e5;
-    margin: 20px 0;
 }
 
 .homepage .reset-button {
@@ -307,7 +276,7 @@
 /* Стили для основного контента */
 .homepage .content-main {
     flex: 1;
-    padding: 24px;
+    padding: 24px 128px 24px 128px;
 }
 
 .homepage .search-bar {
@@ -316,25 +285,14 @@
     margin-bottom: 24px;
 }
 
-.homepage .search-input {
-    flex: 1;
-    padding: 8px 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
 .homepage .search-btn {
     background: #FD7F16;
-    color: white;
-    padding: 8px 24px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
 }
 
 .homepage .results-count {
+    margin-top: 16px;
     margin-bottom: 16px;
-    color: black;
+    color: grey;
 }
 
 .homepage .products-grid {

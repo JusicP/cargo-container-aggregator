@@ -2,3 +2,5 @@ venv/
 .vscode/
 uploaded_photos
 .idea/
+*.pyc
+__pycache__/
