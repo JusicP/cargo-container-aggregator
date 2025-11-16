@@ -20,6 +20,14 @@ export interface Listing {
     analytics?: any;
 }
 
+export interface ListingsPaginatedGet {
+    listings: Listing[];
+    total: number;
+    total_pages: number;
+    page: number;
+    page_size: number;
+}
+
 export interface ListingFilters {
     title?: string;
     container_type?: string[];
@@ -39,7 +47,7 @@ export interface ListingFilters {
 
 export const useListings = (filters: ListingFilters) => {
     return useQuery({
-        queryKey: ["listings"],
+        queryKey: ["listings", filters.page, filters.page_size],
         queryFn: async () => {
             const params: any = { ...filters };
             // type_ -> type для backend
@@ -48,7 +56,7 @@ export const useListings = (filters: ListingFilters) => {
                 delete params.type_;
             }
 
-            const { data } = await defaultAxiosInstance.get<Listing[]>("/listings", { params });
+            const { data } = await defaultAxiosInstance.get<ListingsPaginatedGet>("/listings", { params });
             return data;
         },
     });

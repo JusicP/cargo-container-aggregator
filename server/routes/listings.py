@@ -17,15 +17,15 @@ from server.routes.dependencies import get_current_user, get_listing_filters
 router = APIRouter(prefix="/listings", tags=["listings"])
 
 
-@router.get("/", response_model=list[ListingGet])
+@router.get("/", response_model=ListingPaginatedGet)
 async def get_listings(
     filters: ListingFilterParams = Depends(get_listing_filters),
     session: AsyncSession = Depends(generate_async_session),
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
 ):
-    listings = await get_all_listings_service(session, filters, page, page_size)
-    return listings
+    res = await get_all_listings_service(session, filters, page, page_size)
+    return res
 
 
 @router.post("/", response_model=ListingGet)

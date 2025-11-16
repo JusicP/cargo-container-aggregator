@@ -73,7 +73,7 @@ function App() {
     const [sortBy, setSortBy] = useState<keyof ListingFilters>("addition_date");
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-    const { data: listings, isLoading, refetch } = useListings({
+    const { data, isLoading, refetch } = useListings({
         title: titleFilter || undefined,
         container_type: containerTypeFilter || undefined,
         condition: conditionFilter || undefined,
@@ -248,21 +248,21 @@ function App() {
                             <>
                                 <Flex justify="space-between">
                                     <Text className="results-count" textAlign="center" pt="2" pb="2">
-                                        Всього знайдено: {listings?.length ?? 0}
+                                        Всього знайдено: {data?.total ?? 0}
                                     </Text>
 
                                     <Flex align="center" gap={2}>
-                                        <NativeSelect.Root value={sortBy} onValueChange={(val) => setSortBy(val as keyof ListingFilters)}>
-                                            <NativeSelect.Field placeholder="Поле сортування">
+                                        <NativeSelect.Root>
+                                            <NativeSelect.Field placeholder="Поле сортування" value={sortBy} onChange={(val) => setSortBy(val as keyof ListingFilters)}>
                                                 {sortOptions.map((opt) => (
                                                     <option key={opt.value} value={opt.value}>{opt.label}</option>
                                                 ))}
                                             </NativeSelect.Field>
                                             <NativeSelect.Indicator />
-                                            </NativeSelect.Root>
+                                        </NativeSelect.Root>
 
-                                            <NativeSelect.Root value={sortOrder} onValueChange={(val) => setSortOrder(val as "asc" | "desc")}>
-                                            <NativeSelect.Field placeholder="Напрям сортування">
+                                        <NativeSelect.Root>
+                                            <NativeSelect.Field placeholder="Напрям сортування" value={sortOrder} onChange={(val) => setSortOrder(val as "asc" | "desc")}>
                                                 {sortOrders.map((opt) => (
                                                     <option key={opt.value} value={opt.value}>{opt.label}</option>
                                                 ))}
@@ -273,7 +273,7 @@ function App() {
                                 </Flex>
 
                                 <div className="products-grid">
-                                    {listings?.map(listing => (
+                                    {data?.listings?.map(listing => (
                                         <div key={listing.id} className="product-card">
                                             <img
                                                 src={container}
@@ -292,10 +292,10 @@ function App() {
 
                                 <Center mt="32px" mb="16px">
                                     <Pagination.Root 
-                                        count={10} 
-                                        pageSize={10} 
-                                        page={page}
-                                        onChange={(p) => setPage(p)}
+                                        count={data?.total ?? 0}
+                                        pageSize={data?.page_size ?? 10}
+                                        page={data?.page ?? page}
+                                        onPageChange={(p) => setPage(p.page)}
                                     >
                                         <ButtonGroup gap="4" size="sm" variant="ghost">
                                             <Pagination.PrevTrigger asChild>

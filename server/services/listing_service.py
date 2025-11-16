@@ -1,6 +1,6 @@
 import datetime
 
-from sqlalchemy import asc, desc, select
+from sqlalchemy import asc, desc, func, select
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -70,12 +70,11 @@ async def get_all_listings(
     filters: ListingFilterParams,
     page: int = 1,
     page_size: int = 20
-) -> list[Listing]:
+):
     query = select(Listing).options(
         selectinload(Listing.photos),
         selectinload(Listing.analytics)
     )
-
     if filters.title:
         query = query.where(Listing.title.ilike(f"%{filters.title}%"))
     if filters.container_type:
@@ -97,6 +96,11 @@ async def get_all_listings(
     if filters.status:
         query = query.where(Listing.status == filters.status)
 
+    count_query = select(func.count()).select_from(Listing).where(
+        *query._where_criteria
+    )
+    total = (await session.execute(count_query)).scalar() or 0
+
     sort_column_map = {
         "addition_date": Listing.addition_date,
         "approval_date": Listing.approval_date,
@@ -104,6 +108,7 @@ async def get_all_listings(
         "price": Listing.price,
     }
     sort_column = sort_column_map.get(filters.sort_by, Listing.addition_date) # type: ignore
+
     if (filters.sort_order or "desc").lower() == "asc":
         query = query.order_by(asc(sort_column))
     else:
@@ -114,7 +119,16 @@ async def get_all_listings(
 
     result = await session.execute(query)
     listings = result.scalars().all()
-    return listings  # type: ignore
+
+    total_pages = (total + page_size - 1) // page_size  # ceil
+
+    return {
+        "listings": listings,
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "total_pages": total_pages,
+    }
 
 
 async def get_listing_by_id(session: AsyncSession, listing_id: int):

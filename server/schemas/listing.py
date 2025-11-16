@@ -48,7 +48,10 @@ class ListingFilterParams(BaseModel):
     sort_order: str | None = "desc"        # asc / desc
 
 class ListingPaginatedGet(BaseModel):
-    count: int
+    total: int
+    page: int
+    page_size: int
+    total_pages: int
     listings: list[ListingGet]
 
 class ListingCreate(ListingBase):
