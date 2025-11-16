@@ -1,7 +1,7 @@
 import background from "@/assets/background.png";
 import '@/pages/homepage/homepage.css'
 import container from "@/assets/container.png";
-import { Button, ButtonGroup, Center, Checkbox, CheckboxGroup, Fieldset, Flex, Group, IconButton, Input, InputGroup, NativeSelect, NumberInput, Pagination, Text } from "@chakra-ui/react";
+import { Button, ButtonGroup, Center, Checkbox, CheckboxGroup, Fieldset, Flex, Group, IconButton, Input, InputGroup, NativeSelect, NumberInput, Pagination, Spinner, Text } from "@chakra-ui/react";
 import { ArrowUpRight, ChevronLeft, ChevronRight, Search } from "@mynaui/icons-react";
 import { useListings, type ListingFilters } from "@/services/api/listings";
 import { useState } from "react";
@@ -240,72 +240,80 @@ function App() {
                             </Button>
                         </Group>
 
-                        <Flex justify="space-between">
-                            <Text className="results-count" textAlign="center" pt="2" pb="2">
-                                Всього знайдено: {listings?.length ?? 0}
-                            </Text>
+                        {isLoading ? (
+                            <Center mt="32px" mb="16px">
+                                <Spinner size="xl"/>
+                            </Center>
+                        ) : (
+                            <>
+                                <Flex justify="space-between">
+                                    <Text className="results-count" textAlign="center" pt="2" pb="2">
+                                        Всього знайдено: {listings?.length ?? 0}
+                                    </Text>
 
-                            <Flex align="center" gap={2}>
-                                <NativeSelect.Root value={sortBy} onValueChange={(val) => setSortBy(val as keyof ListingFilters)}>
-                                    <NativeSelect.Field placeholder="Поле сортування">
-                                        {sortOptions.map((opt) => (
-                                            <option key={opt.value} value={opt.value}>{opt.label}</option>
-                                        ))}
-                                    </NativeSelect.Field>
-                                    <NativeSelect.Indicator />
-                                    </NativeSelect.Root>
+                                    <Flex align="center" gap={2}>
+                                        <NativeSelect.Root value={sortBy} onValueChange={(val) => setSortBy(val as keyof ListingFilters)}>
+                                            <NativeSelect.Field placeholder="Поле сортування">
+                                                {sortOptions.map((opt) => (
+                                                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                                ))}
+                                            </NativeSelect.Field>
+                                            <NativeSelect.Indicator />
+                                            </NativeSelect.Root>
 
-                                    <NativeSelect.Root value={sortOrder} onValueChange={(val) => setSortOrder(val as "asc" | "desc")}>
-                                    <NativeSelect.Field placeholder="Напрям сортування">
-                                        {sortOrders.map((opt) => (
-                                            <option key={opt.value} value={opt.value}>{opt.label}</option>
-                                        ))}
-                                    </NativeSelect.Field>
-                                    <NativeSelect.Indicator />
-                                </NativeSelect.Root>
-                            </Flex>
-                        </Flex>
+                                            <NativeSelect.Root value={sortOrder} onValueChange={(val) => setSortOrder(val as "asc" | "desc")}>
+                                            <NativeSelect.Field placeholder="Напрям сортування">
+                                                {sortOrders.map((opt) => (
+                                                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                                ))}
+                                            </NativeSelect.Field>
+                                            <NativeSelect.Indicator />
+                                        </NativeSelect.Root>
+                                    </Flex>
+                                </Flex>
 
-                        <div className="products-grid">
-                            {listings?.map(listing => (
-                                <div key={listing.id} className="product-card">
-                                    <img
-                                        src={container}
-                                        alt="Container"
-                                        className="product-image"
-                                    />
-                                    <div className="product-info">
-                                        <p className="product-title">
-                                            {listing.title}
-                                        </p>
-                                        <IconButton size="md" paddingRight={7} paddingLeft={7}><ArrowUpRight/></IconButton>
-                                    </div>
+                                <div className="products-grid">
+                                    {listings?.map(listing => (
+                                        <div key={listing.id} className="product-card">
+                                            <img
+                                                src={container}
+                                                alt="Container"
+                                                className="product-image"
+                                            />
+                                            <div className="product-info">
+                                                <p className="product-title">
+                                                    {listing.title}
+                                                </p>
+                                                <IconButton size="md" paddingRight={7} paddingLeft={7}><ArrowUpRight/></IconButton>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
-                        </div>
 
-                        <Center mt="32px" mb="16px">
-                            <Pagination.Root 
-                                count={10} 
-                                pageSize={10} 
-                                page={page}
-                                onChange={(p) => setPage(p)}
-                            >
-                                <ButtonGroup gap="4" size="sm" variant="ghost">
-                                    <Pagination.PrevTrigger asChild>
-                                        <IconButton>
-                                            <ChevronLeft  />
-                                        </IconButton>
-                                    </Pagination.PrevTrigger>
-                                    <Pagination.PageText />
-                                    <Pagination.NextTrigger asChild>
-                                        <IconButton>
-                                            <ChevronRight />
-                                        </IconButton>
-                                    </Pagination.NextTrigger>
-                                </ButtonGroup>
-                            </Pagination.Root>
-                        </Center>
+                                <Center mt="32px" mb="16px">
+                                    <Pagination.Root 
+                                        count={10} 
+                                        pageSize={10} 
+                                        page={page}
+                                        onChange={(p) => setPage(p)}
+                                    >
+                                        <ButtonGroup gap="4" size="sm" variant="ghost">
+                                            <Pagination.PrevTrigger asChild>
+                                                <IconButton>
+                                                    <ChevronLeft  />
+                                                </IconButton>
+                                            </Pagination.PrevTrigger>
+                                            <Pagination.PageText />
+                                            <Pagination.NextTrigger asChild>
+                                                <IconButton>
+                                                    <ChevronRight />
+                                                </IconButton>
+                                            </Pagination.NextTrigger>
+                                        </ButtonGroup>
+                                    </Pagination.Root>
+                                </Center>
+                            </>
+                        )}
                     </main>
                 </div>
             </div>
