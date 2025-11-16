@@ -253,7 +253,7 @@ function App() {
 
                                     <Flex align="center" gap={2}>
                                         <NativeSelect.Root>
-                                            <NativeSelect.Field placeholder="Поле сортування" value={sortBy} onChange={(val) => setSortBy(val as keyof ListingFilters)}>
+                                            <NativeSelect.Field placeholder="Поле сортування" value={sortBy} onChange={(ev) => setSortBy(ev.currentTarget.value as keyof ListingFilters)}>
                                                 {sortOptions.map((opt) => (
                                                     <option key={opt.value} value={opt.value}>{opt.label}</option>
                                                 ))}
@@ -262,7 +262,7 @@ function App() {
                                         </NativeSelect.Root>
 
                                         <NativeSelect.Root>
-                                            <NativeSelect.Field placeholder="Напрям сортування" value={sortOrder} onChange={(val) => setSortOrder(val as "asc" | "desc")}>
+                                            <NativeSelect.Field placeholder="Напрям сортування" value={sortOrder} onChange={(ev) => setSortOrder(ev.currentTarget.value as "asc" | "desc")}>
                                                 {sortOrders.map((opt) => (
                                                     <option key={opt.value} value={opt.value}>{opt.label}</option>
                                                 ))}
