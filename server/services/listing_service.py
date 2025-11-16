@@ -1,13 +1,14 @@
 import datetime
 
-from sqlalchemy import select
+from sqlalchemy import asc, desc, select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.models.listing import Listing
 from server.models.user import User
 from server.services.listing_history_service import create_listing_history
 from server.services.listing_photo_service import create_listing_photos
-from server.schemas.listing import ListingCreate, ListingGet
+from server.schemas.listing import ListingCreate, ListingFilterParams, ListingGet
 
 
 async def create_listing(session: AsyncSession, user_id: int, listing_create: ListingCreate):
@@ -27,10 +28,14 @@ async def create_listing(session: AsyncSession, user_id: int, listing_create: Li
 
     session.add(listing)
     await session.commit()
-    await session.refresh(listing)
 
     await create_listing_photos(session, listing_id=listing.id, listing_photos=listing_create.photos)
     await create_listing_history(session, listing)
+
+    await session.execute(select(Listing).options(
+        selectinload(Listing.photos),
+        selectinload(Listing.analytics)
+    ).filter(Listing.id == listing.id))
 
     return listing
 
@@ -60,13 +65,64 @@ async def create_or_update_listings(session: AsyncSession, listings_create: list
     await session.commit()
 
 
-async def get_all_listings(session: AsyncSession):
-    result = await session.execute(select(Listing))
-    return result.scalars().all()
+async def get_all_listings(
+    session: AsyncSession,
+    filters: ListingFilterParams,
+    page: int = 1,
+    page_size: int = 20
+) -> list[Listing]:
+    query = select(Listing).options(
+        selectinload(Listing.photos),
+        selectinload(Listing.analytics)
+    )
+
+    if filters.title:
+        query = query.where(Listing.title.ilike(f"%{filters.title}%"))
+    if filters.container_type:
+        query = query.where(Listing.container_type.in_(filters.container_type))
+    if filters.condition:
+        query = query.where(Listing.condition.in_(filters.condition))
+    if filters.type_:
+        query = query.where(Listing.type.in_(filters.type_))
+    if filters.price_min is not None:
+        query = query.where(Listing.price >= filters.price_min)
+    if filters.price_max is not None:
+        query = query.where(Listing.price <= filters.price_max)
+    if filters.currency:
+        query = query.where(Listing.currency == filters.currency)
+    if filters.location:
+        query = query.where(Listing.location.in_(filters.location))
+    if filters.ral_color:
+        query = query.where(Listing.ral_color.in_(filters.ral_color))
+    if filters.status:
+        query = query.where(Listing.status == filters.status)
+
+    sort_column_map = {
+        "addition_date": Listing.addition_date,
+        "approval_date": Listing.approval_date,
+        "updated_at": Listing.updated_at,
+        "price": Listing.price,
+    }
+    sort_column = sort_column_map.get(filters.sort_by, Listing.addition_date) # type: ignore
+    if (filters.sort_order or "desc").lower() == "asc":
+        query = query.order_by(asc(sort_column))
+    else:
+        query = query.order_by(desc(sort_column))
+
+    offset = (page - 1) * page_size
+    query = query.offset(offset).limit(page_size)
+
+    result = await session.execute(query)
+    listings = result.scalars().all()
+    return listings  # type: ignore
 
 
 async def get_listing_by_id(session: AsyncSession, listing_id: int):
-    return await session.get(Listing, listing_id)
+    result = await session.execute(select(Listing).where(Listing.id==listing_id).options(
+        selectinload(Listing.photos),
+        selectinload(Listing.analytics)
+    ))
+    return result.scalars().one_or_none()
 
 
 # FIXME: make permission check as fastapi dependency? 
