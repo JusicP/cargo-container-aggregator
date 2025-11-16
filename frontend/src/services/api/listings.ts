@@ -2,6 +2,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { defaultAxiosInstance } from "../axiosInstances";
 
+interface ListingPhoto {
+    photo_id: number;
+    is_main: boolean;
+    listing_int: number;
+    uploaded_at: string
+}
+
 export interface Listing {
     id: number;
     title: string;
@@ -16,7 +23,7 @@ export interface Listing {
     addition_date: string;
     approval_date: string | null;
     updated_at: string | null;
-    photos?: any[];
+    photos?: ListingPhoto[];
     analytics?: any;
 }
 

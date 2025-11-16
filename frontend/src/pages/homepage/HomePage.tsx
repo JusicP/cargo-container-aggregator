@@ -1,14 +1,13 @@
 import background from "@/assets/background.png";
 import '@/pages/homepage/homepage.css'
-import container from "@/assets/container.png";
 import { Button, ButtonGroup, Center, Checkbox, CheckboxGroup, Fieldset, Flex, Group, IconButton, Input, InputGroup, NativeSelect, NumberInput, Pagination, Spinner, Text } from "@chakra-ui/react";
-import { ArrowUpRight, ChevronLeft, ChevronRight, Search } from "@mynaui/icons-react";
+import { ChevronLeft, ChevronRight, Search } from "@mynaui/icons-react";
 import { useListings, type ListingFilters } from "@/services/api/listings";
 import { useState } from "react";
 import FilterableCheckboxGroup from "@/components/ui/filterable-checkbox-group";
 
-import { RAL } from "ral-colors/index"
 import RalColorBox from "@/components/ui/ral-color-box";
+import { ListingCard } from "@/components/ui/listing-card";
 
 
 const sortOptions = [
@@ -274,19 +273,7 @@ function App() {
 
                                 <div className="products-grid">
                                     {data?.listings?.map(listing => (
-                                        <div key={listing.id} className="product-card">
-                                            <img
-                                                src={container}
-                                                alt="Container"
-                                                className="product-image"
-                                            />
-                                            <div className="product-info">
-                                                <p className="product-title">
-                                                    {listing.title}
-                                                </p>
-                                                <IconButton size="md" paddingRight={7} paddingLeft={7}><ArrowUpRight/></IconButton>
-                                            </div>
-                                        </div>
+                                        <ListingCard listing={listing}/>
                                     ))}
                                 </div>
 
