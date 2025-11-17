@@ -3,13 +3,17 @@ import { Box, Card, Flex, IconButton, Link, Text } from "@chakra-ui/react";
 import { ArrowUpRight } from "@mynaui/icons-react";
 import container from "@/assets/container.png";
 
-export function ListingCard({ listing }: { listing: Listing }) {
+export function extractPhotoUrl(listing: Listing): string {
     const mainPhoto = listing.photos?.find(p => p.is_main) 
         ?? listing.photos?.[0];
 
-    const photoUrl = mainPhoto
+    return mainPhoto
         ? `${import.meta.env.VITE_SERVER_URL}/user/photo/${mainPhoto.photo_id}`
         : container; // fallback
+}
+
+export function ListingCard({ listing }: { listing: Listing }) {
+    const photoUrl = extractPhotoUrl(listing);
 
     return (
         <Card.Root

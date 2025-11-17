@@ -12,6 +12,7 @@ interface ListingPhoto {
 export interface Listing {
     id: number;
     title: string;
+    description: string;
     container_type: string;
     condition: string;
     type: string;
