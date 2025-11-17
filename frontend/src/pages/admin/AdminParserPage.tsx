@@ -1,5 +1,5 @@
 import { Button, ButtonGroup, Center, IconButton, Pagination, Stack, Table, Text } from "@chakra-ui/react";
-import { Edit, User } from "@mynaui/icons-react";
+import { Edit, Trash, User } from "@mynaui/icons-react";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 
 export default function AdminParserPage() {
