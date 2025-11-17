@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
-from server.routes import auth, user, listings, favorites, parserListings, analytics, user_photo_router
+from server.routes import auth, user, listings, favorites, parserListings, analytics, user_photo_router, notification
 from server.database.connection import async_engine, async_session_maker
 from server.database.base import Base
 from server.scheduler.listing_analytics_job import start_scheduler
@@ -76,6 +76,7 @@ app.include_router(favorites.router)
 app.include_router(parserListings.router)
 app.include_router(analytics.router)
 app.include_router(user_photo_router.router)
+app.include_router(notification.router)
 
 @app.on_event("startup")
 async def startup_event():
