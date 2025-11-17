@@ -7,23 +7,17 @@ from server.database.connection import generate_async_session
 from server.routes.dependencies import get_current_user
 from server.models.user import User
 from server.schemas.notification import UserNotificationCreate, UserNotificationGet
-from server.services.notification_service import (
-    get_notifications,
-    mark_as_read,
-    notify_user,
-    notify_admins,
-    notify_all,
-)
+from server.services.notification_service import get_notifications, mark_as_read
 
 router = APIRouter(
-    prefix="/notifications",
+    prefix="/user/notification",
     tags=["notifications"]
 )
 
 @router.get("/", response_model=list[UserNotificationGet])
 async def notifications_list(
     session: AsyncSession = Depends(generate_async_session),
-    current_user: User = Depends(get_current_user()),
+    current_user: User = Depends(get_current_user()),  # фабрика для поточного користувача
 ):
 
     try:
@@ -40,12 +34,10 @@ async def notifications_list(
             detail=f"Unexpected error: {str(e)}"
         )
 
-
 class MarkReadBody(BaseModel):
     ids: list[int]
 
-
-@router.post("/read")
+@router.post("/")
 async def mark_read_notifications(
     body: MarkReadBody,
     session: AsyncSession = Depends(generate_async_session),
@@ -58,74 +50,8 @@ async def mark_read_notifications(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="No notification IDs provided"
             )
-        await mark_as_read(session, current_user.id, body.ids)
+        await mark_as_read(session, current_user, body.ids)
         return {"status": "ok"}
-    except SQLAlchemyError as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Database error: {str(e)}"
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Unexpected error: {str(e)}"
-        )
-
-@router.post("/send")
-async def send_notification_to_user(
-    user_id: int,
-    data: UserNotificationCreate,
-    session: AsyncSession = Depends(generate_async_session),
-    current_user: User = Depends(get_current_user(role="admin")),
-):
-
-    try:
-        await notify_user(session, user_id, data)
-        return {"status": "sent"}
-    except SQLAlchemyError as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Database error: {str(e)}"
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Unexpected error: {str(e)}"
-        )
-
-
-@router.post("/send_admins")
-async def send_notification_to_admins(
-    data: UserNotificationCreate,
-    session: AsyncSession = Depends(generate_async_session),
-    current_user: User = Depends(get_current_user(role="admin")),
-):
-
-    try:
-        await notify_admins(session, data)
-        return {"status": "sent"}
-    except SQLAlchemyError as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Database error: {str(e)}"
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Unexpected error: {str(e)}"
-        )
-
-
-@router.post("/send_all")
-async def send_notification_to_all_users(
-    data: UserNotificationCreate,
-    session: AsyncSession = Depends(generate_async_session),
-    current_user: User = Depends(get_current_user(role="admin")),
-):
-
-    try:
-        await notify_all(session, data)
-        return {"status": "sent"}
     except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

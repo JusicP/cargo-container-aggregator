@@ -1,7 +1,7 @@
-from enum import Enum
+from enum import StrEnum
 
-class NotificationType(str, Enum):
-    LISTING_SENT_TO_MODERATION = "Оголошення направлено на модерацію"
-    LISTING_PUBLISHED = "Оголошення пройшло модерацію та опубліковано"
-    LISTING_HAS_ERROR = "У вашому оголошенні виявлено помилку"
-    PARSER_FAILED = "Робота парсеру оголошень завершено з помилкою"
+class NotificationType(StrEnum):
+    LISTING_SENT_TO_MODERATION = "listing_sent_to_moderation"
+    LISTING_PUBLISHED = "listing_published"
+    LISTING_ERROR_FOUND = "listing_error_found"
+    PARSER_FAILED = "parser_failed"
