@@ -11,9 +11,9 @@ const tabs: Tab[] = [
 
 export default function AdminPage() {
     return (
-        <Flex height="100vh">
+        <Flex width="100%">
             <TabNavBar tabs={tabs}/>
-            <Box flex="1" padding={6}>
+            <Box flex="1" p={5} pt={14}>
                 <Outlet/>
             </Box>
         </Flex>

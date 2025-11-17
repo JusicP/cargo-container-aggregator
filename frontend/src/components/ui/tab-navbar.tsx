@@ -1,4 +1,4 @@
-import { Box, Button, Link, ListItem, VStack, Text } from "@chakra-ui/react";
+import { Link, VStack, StackSeparator } from "@chakra-ui/react";
 
 export interface Tab {
     label: string;
@@ -14,10 +14,11 @@ export function TabNavBar({tabs}: TabNavBarProps) {
         <VStack
             width="184px"
             minHeight="100vh"
-            borderRight="1px solid #ddd"
             padding={3}
-            bg="gray.50"
+            bg="#E8E8E8"
             justifyContent="center"
+            separator={<StackSeparator alignSelf="center" borderRadius="10px" border="4px solid #A1A1AA66" width="20px"/>}
+            gap={5}
         >
             {tabs.map(tab => (
                 <Link
