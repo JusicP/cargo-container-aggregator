@@ -1,4 +1,4 @@
-import { Box, Button, Link, ListItem, VStack } from "@chakra-ui/react";
+import { Box, Button, Link, ListItem, VStack, Text } from "@chakra-ui/react";
 
 export interface Tab {
     label: string;
@@ -9,21 +9,27 @@ interface TabNavBarProps {
     tabs: Tab[];
 }
 
-
 export function TabNavBar({tabs}: TabNavBarProps) {
     return (
         <VStack
-            padding={4}
-            align="stretch"
+            width="184px"
+            minHeight="100vh"
+            borderRight="1px solid #ddd"
+            padding={3}
+            bg="gray.50"
+            justifyContent="center"
         >
             {tabs.map(tab => (
-                <Button
-                    key={tab.path}
-                    variant={location.pathname === tab.path ? "solid" : "ghost"}
+                <Link
+                    href={tab.path}
+                    textDecoration={location.pathname === tab.path ? "underline" : ""}
+                    textDecorationColor="orange"
+                    fontSize="xl"
+                    textAlign="center"
                 >
                     {tab.label}
-                </Button>
+                </Link>
             ))}
         </VStack>
-    );
+    )
 }
