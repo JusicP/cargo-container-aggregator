@@ -61,9 +61,12 @@ async (error: AxiosError | Error) => {
     }
 
     const originalRequest = error.config as any;
-    // connection / cors
+
+    // connection / cors / user context (restrictions)
     if (!error.response) {
-        console.error("Network error:", error.message);
+        if (error.request && error.config?.url?.includes("/user/me")) {
+            return Promise.reject(new AuthExpiredError());
+        }
         return Promise.reject(new NetworkConnectionError());
     }
 
