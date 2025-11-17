@@ -1,7 +1,6 @@
 import {useMutation} from "@tanstack/react-query";
-import axios from "axios";
 import {defaultAxiosInstance, privateAxiosInstance} from "@/services/axiosInstances.ts"
-import {UserData} from "@/schemas/authUserSchema.ts"
+import { type userData } from "@/schemas/authUserSchema.ts"
 
 export interface SignUpReqBody {
     name: string;
@@ -22,14 +21,6 @@ export const useSignUpUser = () => {
         },
         onSuccess: () => {
             console.log("User registered successfully!");
-        },
-        onError: (err: any) => {
-            if (axios.isAxiosError(err)) {
-                console.log(err.status)
-                console.error(err.response)
-            } else {
-                console.error(err);
-            }
         }
     })
 }
@@ -51,15 +42,7 @@ export const useSignInUser = () => {
         },
         onSuccess: () => {
             console.log("User logged in successfully!");
-        },
-        onError: (err: any) => {
-            if (axios.isAxiosError(err)) {
-                console.log(err.status);
-                console.error(err.response);
-            } else {
-                console.error(err);
-            }
-        },
+        }
     });
 };
 
@@ -75,17 +58,14 @@ export const refreshAccessToken = async () => {
         return newAccessToken;
     } catch (err) {
         console.error("Token refresh failed:", err);
-        sessionStorage.removeItem("accessToken");
-        throw err;
     }
 }
 
 export const getUserInfo = async () => {
     try {
-        const { data } = await privateAxiosInstance.get<UserData>("/users");
+        const { data } = await privateAxiosInstance.get<userData>("/user/me");
         return data;
     } catch (err) {
         console.error("Fetching user data failed", err);
-        throw err;
     }
 }
