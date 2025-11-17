@@ -1,6 +1,7 @@
 import {useMutation} from "@tanstack/react-query";
 import axios from "axios";
-import {defaultAxiosInstance} from "@/services/axiosInstances.ts"
+import {defaultAxiosInstance, privateAxiosInstance} from "@/services/axiosInstances.ts"
+import {UserData} from "@/schemas/authUserSchema.ts"
 
 export interface SignUpReqBody {
     name: string;
@@ -75,6 +76,16 @@ export const refreshAccessToken = async () => {
     } catch (err) {
         console.error("Token refresh failed:", err);
         sessionStorage.removeItem("accessToken");
+        throw err;
+    }
+}
+
+export const getUserInfo = async () => {
+    try {
+        const { data } = await privateAxiosInstance.get<UserData>("/users");
+        return data;
+    } catch (err) {
+        console.error("Fetching user data failed", err);
         throw err;
     }
 }
