@@ -4,3 +4,4 @@ uploaded_photos
 .idea/
 *.pyc
 __pycache__/
+*.env
