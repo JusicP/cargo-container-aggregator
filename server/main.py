@@ -22,7 +22,7 @@ SYNC_DATABASE_URL = os.getenv("SYNC_DATABASE_URL")
 async def lifespan(app: FastAPI):
     start_scheduler()
 
-    if SYNC_DATABASE_URL:
+    if "sqlite" not in DATABASE_URL and SYNC_DATABASE_URL:
         print(">>> Running migrations...")
         import asyncio, concurrent.futures
         from server.database.migrations_runner import run_migrations
