@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.auth.utils import decode_token
 from server.schemas.listing import ListingFilterParams
-from server.schemas.user import UserFilterParams
+from server.schemas.user import UserFilterParams, UserStatus
 from server.services.user_service import get_user_by_id
 from server.models.user import User
 from server.database.connection import generate_async_session
@@ -55,6 +55,12 @@ def get_current_user(role: str = "user"):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Insufficient privileges",
+            )
+        
+        if user.status == UserStatus.BLOCKED:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Blocked",
             )
 
         return user
