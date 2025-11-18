@@ -2,7 +2,6 @@ import os
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from typing import AsyncIterator
 
 from server.routes import auth, user, listings, favorites, parserListings, analytics, user_photo_router, notification
 from server.database.connection import async_engine, async_session_maker
@@ -10,7 +9,6 @@ from server.database.base import Base
 from server.scheduler.listing_analytics_job import start_scheduler
 
 from server.utils.default_admin import ensure_superuser
-from server.database.migrations_runner import run_migrations
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -20,14 +18,11 @@ DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
 SYNC_DATABASE_URL = os.getenv("SYNC_DATABASE_URL")
 
 
-
-
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print(">>> Lifespan start")
+    start_scheduler()
 
-    if "sqlite" not in DATABASE_URL and SYNC_DATABASE_URL:
+    if SYNC_DATABASE_URL:
         print(">>> Running migrations...")
         import asyncio, concurrent.futures
         from server.database.migrations_runner import run_migrations
@@ -41,13 +36,10 @@ async def lifespan(app: FastAPI):
             await conn.run_sync(Base.metadata.create_all)
         print(">>> Tables created")
 
-    print(">>> Creating default superuser...")
     async with async_session_maker() as session:
         await ensure_superuser(session)
-    print(">>> Superuser ensured")
 
     yield
-    print(">>> Lifespan exit")
 
 
 app = FastAPI(
@@ -77,8 +69,3 @@ app.include_router(parserListings.router)
 app.include_router(analytics.router)
 app.include_router(user_photo_router.router)
 app.include_router(notification.router)
-
-@app.on_event("startup")
-async def startup_event():
-    start_scheduler()
-    print("Scheduler started")
