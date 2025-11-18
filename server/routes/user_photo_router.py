@@ -1,15 +1,12 @@
 import os
 from fastapi import APIRouter, UploadFile, Depends, HTTPException, Response
-from sqlalchemy.ext.asyncio import AsyncSession
-from datetime import datetime
 from server.database.connection import generate_async_session
-from server.models.user import User
 from server.models.user_photo import UserPhoto
 from server.routes.dependencies import get_current_user
 
 router = APIRouter(prefix="/user", tags=["User Photos"])
 
-UPLOAD_DIR = "uploaded_photos"
+UPLOAD_DIR = "uploaded_photos" # TODO: MOVE TO ENV, ABSOULUTE PATH HERE
 MAX_SIZE = 4 * 1024 * 1024  # 4 МБ
 
 
@@ -58,11 +55,9 @@ async def upload_photo(
 async def get_photo(
     photo_id: int,
     db = Depends(generate_async_session),
-    user: User = Depends(get_current_user("user")),
 ):
-
     result = await db.get(UserPhoto, photo_id)
-    if not result or result.user_id != user.id:
+    if not result:
         raise HTTPException(status_code=404, detail="Photo not found")
 
     file_path = os.path.join(UPLOAD_DIR, result.filename)

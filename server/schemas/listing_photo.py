@@ -7,8 +7,8 @@ class ListingPhotoBase(BaseModel):
     is_main: bool
     
 class ListingPhotoGet(ListingPhotoBase):
-    listing_int: int
-    uploaded_at: datetime.datetime
+    listing_id: int
+    addition_date: datetime.datetime
 
 class ListingPhotoCreate(ListingPhotoBase):
     pass

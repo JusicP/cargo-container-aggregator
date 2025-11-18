@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime, timezone
 
-from server.schemas.listing import ListingGet, ListingCreate
+from server.schemas.listing import ListingFilterParams, ListingGet, ListingCreate, ListingPaginatedGet
 from server.database.connection import generate_async_session
 from server.services.listing_service import (
     create_listing as create_listing_service,
@@ -12,15 +12,20 @@ from server.services.listing_service import (
     delete_listing as delete_listing_service,
 )
 from server.models.user import User
-from server.routes.dependencies import get_current_user
+from server.routes.dependencies import get_current_user, get_listing_filters
 
 router = APIRouter(prefix="/listings", tags=["listings"])
 
 
-@router.get("/", response_model=list[ListingGet])
-async def get_listings(session: AsyncSession = Depends(generate_async_session)):
-    listings = await get_all_listings_service(session)
-    return listings
+@router.get("/", response_model=ListingPaginatedGet)
+async def get_listings(
+    filters: ListingFilterParams = Depends(get_listing_filters),
+    session: AsyncSession = Depends(generate_async_session),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+):
+    res = await get_all_listings_service(session, filters, page, page_size)
+    return res
 
 
 @router.post("/", response_model=ListingGet)

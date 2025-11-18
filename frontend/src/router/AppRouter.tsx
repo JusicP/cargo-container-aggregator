@@ -155,43 +155,15 @@ const AppRouterContent: React.FC = () => {
       <Route 
         path="/admin" 
         element={
-          <ProtectedRoute requiredRoles={['admin']}>
             <AdminPage />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/admin/listings" 
-        element={
-          <ProtectedRoute requiredRoles={['admin']}>
-            <AdminListingsPage />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/admin/parser" 
-        element={
-          <ProtectedRoute requiredRoles={['admin']}>
-            <AdminParserPage />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/admin/users" 
-        element={
-          <ProtectedRoute requiredRoles={['admin']}>
-            <AdminUsersPage />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/admin/logs" 
-        element={
-          <ProtectedRoute requiredRoles={['admin']}>
-            <AdminLogsPage />
-          </ProtectedRoute>
-        } 
-      />
+        }
+      >
+        <Route path="listings" element={<AdminListingsPage />} />
+        <Route path="parser" element={<AdminParserPage />} />
+        <Route path="users" element={<AdminUsersPage />} />
+        <Route path="logs" element={<AdminLogsPage />} />
+      </Route>
+
       
       {/* 404 сторінка для всіх інших маршрутів */}
       <Route path="*" element={<NotFoundPage />} />
