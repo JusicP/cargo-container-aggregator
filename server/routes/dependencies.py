@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.auth.utils import decode_token
 from server.schemas.listing import ListingFilterParams
+from server.schemas.user import UserFilterParams
 from server.services.user_service import get_user_by_id
 from server.models.user import User
 from server.database.connection import generate_async_session
@@ -87,4 +88,12 @@ def get_listing_filters(
     params.status = status
     params.sort_by = sort_by
     params.sort_order = sort_order
+    return params
+
+
+def get_user_filters(
+    search_query: str | None = Query(None, alias="searchQuery"),
+) -> UserFilterParams:
+    params = UserFilterParams()
+    params.search_query = search_query
     return params

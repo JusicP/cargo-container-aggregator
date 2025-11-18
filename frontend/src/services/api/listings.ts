@@ -1,12 +1,27 @@
-// src/services/api/listings.ts
 import { useQuery } from "@tanstack/react-query";
 import { defaultAxiosInstance } from "../axiosInstances";
 
-interface ListingPhoto {
+export interface ListingPhoto {
     photo_id: number;
     is_main: boolean;
     listing_int: number;
     uploaded_at: string
+}
+
+export interface ListingAnalytics {
+    listing_id: number;
+
+    average_price: number | null;
+    min_price: number | null;
+    max_price: number | null;
+
+    price_trend: object;
+
+    views: number;
+    contacts: number;
+    favorites: number;
+
+    updated_at: string;
 }
 
 export interface Listing {
@@ -25,7 +40,7 @@ export interface Listing {
     approval_date: string | null;
     updated_at: string | null;
     photos?: ListingPhoto[];
-    analytics?: any;
+    analytics?: ListingAnalytics;
 }
 
 export interface ListingsPaginatedGet {

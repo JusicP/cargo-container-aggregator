@@ -94,6 +94,15 @@ const AppRouterContent: React.FC = () => {
       
       {/* Профіль і налаштування - доступні всім авторизованим користувачам */}
       <Route 
+        path="/profile/{:id}" 
+        element={
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
         path="/myaccount/profile" 
         element={
           <ProtectedRoute>
@@ -155,7 +164,9 @@ const AppRouterContent: React.FC = () => {
       <Route 
         path="/admin" 
         element={
+          <ProtectedRoute requiredRoles={['admin']}>
             <AdminPage />
+          </ProtectedRoute>
         }
       >
         <Route path="listings" element={<AdminListingsPage />} />

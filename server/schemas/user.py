@@ -37,3 +37,13 @@ class UserGet(UserBase):
     
 class UserUpdate(UserBase):
     pass
+
+class UserFilterParams(BaseModel):
+    search_query: str | None = None
+
+class UserPaginatedGet(BaseModel):
+    total: int
+    page: int
+    page_size: int
+    total_pages: int
+    users: list[UserGet]

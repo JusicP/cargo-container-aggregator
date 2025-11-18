@@ -1,7 +1,7 @@
 import {useState} from "react";
 import '@/pages/homepage/homepage.css'
 import { useAuth } from "@/contexts/AuthContext";
-import { Cart, UserCircle } from "@mynaui/icons-react";
+import { BookmarkHome, UserCircle } from "@mynaui/icons-react";
 import { Link, Box, Flex, IconButton, NativeSelect } from "@chakra-ui/react";
 
 export default function Navbar() {
@@ -37,7 +37,7 @@ export default function Navbar() {
                         <NativeSelect.Indicator color="#FD7F16"/>
                     </NativeSelect.Root>
 
-                    <IconButton variant="ghost" _hover={{ bg: "orange.400" }} rounded="full"><Cart color="white"/></IconButton>
+                    <IconButton as={Link} variant="ghost" _hover={{ bg: "orange.400" }} rounded="full" href="???"><BookmarkHome color="white"/></IconButton>
 
                     {!isAuthenticated ? (
                         <IconButton as={Link} variant={{ base: "ghost", _selected: "subtle" }} _hover={{ bg: "orange.400" }} rounded="full" href="/login"><UserCircle color="white"/></IconButton>
