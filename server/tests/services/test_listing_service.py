@@ -81,6 +81,7 @@ async def test_get_all_and_by_id(session: AsyncSession):
     if listings:
         listing = listings[0]
         fetched = await get_listing_by_id(session, listing.id)
+        assert fetched
         assert fetched.id == listing.id
 
 
@@ -112,6 +113,7 @@ async def test_update_listing(session: AsyncSession):
     listing = await create_listing(session, user.id, listing_data)
 
     update_data = ListingGet(
+        id=1,
         title="Updated Listing",
         description=listing.description,
         container_type=listing.container_type,
@@ -191,6 +193,7 @@ async def test_update_nonexistent_listing(session: AsyncSession):
 
     fake_listing_id = 999
     dummy_data = ListingGet(
+        id=1,
         title="Ghost",
         description="Ghost",
         container_type="20ft",

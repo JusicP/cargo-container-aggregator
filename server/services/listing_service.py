@@ -65,7 +65,7 @@ async def create_or_update_listings(session: AsyncSession, listings_create: list
     await session.commit()
 
 
-async def get_all_listings(
+async def get_all_listings_paginated(
     session: AsyncSession,
     filters: ListingFilterParams,
     page: int = 1,
@@ -129,6 +129,16 @@ async def get_all_listings(
         "page_size": page_size,
         "total_pages": total_pages,
     }
+
+
+async def get_all_listings(session: AsyncSession):
+    query = select(Listing).options(
+        selectinload(Listing.photos),
+        selectinload(Listing.analytics)
+    )
+    result = await session.execute(query)
+
+    return result.scalars().all()
 
 
 async def get_listing_by_id(session: AsyncSession, listing_id: int):

@@ -6,7 +6,7 @@ from server.schemas.listing import ListingFilterParams, ListingGet, ListingCreat
 from server.database.connection import generate_async_session
 from server.services.listing_service import (
     create_listing as create_listing_service,
-    get_all_listings as get_all_listings_service,
+    get_all_listings_paginated as get_all_listings_service,
     get_listing_by_id as get_listing_by_id_service,
     update_listing as update_listing_service,
     delete_listing as delete_listing_service,
