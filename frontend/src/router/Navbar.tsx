@@ -29,19 +29,59 @@ export default function Navbar() {
                         <NativeSelect.Field
                             value={lang}
                             onChange={(e) => setLang(e.target.value)}
+                            color="white"
+                            className="!border-none"
                         >
-                            <option value="UA">UA</option>
-                            <option value="EN">EN</option>
+                            <option className="!bg-gray-800" value="UA">UA</option>
+                            <option className="!bg-gray-800"  value="EN">EN</option>
                         </NativeSelect.Field>
-                        <NativeSelect.Indicator />
+                        <NativeSelect.Indicator color="#FD7F16" />
                     </NativeSelect.Root>
 
-                    <IconButton aria-label="cart" variant="ghost" rounded="full"><Cart /></IconButton>
+                    <IconButton
+                        aria-label="cart"
+                        variant="ghost"
+                        rounded="full"
+                        _hover={{
+                            bg: 'orange.500',
+                            color: 'white',
+                            transform: 'scale(1.05)',
+                        }}
+                    >
+                        <Cart color="#ffffff"/>
+                    </IconButton>
 
                     {!isAuthenticated ? (
-                        <IconButton as={Link} aria-label="profile" variant="ghost" rounded="full" size="md" href="/login"><UserCircle /></IconButton>
+                        <IconButton
+                            as={Link}
+                            aria-label="profile"
+                            variant="ghost"
+                            rounded="full"
+                            size="md"
+                            href="/login"
+                            _hover={{
+                                bg: 'orange.500',
+                                color: 'white',
+                                transform: 'scale(1.05)',
+                            }}
+                        >
+                            <UserCircle color="#ffffff"/>
+                        </IconButton>
                     ) : (
-                        <IconButton as={Link} aria-label="profile" variant="ghost" rounded="full" href="/myaccount"><UserCircle /></IconButton>
+                        <IconButton
+                            as={Link}
+                            aria-label="profile"
+                            variant="ghost"
+                            rounded="full"
+                            href="/myaccount"
+                            _hover={{
+                                bg: 'orange.500',
+                                color: 'white',
+                                transform: 'scale(1.05)',
+                            }}
+                        >
+                            <UserCircle color="#ffffff"/>
+                        </IconButton>
                     )}
                 </Flex>
             </Box>
