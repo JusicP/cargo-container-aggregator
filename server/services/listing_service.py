@@ -1,7 +1,7 @@
 import datetime
 
-from sqlalchemy import asc, desc, func, select
-from sqlalchemy.orm import selectinload
+from sqlalchemy import and_, asc, desc, func, select
+from sqlalchemy.orm import selectinload, aliased
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.models.listing import Listing
@@ -70,10 +70,23 @@ async def get_all_listings_paginated(
     page: int = 1,
     page_size: int = 20
 ):
-    query = select(Listing).options(
-        selectinload(Listing.photos),
-        selectinload(Listing.analytics),
-        selectinload(Listing.last_history)
+    last_history_alias = aliased(ListingHistory)
+
+    query = (
+        select(Listing)
+        .join(
+            last_history_alias,
+            and_(
+                last_history_alias.listing_id == Listing.id,
+                last_history_alias.addition_date.is_(None)
+            ),
+            isouter=True
+        )
+        .options(
+            selectinload(Listing.photos),
+            selectinload(Listing.analytics),
+            selectinload(Listing.last_history)
+        )
     )
     if filters.title:
         query = query.where(Listing.title.ilike(f"%{filters.title}%"))
@@ -84,9 +97,9 @@ async def get_all_listings_paginated(
     if filters.type_:
         query = query.where(Listing.type.in_(filters.type_))
     if filters.price_min is not None:
-        query = query.where(Listing.last_history.price >= filters.price_min)
+        query = query.where(last_history_alias.price >= filters.price_min)
     if filters.price_max is not None:
-        query = query.where(Listing.last_history.price <= filters.price_max)
+        query = query.where(last_history_alias.price <= filters.price_max)
     if filters.currency:
         query = query.where(Listing.currency == filters.currency)
     if filters.location:
@@ -105,7 +118,7 @@ async def get_all_listings_paginated(
         "addition_date": Listing.addition_date,
         "approval_date": Listing.approval_date,
         "updated_at": Listing.updated_at,
-        "price": ListingHistory.price,
+        "price": last_history_alias.price,
     }
     sort_column = sort_column_map.get(filters.sort_by, Listing.addition_date) # type: ignore
 
