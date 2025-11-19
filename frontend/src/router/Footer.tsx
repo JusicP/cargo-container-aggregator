@@ -99,9 +99,9 @@ export default function Footer() {
                     </div>
                     <div className="flex flex-col items-center">
                         <nav className="footer-nav flex flex-row gap-10">
-                            <Link as={RouterLink} to="#">Про нас</Link>
-                            <Link as={RouterLink} to="#">Контакти</a>
-                            <Link as={RouterLink} to="#">Оголошення</a>
+                            <Link as={RouterLink} to="/">Про нас</Link>
+                            <Link as={RouterLink} to="/">Контакти</Link>
+                            <Link as={RouterLink} to="/">Оголошення</Link>
                         </nav>
                         <div className="footer-social flex flex-row gap-5">
                             <BrandGithub />
