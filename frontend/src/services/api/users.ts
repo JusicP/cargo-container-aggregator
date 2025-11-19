@@ -35,11 +35,6 @@ export const useUsers = (filters: UserFilters) => {
         queryKey: ["users", filters.page, filters.pageSize],
         queryFn: async () => {
             const params: any = { ...filters };
-            // type_ -> type для backend
-            if (params.type_) {
-                params.type = params.type_;
-                delete params.type_;
-            }
 
             const { data } = await defaultAxiosInstance.get<UserPaginatedGet>("/users", { params });
             return data;

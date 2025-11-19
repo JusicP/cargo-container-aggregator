@@ -63,7 +63,7 @@ export const refreshAccessToken = async () => {
 
 export const getUserInfo = async () => {
     try {
-        const { data } = await privateAxiosInstance.get<userData>("/user/me");
+        const { data } = await privateAxiosInstance.get<userData>("/users/me");
         return data;
     } catch (err) {
         console.error("Fetching user data failed", err);

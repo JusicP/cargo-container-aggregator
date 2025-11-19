@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime, timezone
 
-from server.schemas.listing import ListingFilterParams, ListingGet, ListingCreate, ListingPaginatedGet
+from server.schemas.listing import ListingFilterParams, ListingGet, ListingCreate, ListingPaginatedGet, ListingUpdate
 from server.database.connection import generate_async_session
 from server.services.listing_service import (
     create_listing as create_listing_service,
@@ -55,7 +55,7 @@ async def get_listing(
 @router.put("/{listing_id}", response_model=ListingGet)
 async def update_listing(
     listing_id: int,
-    listing_data: ListingCreate,
+    listing_data: ListingUpdate,
     session: AsyncSession = Depends(generate_async_session),
     current_user: User = Depends(get_current_user()),
 ):
@@ -83,9 +83,10 @@ async def delete_listing(
         raise HTTPException(status_code=404, detail=str(e))
 
 
-@router.post("/{listing_id}/approve")
-async def approve_listing(
+@router.post("/{listing_id}/status/{status}")
+async def update_listing_status(
     listing_id: int,
+    status: str,
     session: AsyncSession = Depends(generate_async_session),
     _: User = Depends(get_current_user()),
 ):
@@ -93,9 +94,9 @@ async def approve_listing(
     if not listing:
         raise HTTPException(status_code=404, detail="Listing not found")
 
-    listing.status = "approved"
+    listing.status = status
     listing.approval_date = datetime.now(timezone.utc)
     await session.commit()
     await session.refresh(listing)
 
-    return {"status": "approved", "id": listing_id, "approval_date": listing.approval_date}
+    return {"status": status, "id": listing_id, "approval_date": listing.approval_date}

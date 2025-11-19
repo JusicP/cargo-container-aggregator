@@ -1,7 +1,7 @@
-import { Box, ButtonGroup, Center, IconButton, Link, Pagination, Spinner, Stack, Switch, Table, Text, VStack } from "@chakra-ui/react";
-import { Bookmark, Check, Click, Eye, User, X } from "@mynaui/icons-react";
+import { Box, Button, ButtonGroup, Center, IconButton, Link, Pagination, Spinner, Stack, Switch, Table, Text, VStack } from "@chakra-ui/react";
+import { Bookmark, Check, Click, Eye, Trash, User, X } from "@mynaui/icons-react";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
-import { useListings } from "@/services/api/listings";
+import { useListings, useUpdateListingStatus, type Listing } from "@/services/api/listings";
 import { extractPhotoUrl } from "@/components/ui/listing-card";
 import RalColorBox from "@/components/ui/ral-color-box";
 import { useState } from "react";
@@ -9,6 +9,7 @@ import { useState } from "react";
 export default function AdminListingsPage() {
     const [statusFilter, setStatusFilter] = useState("");
     const [page, setPage] = useState(1);
+    const { mutate: updateStatus } = useUpdateListingStatus();
 
     const { data, isLoading, isRefetching, refetch } = useListings({
         status: statusFilter,
@@ -23,6 +24,10 @@ export default function AdminListingsPage() {
 
     const colorIfNull = (isNull: boolean) => {
         return isNull ? "#A1A1AA" : "inherit";
+    }
+
+    const updateListingStatus = (listing: Listing, status: string) => {
+        updateStatus({listingId: listing.id, status})
     }
 
     return (
@@ -86,8 +91,25 @@ export default function AdminListingsPage() {
                                 <Table.Cell>{listing.last_history.contacts}</Table.Cell>
                                 <Table.Cell>{listing.last_history.favorites}</Table.Cell>
                                 <Table.Cell>
-                                    <IconButton variant={{ base: "ghost", _selected: "outline" }} color="green"><Check /></IconButton>
-                                    <IconButton variant={{ base: "ghost", _selected: "outline" }} color="red"><X /></IconButton>
+                                    {listing.status == "pending" && (
+                                        <>
+                                            <IconButton variant={{ base: "ghost", _selected: "outline" }} color="green" onClick={() => updateListingStatus(listing, "active")}><Check /></IconButton>
+                                            <IconButton variant={{ base: "ghost", _selected: "outline" }} color="red" onClick={() => updateListingStatus(listing, "rejected")}><X /></IconButton>
+                                            <IconButton variant={{ base: "ghost", _selected: "outline" }} color="red" onClick={() => updateListingStatus(listing, "deleted")}><Trash /></IconButton>
+                                        </>
+                                    )}
+                                    {listing.status == "active" && (
+                                        <>
+                                            <IconButton variant={{ base: "ghost", _selected: "outline" }} color="red" onClick={() => updateListingStatus(listing, "deleted")}><Trash /></IconButton>
+                                        </>
+                                    )}
+                                    {listing.status == "rejected" && (
+                                        <>
+                                            <Button variant={{ base: "ghost", _selected: "outline" }} color="red" onClick={() => updateListingStatus(listing, "pending")}>Pending</Button>
+                                            <IconButton variant={{ base: "ghost", _selected: "outline" }} color="green" onClick={() => updateListingStatus(listing, "active")}><Check /></IconButton>
+                                            <IconButton variant={{ base: "ghost", _selected: "outline" }} color="red" onClick={() => updateListingStatus(listing, "deleted")}><Trash /></IconButton>
+                                        </>
+                                    )}
                                 </Table.Cell>
                             </Table.Row>
                         ))}

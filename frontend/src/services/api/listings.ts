@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { defaultAxiosInstance } from "../axiosInstances";
 
 export interface ListingPhoto {
@@ -92,6 +92,19 @@ export const useListings = (filters: ListingFilters) => {
 
             const { data } = await defaultAxiosInstance.get<ListingsPaginatedGet>("/listings", { params });
             return data;
+        },
+    });
+};
+
+export const useUpdateListingStatus = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ listingId, status }: { listingId: number; status: string }) => {
+            await defaultAxiosInstance.post(`/listings/${listingId}/status/${status}`);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["listings"] });
         },
     });
 };
