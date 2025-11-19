@@ -1,11 +1,9 @@
 import pytest
-from datetime import datetime, timezone
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.models.user import User
-from server.schemas.listing import ListingCreate, ListingGet
+from server.schemas.listing import ListingCreate, ListingUpdate
 from server.schemas.listing_photo import ListingPhotoCreate
-from server.schemas.listing_analytics import ListingAnalyticsGet
 from server.services.listing_service import (
     create_listing,
     get_all_listings,
@@ -45,7 +43,7 @@ async def test_create_listing(session: AsyncSession):
     assert listing.id is not None
     assert listing.user_id == user.id
     assert listing.title == "Test Listing"
-    assert listing.status == "active"
+    assert listing.status == "pending"
 
 
 @pytest.mark.asyncio
@@ -112,35 +110,17 @@ async def test_update_listing(session: AsyncSession):
     )
     listing = await create_listing(session, user.id, listing_data)
 
-    update_data = ListingGet(
-        id=1,
+    update_data = ListingUpdate(
         title="Updated Listing",
         description=listing.description,
         container_type=listing.container_type,
         condition=listing.condition,
         type=listing.type,
-        price=listing.price,
+        price=listing.last_history.price,
         currency=listing.currency,
         location=listing.location,
         ral_color=listing.ral_color,
         original_url=listing.original_url,
-        user_id=listing.user_id,
-        addition_date=listing.addition_date,
-        approval_date=listing.approval_date,
-        updated_at=datetime.now(timezone.utc),
-        status="active",
-        photos=[],
-        analytics=ListingAnalyticsGet(
-            listing_id=listing.id,
-            updated_at=datetime.now(timezone.utc),
-            views=0,
-            contacts=0,
-            favorites=0,
-            average_price=None,
-            min_price=None,
-            max_price=None,
-            price_trend={}
-        )
     )
 
     updated = await update_listing(session, user, listing.id, update_data)
@@ -192,8 +172,7 @@ async def test_update_nonexistent_listing(session: AsyncSession):
     await session.refresh(user)
 
     fake_listing_id = 999
-    dummy_data = ListingGet(
-        id=1,
+    dummy_data = ListingUpdate(
         title="Ghost",
         description="Ghost",
         container_type="20ft",
@@ -204,23 +183,6 @@ async def test_update_nonexistent_listing(session: AsyncSession):
         location="Nowhere",
         ral_color=None,
         original_url=None,
-        user_id=user.id,
-        addition_date=datetime.now(timezone.utc),
-        approval_date=None,
-        updated_at=datetime.now(timezone.utc),
-        status="active",
-        photos=[],
-        analytics=ListingAnalyticsGet(
-            listing_id=999,
-            updated_at=datetime.now(timezone.utc),
-            views=0,
-            contacts=0,
-            favorites=0,
-            average_price=None,
-            min_price=None,
-            max_price=None,
-            price_trend={}
-        )
     )
 
     with pytest.raises(ValueError) as exc_info:

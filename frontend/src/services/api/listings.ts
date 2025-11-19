@@ -51,6 +51,7 @@ export interface Listing {
     photos?: ListingPhoto[];
     analytics?: ListingAnalytics;
     last_history: ListingHistory;
+    original_url: string | null;
 }
 
 export interface ListingsPaginatedGet {

@@ -1,6 +1,6 @@
 import datetime
 from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from server.database.base import Base
 
@@ -25,3 +25,5 @@ class ListingParser(Base):
 
     status: Mapped[str] = mapped_column(String(64), default="done") # running, error, done
     error_message: Mapped[str | None] = mapped_column(String(256))
+
+    listings = relationship("Listing", back_populates="parser", cascade="all, delete-orphan")

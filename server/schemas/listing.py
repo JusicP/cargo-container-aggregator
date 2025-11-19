@@ -14,7 +14,7 @@ class ListingBase(BaseModel):
     condition: str = Field(max_length=64)
     type: str = Field(max_length=64)
 
-    currency: str = Field(max_length=3)
+    currency: str | None = Field(max_length=3)
     location: str = Field(max_length=128)
     ral_color: str | None = Field(max_length=7)
 

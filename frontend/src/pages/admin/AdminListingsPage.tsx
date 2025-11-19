@@ -1,4 +1,4 @@
-import { Box, ButtonGroup, Center, IconButton, Pagination, Spinner, Stack, Switch, Table, Text, VStack } from "@chakra-ui/react";
+import { Box, ButtonGroup, Center, IconButton, Link, Pagination, Spinner, Stack, Switch, Table, Text, VStack } from "@chakra-ui/react";
 import { Bookmark, Check, Click, Eye, User, X } from "@mynaui/icons-react";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import { useListings } from "@/services/api/listings";
@@ -75,7 +75,11 @@ export default function AdminListingsPage() {
                                         <RalColorBox ralColorKey={listing.ral_color} />
                                     </VStack>
                                 </Table.Cell>
-                                <Table.Cell textDecoration="underline" textDecorationColor="#FD7F16" color={colorIfNull(listing.url == null)}>{listing.url || "null"}</Table.Cell>
+                                <Table.Cell textDecoration="underline" textDecorationColor="#FD7F16" color={colorIfNull(listing.original_url == null)}>
+                                    <Link href={listing.original_url}>
+                                        {listing.original_url || "null"}
+                                    </Link>
+                                </Table.Cell>
                                 <Table.Cell>{listing.location}</Table.Cell>
                                 <Table.Cell>{listing.status}</Table.Cell>
                                 <Table.Cell>{listing.last_history.views}</Table.Cell>

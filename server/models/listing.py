@@ -11,6 +11,7 @@ class Listing(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int | None] = mapped_column(ForeignKey('users.id', ondelete='CASCADE', name='fk_listing_user_id'))
+    parser_id: Mapped[int | None] = mapped_column(ForeignKey('listings_parser.id', ondelete='CASCADE', name='fk_listing_parser_id'))
 
     title: Mapped[str] = mapped_column(String(128))
     description: Mapped[str] = mapped_column(String(2048)) 
@@ -34,7 +35,7 @@ class Listing(Base):
     analytics = relationship("ListingAnalytics", uselist=False, back_populates="listing")
     history = relationship("ListingHistory", back_populates="listing", cascade="all, delete-orphan")
     photos = relationship("ListingPhoto", back_populates="listing", cascade="all, delete-orphan")
-
+    parser = relationship("ListingParser", uselist=False, backref="listing", lazy="selectin", viewonly=True)
     last_history: Mapped["ListingHistory"] = relationship(
         "ListingHistory",
         uselist=False,
