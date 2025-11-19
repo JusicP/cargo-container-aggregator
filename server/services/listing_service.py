@@ -5,10 +5,11 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.models.listing import Listing
+from server.models.listing_history import ListingHistory
 from server.models.user import User
-from server.services.listing_history_service import create_listing_history
+from server.services.listing_history_service import create_listing_history, update_listing_history
 from server.services.listing_photo_service import create_listing_photos
-from server.schemas.listing import ListingCreate, ListingFilterParams, ListingGet
+from server.schemas.listing import ListingCreate, ListingFilterParams, ListingGet, ListingUpdate
 
 
 async def create_listing(session: AsyncSession, user_id: int, listing_create: ListingCreate):
@@ -19,7 +20,6 @@ async def create_listing(session: AsyncSession, user_id: int, listing_create: Li
         container_type=listing_create.container_type,
         condition=listing_create.condition,
         type=listing_create.type,
-        price=listing_create.price,
         currency=listing_create.currency,
         location=listing_create.location,
         ral_color=listing_create.ral_color,
@@ -30,7 +30,7 @@ async def create_listing(session: AsyncSession, user_id: int, listing_create: Li
     await session.commit()
 
     await create_listing_photos(session, listing_id=listing.id, listing_photos=listing_create.photos)
-    await create_listing_history(session, listing)
+    await create_listing_history(session, listing_create.price, listing)
 
     await session.execute(select(Listing).options(
         selectinload(Listing.photos),
@@ -49,7 +49,6 @@ async def create_or_update_listings(session: AsyncSession, listings_create: list
             container_type=listing_create.container_type,
             condition=listing_create.condition,
             type=listing_create.type,
-            price=listing_create.price,
             currency=listing_create.currency,
             location=listing_create.location,
             ral_color=listing_create.ral_color,
@@ -73,7 +72,8 @@ async def get_all_listings_paginated(
 ):
     query = select(Listing).options(
         selectinload(Listing.photos),
-        selectinload(Listing.analytics)
+        selectinload(Listing.analytics),
+        selectinload(Listing.last_history)
     )
     if filters.title:
         query = query.where(Listing.title.ilike(f"%{filters.title}%"))
@@ -84,9 +84,9 @@ async def get_all_listings_paginated(
     if filters.type_:
         query = query.where(Listing.type.in_(filters.type_))
     if filters.price_min is not None:
-        query = query.where(Listing.price >= filters.price_min)
+        query = query.where(Listing.last_history.price >= filters.price_min)
     if filters.price_max is not None:
-        query = query.where(Listing.price <= filters.price_max)
+        query = query.where(Listing.last_history.price <= filters.price_max)
     if filters.currency:
         query = query.where(Listing.currency == filters.currency)
     if filters.location:
@@ -105,7 +105,7 @@ async def get_all_listings_paginated(
         "addition_date": Listing.addition_date,
         "approval_date": Listing.approval_date,
         "updated_at": Listing.updated_at,
-        "price": Listing.price,
+        "price": ListingHistory.price,
     }
     sort_column = sort_column_map.get(filters.sort_by, Listing.addition_date) # type: ignore
 
@@ -134,7 +134,8 @@ async def get_all_listings_paginated(
 async def get_all_listings(session: AsyncSession):
     query = select(Listing).options(
         selectinload(Listing.photos),
-        selectinload(Listing.analytics)
+        selectinload(Listing.analytics),
+        selectinload(Listing.last_history)
     )
     result = await session.execute(query)
 
@@ -162,26 +163,19 @@ async def get_listing_by_id_and_check_rights(session: AsyncSession, listing_id: 
     return listing
 
 
-async def update_listing(session: AsyncSession, user: User, listing_id: int, listing_get: ListingGet):
+async def update_listing(session: AsyncSession, user: User, listing_id: int, listing_update: ListingUpdate):
     listing = await get_listing_by_id_and_check_rights(session, listing_id, user)
 
-    listing.title = listing_get.title
-    listing.description = listing_get.description
-    listing.container_type = listing_get.container_type
-    listing.condition = listing_get.condition
-    listing.type = listing_get.type
-    listing.price = listing_get.price
-    listing.currency = listing_get.currency
-    listing.location = listing_get.location
-    listing.ral_color = listing_get.ral_color
-    listing.original_url = listing_get.original_url
+    for key, value in listing_update.model_dump().items():
+        if hasattr(listing, key):
+            setattr(listing, key, value)
 
     listing.updated_at = datetime.datetime.now(datetime.timezone.utc)
 
     await session.commit()
     await session.refresh(listing)
 
-    await create_listing_history(session, listing)
+    await update_listing_history(session, listing_update.price, listing)
 
     return listing
 

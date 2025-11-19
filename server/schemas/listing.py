@@ -2,6 +2,7 @@ import datetime
 from pydantic import BaseModel, Field
 
 from server.schemas.listing_analytics import ListingAnalyticsGet
+from server.schemas.listing_history import ListingHistoryBase
 from server.schemas.listing_photo import ListingPhotoCreate, ListingPhotoGet
 
 
@@ -13,7 +14,6 @@ class ListingBase(BaseModel):
     condition: str = Field(max_length=64)
     type: str = Field(max_length=64)
 
-    price: float | None
     currency: str = Field(max_length=3)
     location: str = Field(max_length=128)
     ral_color: str | None = Field(max_length=7)
@@ -31,6 +31,10 @@ class ListingGet(ListingBase):
 
     photos: list[ListingPhotoGet] = []
     analytics: ListingAnalyticsGet | None = None
+    last_history: ListingHistoryBase
+
+class ListingUpdate(ListingBase):
+    price: float | None
 
 class ListingFilterParams(BaseModel):
     title: str | None = None
@@ -55,4 +59,5 @@ class ListingPaginatedGet(BaseModel):
     listings: list[ListingGet]
 
 class ListingCreate(ListingBase):
+    price: float | None
     photos: list[ListingPhotoCreate] = []

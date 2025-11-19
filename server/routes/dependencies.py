@@ -77,7 +77,7 @@ def get_listing_filters(
     currency: str | None = Query(None),
     location: list[str] | None = Query(None, alias="location[]"),
     ral_color: list[str] | None = Query(None, alias="ral_color[]"),
-    status: str | None = Query(None),
+    status: str | None = Query("active"),
     sort_by: str | None = Query("addition_date"),
     sort_order: str | None = Query("desc"),
 ) -> ListingFilterParams:

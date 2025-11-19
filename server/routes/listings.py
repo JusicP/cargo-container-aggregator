@@ -87,7 +87,7 @@ async def delete_listing(
 async def approve_listing(
     listing_id: int,
     session: AsyncSession = Depends(generate_async_session),
-    current_user: User = Depends(get_current_user()),
+    _: User = Depends(get_current_user()),
 ):
     listing = await get_listing_by_id_service(session, listing_id)
     if not listing:

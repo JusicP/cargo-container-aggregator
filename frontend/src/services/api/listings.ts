@@ -24,6 +24,16 @@ export interface ListingAnalytics {
     updated_at: string;
 }
 
+export interface ListingHistory {
+    price: number | null
+
+    views: number
+    contacts: number
+    favorites: number
+    
+    addition_date: string | null
+}
+
 export interface Listing {
     id: number;
     title: string;
@@ -41,6 +51,7 @@ export interface Listing {
     updated_at: string | null;
     photos?: ListingPhoto[];
     analytics?: ListingAnalytics;
+    last_history: ListingHistory;
 }
 
 export interface ListingsPaginatedGet {

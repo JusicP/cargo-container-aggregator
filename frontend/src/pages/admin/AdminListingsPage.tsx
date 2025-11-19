@@ -1,26 +1,28 @@
-import { Box, ButtonGroup, Center, IconButton, Pagination, Stack, Switch, Table, Text, VStack } from "@chakra-ui/react";
-import { Bookmark, Click, Edit, Eye, Trash, User } from "@mynaui/icons-react";
+import { Box, ButtonGroup, Center, IconButton, Pagination, Spinner, Stack, Switch, Table, Text, VStack } from "@chakra-ui/react";
+import { Bookmark, Check, Click, Eye, User, X } from "@mynaui/icons-react";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
-import type { Listing } from "@/services/api/listings";
+import { useListings } from "@/services/api/listings";
 import { extractPhotoUrl } from "@/components/ui/listing-card";
 import RalColorBox from "@/components/ui/ral-color-box";
+import { useState } from "react";
 
 export default function AdminListingsPage() {
-    const testListing: Listing = {
-        id: 1,
-        title: "test listing",
-        description: "test desc",
-        container_type: "40ft High Cube",
-        condition: "used",
-        type: "sale",
-        price: 2500,
-        currency: "USD",
-        location: "Odessa, Ukraine",
-        ral_color: "RAL5010",
-        status: "approved",
-        addition_date: "123",
-        approval_date: "123",
-        updated_at: "123",
+    const [statusFilter, setStatusFilter] = useState("");
+    const [page, setPage] = useState(1);
+
+    const { data, isLoading, refetch } = useListings({
+        status: statusFilter,
+        page,
+        page_size: 5,
+    });
+
+    const applyFilters = () => {
+        setPage(1);
+        refetch();
+    };
+
+    const colorIfNull = (isNull: boolean) => {
+        return isNull ? "#A1A1AA" : "inherit";
     }
 
     return (
@@ -28,7 +30,7 @@ export default function AdminListingsPage() {
             <Text textAlign="center">Вітаємо на вкладці “Модерація оголошень”.</Text>
             <Text textAlign="center">Тут ви зможете керувати інформацією та станом усіх оголошень сайту</Text>
 
-            <Switch.Root>
+            <Switch.Root onCheckedChange={(details) => {setStatusFilter(details.checked ? "" : "pending"); applyFilters()}}>
                 <Switch.HiddenInput />
                 <Switch.Control/>
                 <Switch.Label>Переглянути оголошення, які ще не пройшли модерацію</Switch.Label>
@@ -49,69 +51,81 @@ export default function AdminListingsPage() {
                         <Table.ColumnHeader></Table.ColumnHeader>
                     </Table.Row>
                 </Table.Header>
-                <Table.Body>
-                    <Table.Row key={1}>
-                        <Table.Cell>1</Table.Cell>
-                        <Table.Cell>
-                            <Box
-                                width="181px"
-                                height="124px"
-                                bgSize="cover"
-                                bgRepeat="no-repeat"
-                                bgImage={`url(${extractPhotoUrl(testListing)})`}
-                                borderRadius="10px"
-                            >
-
-                            </Box>
-                        </Table.Cell>
-                        <Table.Cell>
-                            <VStack align="left">
-                                <Text fontWeight="bold">{testListing.container_type}</Text>
-                                <Text>Ціна: {testListing.price} {testListing.currency}</Text>
-                                <Text>Тип: {testListing.type}</Text>
-                                <Text>Стан: {testListing.condition}</Text>
-                                <RalColorBox ralColorKey={testListing.ral_color} />
-                            </VStack>
-                        </Table.Cell>
-                        <Table.Cell textDecoration="underline" textDecorationColor="#FD7F16">testListing.url</Table.Cell>
-                        <Table.Cell>{testListing.location}</Table.Cell>
-                        <Table.Cell>{testListing.status}</Table.Cell>
-                        <Table.Cell>0</Table.Cell>
-                        <Table.Cell>0</Table.Cell>
-                        <Table.Cell>0</Table.Cell>
-                        <Table.Cell>
-                            <IconButton variant={{ base: "ghost", _selected: "outline" }} color="red"><Trash /></IconButton>
-                            <IconButton variant={{ base: "ghost", _selected: "outline" }} color="#AEACAC"><Edit/></IconButton>
-                        </Table.Cell>
-
-                    </Table.Row>
-                </Table.Body>
+                {!isLoading && (
+                    <Table.Body>
+                        {data?.listings.map(listing => (
+                            <Table.Row key={listing.id}>
+                                <Table.Cell>{listing.id}</Table.Cell>
+                                <Table.Cell>
+                                    <Box
+                                        width="181px"
+                                        height="124px"
+                                        bgSize="cover"
+                                        bgRepeat="no-repeat"
+                                        bgImage={`url(${extractPhotoUrl(listing)})`}
+                                        borderRadius="10px"
+                                    />
+                                </Table.Cell>
+                                <Table.Cell>
+                                    <VStack align="left">
+                                        <Text fontWeight="bold">{listing.container_type}</Text>
+                                        <Text>Ціна: {listing.last_history.price} {listing.currency}</Text>
+                                        <Text>Тип: {listing.type}</Text>
+                                        <Text>Стан: {listing.condition}</Text>
+                                        <RalColorBox ralColorKey={listing.ral_color} />
+                                    </VStack>
+                                </Table.Cell>
+                                <Table.Cell textDecoration="underline" textDecorationColor="#FD7F16" color={colorIfNull(listing.url == null)}>{listing.url || "null"}</Table.Cell>
+                                <Table.Cell>{listing.location}</Table.Cell>
+                                <Table.Cell>{listing.status}</Table.Cell>
+                                <Table.Cell>{listing.last_history.views}</Table.Cell>
+                                <Table.Cell>{listing.last_history.contacts}</Table.Cell>
+                                <Table.Cell>{listing.last_history.favorites}</Table.Cell>
+                                <Table.Cell>
+                                    <IconButton variant={{ base: "ghost", _selected: "outline" }} color="green"><Check /></IconButton>
+                                    <IconButton variant={{ base: "ghost", _selected: "outline" }} color="red"><X /></IconButton>
+                                </Table.Cell>
+                            </Table.Row>
+                        ))}
+                    </Table.Body>
+                )}
             </Table.Root>
 
+            {isLoading && (
+                <Center>
+                    <Spinner size="xl"/>
+                </Center>
+            )}
+
             <Center>
-            <Pagination.Root count={5} pageSize={5} page={1}>
-                <ButtonGroup variant="ghost" size="sm" wrap="wrap">
-                <Pagination.PrevTrigger asChild>
-                    <IconButton>
-                    <LuChevronLeft />
-                    </IconButton>
-                </Pagination.PrevTrigger>
+                <Pagination.Root
+                    count={data?.total ?? 0}
+                    pageSize={data?.page_size ?? 10}
+                    page={data?.page ?? page}
+                    onPageChange={(p) => setPage(p.page)}
+                >
+                    <ButtonGroup variant="ghost" size="sm" wrap="wrap">
+                        <Pagination.PrevTrigger asChild>
+                            <IconButton>
+                                <LuChevronLeft />
+                            </IconButton>
+                        </Pagination.PrevTrigger>
 
-                <Pagination.Items
-                    render={(page) => (
-                    <IconButton variant={{ base: "ghost", _selected: "outline" }}>
-                        {page.value}
-                    </IconButton>
-                    )}
-                />
+                        <Pagination.Items
+                            render={(page) => (
+                            <IconButton variant={{ base: "ghost", _selected: "outline" }}>
+                                {page.value}
+                            </IconButton>
+                            )}
+                        />
 
-                <Pagination.NextTrigger asChild>
-                    <IconButton>
-                    <LuChevronRight />
-                    </IconButton>
-                </Pagination.NextTrigger>
-                </ButtonGroup>
-            </Pagination.Root>
+                        <Pagination.NextTrigger asChild>
+                            <IconButton>
+                                <LuChevronRight />
+                            </IconButton>
+                        </Pagination.NextTrigger>
+                    </ButtonGroup>
+                </Pagination.Root>
             </Center>
         </Stack>
     )

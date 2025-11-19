@@ -1,9 +1,10 @@
 import datetime
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import ForeignKey, String, and_
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from server.database.base import Base
 
+from server.models.listing_history import ListingHistory
 
 class Listing(Base):
     __tablename__ = "listings"
@@ -18,7 +19,6 @@ class Listing(Base):
     condition: Mapped[str] = mapped_column(String(64)) # new, used
     type: Mapped[str] = mapped_column(String(64)) # sale, rent
 
-    price: Mapped[float | None]
     currency: Mapped[str | None] = mapped_column(String(128))
     location: Mapped[str] = mapped_column(String(128))
     ral_color: Mapped[str | None] = mapped_column(String(7)) # RAL0000
@@ -29,9 +29,19 @@ class Listing(Base):
 
     original_url: Mapped[str | None] = mapped_column(String(2048))
 
-    status: Mapped[str] = mapped_column(String(64), default="active") # active|pending|rejected|deleted
+    status: Mapped[str] = mapped_column(String(64), default="pending") # active|pending|rejected|deleted
 
     analytics = relationship("ListingAnalytics", uselist=False, back_populates="listing")
     history = relationship("ListingHistory", back_populates="listing", cascade="all, delete-orphan")
     photos = relationship("ListingPhoto", back_populates="listing", cascade="all, delete-orphan")
-    
+
+    last_history: Mapped["ListingHistory"] = relationship(
+        "ListingHistory",
+        uselist=False,
+        primaryjoin=and_(
+            ListingHistory.listing_id == id,
+            ListingHistory.addition_date.is_(None)
+        ),
+        viewonly=True,
+        lazy="selectin" 
+    )
