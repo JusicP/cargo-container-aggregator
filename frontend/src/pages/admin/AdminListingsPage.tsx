@@ -10,7 +10,7 @@ export default function AdminListingsPage() {
     const [statusFilter, setStatusFilter] = useState("");
     const [page, setPage] = useState(1);
 
-    const { data, isLoading, refetch } = useListings({
+    const { data, isLoading, isRefetching, refetch } = useListings({
         status: statusFilter,
         page,
         page_size: 5,
@@ -51,7 +51,7 @@ export default function AdminListingsPage() {
                         <Table.ColumnHeader></Table.ColumnHeader>
                     </Table.Row>
                 </Table.Header>
-                {!isLoading && (
+                {!isLoading && !isRefetching && (
                     <Table.Body>
                         {data?.listings.map(listing => (
                             <Table.Row key={listing.id}>
@@ -95,7 +95,7 @@ export default function AdminListingsPage() {
                 )}
             </Table.Root>
 
-            {isLoading && (
+            {isLoading || isRefetching && (
                 <Center>
                     <Spinner size="xl"/>
                 </Center>

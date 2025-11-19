@@ -9,7 +9,7 @@ export default function AdminUsersPage() {
     const [page, setPage] = useState(1);
     const { mutate: updateStatus, isPending } = useUpdateUserStatus();
 
-    const {data, isLoading, refetch} = useUsers({
+    const {data, isLoading, isFetching, refetch} = useUsers({
         searchQuery: searchQueryFilter || undefined,
         page,
         pageSize: 10,
@@ -91,7 +91,7 @@ export default function AdminUsersPage() {
                         <Table.ColumnHeader></Table.ColumnHeader>
                     </Table.Row>
                 </Table.Header>
-                {!isLoading && (
+                {!isLoading && !isFetching && (
                     <Table.Body>
                         {data?.users.map((user) => (
                             <Table.Row key={user.id}>
@@ -112,7 +112,7 @@ export default function AdminUsersPage() {
                 )}
             </Table.Root>
 
-            {isLoading && (
+            {isLoading || isFetching && (
                 <Center>
                     <Spinner size="xl"/>
                 </Center>

@@ -72,7 +72,7 @@ function App() {
     const [sortBy, setSortBy] = useState<keyof ListingFilters>("addition_date");
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-    const { data, isLoading, refetch } = useListings({
+    const { data, isLoading, isFetching, refetch } = useListings({
         title: titleFilter || undefined,
         container_type: containerTypeFilter || undefined,
         condition: conditionFilter || undefined,
@@ -239,7 +239,7 @@ function App() {
                             </Button>
                         </Group>
 
-                        {isLoading ? (
+                        {isLoading || isFetching ? (
                             <Center mt="32px" mb="16px">
                                 <Spinner size="xl"/>
                             </Center>
