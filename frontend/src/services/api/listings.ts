@@ -41,7 +41,6 @@ export interface Listing {
     container_type: string;
     condition: string;
     type: string;
-    price: number | null;
     currency: string | null;
     location: string;
     ral_color: string | null;

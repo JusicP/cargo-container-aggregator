@@ -9,7 +9,7 @@ from server.models.listing_history import ListingHistory
 from server.models.user import User
 from server.services.listing_history_service import create_listing_history, update_listing_history
 from server.services.listing_photo_service import create_listing_photos
-from server.schemas.listing import ListingCreate, ListingFilterParams, ListingGet, ListingUpdate
+from server.schemas.listing import ListingCreate, ListingFilterParams, ListingUpdate
 
 
 async def create_listing(session: AsyncSession, user_id: int, listing_create: ListingCreate):
