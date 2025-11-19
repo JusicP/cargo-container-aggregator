@@ -3,7 +3,7 @@ import '@/pages/homepage/homepage.css'
 
 export default function Footer() {
     return (
-        <div className="homepage">
+        <div className="homepage w-full">
             <footer className="footer bg-[#595F65] text-white homepage">
                 <div className="footer-content flex justify-between">
                     <div className="footer-brand">

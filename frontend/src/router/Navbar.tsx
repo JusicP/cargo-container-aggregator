@@ -8,7 +8,7 @@ export default function Navbar() {
     const [lang, setLang] = useState("UA");
     const {isAuthenticated, user} = useAuth();
     return (
-        <Box className="homepage">
+        <Box className="homepage w-full">
             <Box as="header" className="site-header" colorPalette="fg">
                 <nav className="nav-left">
                     <Link href="/#">Головна</Link>

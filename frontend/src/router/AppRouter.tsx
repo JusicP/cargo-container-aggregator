@@ -25,6 +25,8 @@ import AdminParserPage from '../pages/admin/AdminParserPage';
 import AdminUsersPage from '../pages/admin/AdminUsersPage';
 import AdminLogsPage from '../pages/admin/AdminLogsPage';
 import NotFoundPage from '../pages/NotFoundPage';
+import Navbar from "@/router/Navbar.tsx";
+import Footer from "@/router/Footer.tsx"
 
 const AppRouterContent: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -173,9 +175,13 @@ const AppRouterContent: React.FC = () => {
 
 const AppRouter: React.FC = () => {
   return (
-    <BrowserRouter>
-      <AppRouterContent />
-    </BrowserRouter>
+      <div className="flex flex-col min-h-screen">
+          <Navbar />
+          <div className="flex-1 h-full">
+              <AppRouterContent/>
+          </div>
+          <Footer />
+      </div>
   );
 };
 
