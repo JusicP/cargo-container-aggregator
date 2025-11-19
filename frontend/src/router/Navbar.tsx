@@ -3,6 +3,7 @@ import '@/pages/homepage/homepage.css'
 import { useAuth } from "@/contexts/AuthContext";
 import { Cart, UserCircle } from "@mynaui/icons-react";
 import { Link, Box, Flex, IconButton, NativeSelect } from "@chakra-ui/react";
+import { Link as RouterLink } from 'react-router-dom';
 
 export default function Navbar() {
     const [lang, setLang] = useState("UA");
@@ -11,16 +12,24 @@ export default function Navbar() {
         <Box className="homepage w-full">
             <Box as="header" className="site-header" colorPalette="fg">
                 <nav className="nav-left">
+<<<<<<< HEAD
                     <Link href="/#">Головна</Link>
                     <Link href="/create-listing">Створити оголошення</Link>
                     {isAuthenticated ? (
                         user?.role === "admin" ? (
                             <Link href="/admin/listings">Адмін панель</Link>
+=======
+                    <Link as={RouterLink} to="/">Головна</Link>
+                    <Link as={RouterLink} to="/search">Пошук контейнерів</Link>
+                    {isAuthenticated ? (
+                        user?.role === "admin" ? (
+                            <Link as={RouterLink} to="/admin">Адмін панель</Link>
+>>>>>>> d4d1866 (fix: improving the top layer app hierarchy & fixing inside app navigation (no rerender for the context))
                         ) : (
                             null
                         )
                     ) : (
-                        <Link href="/register">Реєстрація</Link>
+                        <Link as={RouterLink} to="/register">Реєстрація</Link>
                     )}
                 </nav>
 
@@ -52,38 +61,21 @@ export default function Navbar() {
                         <Cart color="#ffffff"/>
                     </IconButton>
 
-                    {!isAuthenticated ? (
-                        <IconButton
-                            as={Link}
-                            aria-label="profile"
-                            variant="ghost"
-                            rounded="full"
-                            size="md"
-                            href="/login"
-                            _hover={{
-                                bg: 'orange.500',
-                                color: 'white',
-                                transform: 'scale(1.05)',
-                            }}
-                        >
-                            <UserCircle color="#ffffff"/>
-                        </IconButton>
-                    ) : (
-                        <IconButton
-                            as={Link}
-                            aria-label="profile"
-                            variant="ghost"
-                            rounded="full"
-                            href="/myaccount"
-                            _hover={{
-                                bg: 'orange.500',
-                                color: 'white',
-                                transform: 'scale(1.05)',
-                            }}
-                        >
-                            <UserCircle color="#ffffff"/>
-                        </IconButton>
-                    )}
+                    <IconButton
+                        as={RouterLink}
+                        aria-label="profile"
+                        variant="ghost"
+                        rounded="full"
+                        size="md"
+                        to={isAuthenticated ? "/myaccount" : "/login"}
+                        _hover={{
+                            bg: 'orange.500',
+                            color: 'white',
+                            transform: 'scale(1.05)',
+                        }}
+                    >
+                        <UserCircle color="#ffffff"/>
+                    </IconButton>
                 </Flex>
             </Box>
         </Box>

@@ -25,7 +25,11 @@ import AdminParserPage from '../pages/admin/AdminParserPage';
 import AdminUsersPage from '../pages/admin/AdminUsersPage';
 import AdminLogsPage from '../pages/admin/AdminLogsPage';
 import NotFoundPage from '../pages/NotFoundPage';
+<<<<<<< HEAD
 import AboutUsPage from '@/pages/AboutUsPage.tsx';
+=======
+import Footer from "@/router/Footer.tsx"
+>>>>>>> d4d1866 (fix: improving the top layer app hierarchy & fixing inside app navigation (no rerender for the context))
 
 const AppRouterContent: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -177,7 +181,15 @@ const AppRouterContent: React.FC = () => {
 
 const AppRouter: React.FC = () => {
   return (
+<<<<<<< HEAD
       <AppRouterContent />
+=======
+      <div className="flex flex-col min-h-screen">
+          <div className="flex-1 h-full">
+              <AppRouterContent/>
+          </div>
+      </div>
+>>>>>>> d4d1866 (fix: improving the top layer app hierarchy & fixing inside app navigation (no rerender for the context))
   );
 };
 
