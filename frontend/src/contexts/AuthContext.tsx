@@ -6,7 +6,7 @@ export type UserRole = 'guest' | 'user' | 'admin';
 export type UserStatus = 'ACTIVE' | 'INACTIVE' | 'BANNED';
 import {type User, type AuthContextType} from "@/contexts/contextInterfaces.ts"
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -15,6 +15,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   useEffect(() => {
     const checkAuth = async () => {
       try {
+<<<<<<< HEAD
         if (!user) {
           const userData = await getUserInfo();
           if (userData) {
@@ -33,6 +34,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           setUser(userData);
         }
 
+=======
+        const {res} = await refreshAccessToken();
+        const accessToken = res.access_token;
+        if (accessToken) {
+          privateAxiosInstance.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+          const userData = await getUserInfo();
+          setUser(userData);
+        }
+      } catch (err) {
+        setUser(null);
+>>>>>>> 657cb92 (feat: adding custom hooks & modifying context)
       } finally {
         setIsLoading(false);
       }
