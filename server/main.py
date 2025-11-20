@@ -2,6 +2,16 @@ import os
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
+from time import time
+
+from fastapi import FastAPI, Request
+from dotenv import load_dotenv
+import os
+
+from server.logger import logger
+from server.routes import logs, auth, user, listings, favorites, parserListings, analytics
+from server.database.connection import async_engine, Base, async_session_maker
+from server.utils.default_admin import ensure_superuser
 
 from server.routes import auth, user, listings, favorites, parserListings, analytics, user_photo_router, notification
 from server.database.connection import async_engine, async_session_maker
@@ -13,7 +23,6 @@ from server.utils.default_admin import ensure_superuser
 from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
-
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
 SYNC_DATABASE_URL = os.getenv("SYNC_DATABASE_URL")
 
@@ -42,6 +51,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
+
 app = FastAPI(
     title="Cargo Container Aggregator",
     version="1.0.0",
@@ -61,11 +71,32 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time()
+
+    try:
+        response = await call_next(request)
+        process_time = (time() - start_time) * 1000  # milliseconds
+
+        logger.info(
+            f"{request.client.host} {request.method} {request.url.path} "
+            f"→ {response.status_code} ({process_time:.2f}ms)"
+        )
+
+        return response
+
+    except Exception as e:
+        logger.error(f"Error processing {request.method} {request.url.path}: {e}")
+        raise
+
+
 app.include_router(auth.router)
 app.include_router(user.router)
 app.include_router(listings.router)
 app.include_router(favorites.router)
 app.include_router(parserListings.router)
 app.include_router(analytics.router)
+app.include_router(logs.router)
 app.include_router(user_photo_router.router)
 app.include_router(notification.router)
