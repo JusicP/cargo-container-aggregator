@@ -115,4 +115,3 @@ async def rotate_refresh_token(session: AsyncSession, refresh_token: str, new_to
     token.issued_at = datetime.datetime.now(datetime.timezone.utc)
     token.expires_at = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
     await session.commit()
-

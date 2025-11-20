@@ -1,8 +1,8 @@
-from sqlalchemy import select
+from sqlalchemy import func, select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.auth.utils import hash_password
-from server.schemas.user import UserCreate, UserUpdate
+from server.schemas.user import UserCreate, UserFilterParams, UserUpdate
 from server.models.user import User
 
 
@@ -15,10 +15,45 @@ async def create_user(session: AsyncSession, user_create: UserCreate):
     session.add(user)
     
     await session.commit()
+    await session.refresh(user)
+    return user
 
 async def get_all_users(session: AsyncSession):
     result = await session.execute(select(User))
     return result.scalars().all()
+
+async def get_all_users_paginated(session: AsyncSession, filters: UserFilterParams, page: int = 1, page_size: int = 20):
+    query = select(User)
+
+    if filters.search_query:
+        query = query.where(
+            or_(
+                User.name.ilike(f"%{filters.search_query}%"),
+                User.email.ilike(f"%{filters.search_query}%"),
+                User.phone_number.ilike(f"%{filters.search_query}%"),
+            )
+        )
+
+    count_query = select(func.count()).select_from(User).where(
+        *query._where_criteria
+    )
+    total = (await session.execute(count_query)).scalar() or 0
+
+    offset = (page - 1) * page_size
+    query = query.offset(offset).limit(page_size)
+
+    result = await session.execute(query)
+    users = result.scalars().all()
+
+    total_pages = (total + page_size - 1) // page_size  # ceil
+
+    return {
+        "users": users,
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "total_pages": total_pages,
+    }
 
 async def get_user_by_id(session: AsyncSession, user_id: int):
     return await session.get(User, user_id)

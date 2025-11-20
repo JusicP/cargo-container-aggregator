@@ -1,185 +1,102 @@
-from fastapi import APIRouter
-from datetime import datetime
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.ext.asyncio import AsyncSession
+from datetime import datetime, timezone
 
-from server.schemas.listing import ListingGet, ListingCreate
-from server.schemas.listing_analytics import ListingAnalyticsGet
-from server.schemas.listing_photo import ListingPhotoGet
+from server.schemas.listing import ListingFilterParams, ListingGet, ListingCreate, ListingPaginatedGet, ListingUpdate
+from server.database.connection import generate_async_session
+from server.services.listing_service import (
+    create_listing as create_listing_service,
+    get_all_listings_paginated as get_all_listings_service,
+    get_listing_by_id as get_listing_by_id_service,
+    update_listing as update_listing_service,
+    delete_listing as delete_listing_service,
+)
+from server.models.user import User
+from server.routes.dependencies import get_current_user, get_listing_filters
 
 router = APIRouter(prefix="/listings", tags=["listings"])
 
 
-@router.get("/", response_model=list[ListingGet])
-async def get_listings():
-    now = datetime.now()
-    return [
-        ListingGet(
-            user_id=1,
-            title="40ft Container for Sale",
-            description="Used 40ft container in good condition.",
-            container_type="40ft",
-            condition="used",
-            type="sale",
-            price=2500.00,
-            currency="USD",
-            location="Odessa, Ukraine",
-            ral_color="RAL5010",
-            original_url=None,
-            addition_date=now,
-            approval_date=now,
-            updated_at=None,
-            status="active",
-            photos=[
-                ListingPhotoGet(
-                    photo_id=1,
-                    is_main=True,
-                    listing_int=1,
-                    uploaded_at=now
-                )
-            ],
-            analytics=ListingAnalyticsGet(
-                views=120,
-                favorites=15,
-                contacts=5,
-                average_price=2500.0,
-                min_price=2000.0,
-                max_price=3000.0,
-                price_trend={},
-                listing_id=1,
-                updated_at=now
-            ),
-        ),
-        ListingGet(
-            user_id=2,
-            title="20ft Reefer for Rent",
-            description="Reefer container, fully functional cooling system.",
-            container_type="reefer",
-            condition="new",
-            type="rent",
-            price=300.00,
-            currency="EUR",
-            location="Hamburg, Germany",
-            ral_color=None,
-            original_url="https://external-marketplace.com/container/123",
-            addition_date=now,
-            approval_date=None,
-            updated_at=now,
-            status="pending",
-            photos=[
-                ListingPhotoGet(
-                    photo_id=2,
-                    is_main=True,
-                    listing_int=2,
-                    uploaded_at=now
-                )
-            ],
-            analytics=ListingAnalyticsGet(
-                views=50,
-                favorites=5,
-                contacts=2,
-                average_price=300.0,
-                min_price=300.0,
-                max_price=300.0,
-                price_trend={},
-                listing_id=2,
-                updated_at=now
-            ),
-        ),
-    ]
-
+@router.get("/", response_model=ListingPaginatedGet)
+async def get_listings(
+    filters: ListingFilterParams = Depends(get_listing_filters),
+    session: AsyncSession = Depends(generate_async_session),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+):
+    res = await get_all_listings_service(session, filters, page, page_size)
+    return res
 
 
 @router.post("/", response_model=ListingGet)
-async def create_listing(listing: ListingCreate):
-    now = datetime.now()
-    listing_data = listing.dict()
-    listing_data.pop("photos", None)
-
-    return ListingGet(
-        **listing_data,
-        addition_date=now,
-        approval_date=None,
-        updated_at=now,
-        status="pending",
-        photos=[],
-        analytics=ListingAnalyticsGet(
-            views=0,
-            favorites=0,
-            contacts=0,
-            average_price=listing.price or 0,
-            min_price=listing.price or 0,
-            max_price=listing.price or 0,
-            price_trend={},
-            listing_id=0,
-            updated_at=now
-        )
-    )
+async def create_listing(
+    listing: ListingCreate,
+    session: AsyncSession = Depends(generate_async_session),
+    current_user: User = Depends(get_current_user()),
+):
+    try:
+        created_listing = await create_listing_service(session, current_user.id, listing)
+        return created_listing
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
-
-@router.get("/{id}", response_model=ListingGet)
-async def get_listing(id: str):
-    now = datetime.now()
-    return ListingGet(
-        user_id=1,
-        title="40ft Container Example",
-        description="Example container description.",
-        container_type="40ft",
-        condition="used",
-        type="sale",
-        price=2500.00,
-        currency="USD",
-        location="Odessa, Ukraine",
-        ral_color="RAL5010",
-        original_url=None,
-        addition_date=now,
-        approval_date=now,
-        updated_at=now,
-        status="active",
-        photos=[],
-        analytics=ListingAnalyticsGet(
-            views=10,
-            favorites=2,
-            contacts=0,
-            average_price=2500.0,
-            min_price=2500.0,
-            max_price=2500.0,
-            price_trend={},
-            listing_id=int(id),
-            updated_at=now
-        ),
-    )
+@router.get("/{listing_id}", response_model=ListingGet)
+async def get_listing(
+    listing_id: int,
+    session: AsyncSession = Depends(generate_async_session),
+):
+    listing = await get_listing_by_id_service(session, listing_id)
+    if not listing:
+        raise HTTPException(status_code=404, detail="Listing not found")
+    return listing
 
 
-@router.put("/{id}", response_model=ListingGet)
-async def update_listing(id: str, listing: ListingCreate):
-    now = datetime.now()
-    data = listing.dict()
-    data.pop("photos", None)
-    return ListingGet(
-        **data,
-        addition_date=now,
-        approval_date=None,
-        updated_at=now,
-        status="pending",
-        photos=[],  #
-        analytics=ListingAnalyticsGet(
-            views=10,
-            favorites=3,
-            contacts=0,
-            average_price=listing.price or 0,
-            min_price=listing.price or 0,
-            max_price=listing.price or 0,
-            price_trend={},
-            listing_id=int(id),
-            updated_at=now
-        ),
-    )
-
-@router.delete("/{id}")
-async def delete_listing(id: str):
-    return {"status": "deleted", "id": id}
+@router.put("/{listing_id}", response_model=ListingGet)
+async def update_listing(
+    listing_id: int,
+    listing_data: ListingUpdate,
+    session: AsyncSession = Depends(generate_async_session),
+    current_user: User = Depends(get_current_user()),
+):
+    try:
+        updated_listing = await update_listing_service(session, current_user, listing_id, listing_data)
+        return updated_listing
+    except PermissionError as e:
+        raise HTTPException(status_code=403, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
 
 
-@router.post("/{id}/approve")
-async def approve_listing(id: str):
-    return {"status": "approved", "id": id, "approval_date": datetime.utcnow()}
+@router.delete("/{listing_id}")
+async def delete_listing(
+    listing_id: int,
+    session: AsyncSession = Depends(generate_async_session),
+    current_user: User = Depends(get_current_user()),
+):
+    try:
+        await delete_listing_service(session, current_user, listing_id)
+        return {"status": "deleted", "id": listing_id}
+    except PermissionError as e:
+        raise HTTPException(status_code=403, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.post("/{listing_id}/status/{status}")
+async def update_listing_status(
+    listing_id: int,
+    status: str,
+    session: AsyncSession = Depends(generate_async_session),
+    _: User = Depends(get_current_user()),
+):
+    listing = await get_listing_by_id_service(session, listing_id)
+    if not listing:
+        raise HTTPException(status_code=404, detail="Listing not found")
+
+    listing.status = status
+    listing.approval_date = datetime.now(timezone.utc)
+    await session.commit()
+    await session.refresh(listing)
+
+    return {"status": status, "id": listing_id, "approval_date": listing.approval_date}

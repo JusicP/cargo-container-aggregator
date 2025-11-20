@@ -1,0 +1,77 @@
+.language-switcher {
+    position: relative;
+    display: inline-block;
+}
+
+.language-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 0.5rem 2rem 0.5rem 0.75rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 80px;
+}
+
+.language-select:hover {
+    border-color: #667eea;
+    background: #f8f9ff;
+}
+
+.language-select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.select-arrow {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #999;
+    font-size: 0.7rem;
+}
+
+.language-select option {
+    padding: 0.5rem;
+    font-weight: 600;
+    background: white;
+    color: #555;
+}
+
+.language-select option:hover {
+    background: #f8f9ff;
+}
+
+@media (max-width: 768px) {
+    .language-select {
+        padding: 0.4rem 1.75rem 0.4rem 0.6rem;
+        font-size: 0.85rem;
+        min-width: 70px;
+    }
+
+    .select-arrow {
+        right: 0.6rem;
+        font-size: 0.6rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .language-select {
+        padding: 0.35rem 1.5rem 0.35rem 0.5rem;
+        font-size: 0.8rem;
+        min-width: 65px;
+    }
+
+    .select-arrow {
+        right: 0.5rem;
+    }
+}
