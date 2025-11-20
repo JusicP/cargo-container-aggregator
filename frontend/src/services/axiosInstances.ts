@@ -23,3 +23,5 @@ export const privateAxiosInstance = axios.create({
 
 privateAxiosInstance.interceptors.request.use(requestInterceptor, errorInterceptor);
 privateAxiosInstance.interceptors.response.use(responseInterceptor, errorInterceptor);
+// adding error processing to the default interceptor
+defaultAxiosInstance.interceptors.response.use(responseInterceptor, errorInterceptor);
