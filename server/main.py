@@ -9,11 +9,7 @@ from dotenv import load_dotenv
 import os
 
 from server.logger import logger
-from server.routes import logs, auth, user, listings, favorites, parserListings, analytics
-from server.database.connection import async_engine, Base, async_session_maker
-from server.utils.default_admin import ensure_superuser
-
-from server.routes import auth, user, listings, favorites, parserListings, analytics, user_photo_router, notification
+from server.routes import auth, user, listings, favorites, parserListings, analytics, user_photo_router, notification, logs
 from server.database.connection import async_engine, async_session_maker
 from server.database.base import Base
 from server.scheduler.listing_analytics_job import start_scheduler
@@ -85,7 +81,6 @@ async def log_requests(request: Request, call_next):
         )
 
         return response
-
     except Exception as e:
         logger.error(f"Error processing {request.method} {request.url.path}: {e}")
         raise
