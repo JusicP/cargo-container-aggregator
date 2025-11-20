@@ -106,7 +106,6 @@ export default function AdminListingsPage() {
                                     {listing.status == "rejected" && (
                                         <>
                                             <Button variant={{ base: "ghost", _selected: "outline" }} color="red" onClick={() => updateListingStatus(listing, "pending")}>Pending</Button>
-                                            <IconButton variant={{ base: "ghost", _selected: "outline" }} color="green" onClick={() => updateListingStatus(listing, "active")}><Check /></IconButton>
                                             <IconButton variant={{ base: "ghost", _selected: "outline" }} color="red" onClick={() => updateListingStatus(listing, "deleted")}><Trash /></IconButton>
                                         </>
                                     )}
