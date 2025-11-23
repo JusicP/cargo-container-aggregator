@@ -8,6 +8,7 @@ import FilterableCheckboxGroup from "@/components/ui/filterable-checkbox-group";
 
 import RalColorBox from "@/components/ui/ral-color-box";
 import { ListingCard } from "@/components/ui/listing-card";
+import { conditionMap, containerTypes, listingTypes, ralColors } from "@/schemas/listingSchema";
 
 
 const sortOptions = [
@@ -21,38 +22,6 @@ const sortOrders = [
   { value: "asc", label: "За зростанням" },
   { value: "desc", label: "За спаданням" },
 ];
-
-const conditionMap: Record<string, string> = {
-    new: "Новий",
-    used: "Б/В",
-    restored: "Відновлений",
-};
-
-const containerTypes: Record<string, string> = {
-  standard: "Standard",
-  high_cube: "High Cube",
-  reefer: "Reefer",
-  open_top: "Open Top",
-  open_side: "Open Side",
-  flat_rack: "Flat Rack",
-  double_door: "Double Door",
-  tank: "Tank",
-  other: "Інший",
-};
-
-const listingTypes: Record<string, string> = {
-  sale: "Продаж",
-  rent: "Оренда",
-};
-
-const ralColors: Record<string, string> = {
-    RAL1000: "Зеленувато-бежевий",
-    RAL1001: "Бежевий",
-    RAL1002: "Піщаний жовтий",
-    RAL1003: "Сигнальний жовтий",
-    RAL1004: "Золотисто-жовтий",
-    RAL1005: "Жовтий медовий",
-};
 
 const locations: Record<string, string> = {
     ua: "Україна",
