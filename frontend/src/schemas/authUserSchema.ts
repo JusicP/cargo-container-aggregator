@@ -40,5 +40,17 @@ export const loginUserSchema = z.object({
         .min(6, { message: 'Пароль закороткий' })
         .max(128, { message: 'Пароль задовгий' }),
 });
-
 export type loginUser = z.infer<typeof loginUserSchema>;
+
+export const UserInfo = z.object({
+    id: z.string(),
+    name: z.string(),
+    email: z.string(),
+    phone_number: z.string(),
+    company_name: z.string(),
+    avatar_photo_id: z.string().optional(),
+    role: z.string(),
+    registration_date: z.string(),
+    status: z.string()
+})
+export type userData = z.infer<typeof UserInfo>;

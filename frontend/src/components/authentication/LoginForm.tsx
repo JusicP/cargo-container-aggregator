@@ -13,13 +13,15 @@ import {loginUserSchema, type loginUser} from "@/schemas/authUserSchema.ts";
 import DOMPurify from "dompurify";
 import {useSignInUser} from "@/services/api/auth.ts";
 import {Envelope} from "@mynaui/icons-react";
+import { useNavigate } from "react-router-dom"
 
-export default function LoginForm() {
+export default function LoginForm({ next }: { next: string }) {
     const signInUser = useSignInUser()
     const { handleSubmit,register, formState: { errors, isSubmitting } } = useForm({
         resolver: zodResolver(loginUserSchema),
     })
     const sanitizeInput = (value: string) => DOMPurify.sanitize(value);
+    const navigate = useNavigate();
 
     const onSubmit = async (data: loginUser) => {
         try{
@@ -28,6 +30,8 @@ export default function LoginForm() {
             formData.append('password', sanitizeInput(data.password));
             console.log(formData);
             await signInUser.mutateAsync(formData);
+
+            navigate(next, { replace: true });
         } catch (error) {
 
         }

@@ -17,6 +17,6 @@ class ListingHistory(Base):
     contacts: Mapped[int] = mapped_column(default=0)
     favorites: Mapped[int] = mapped_column(default=0)
     
-    addition_date: Mapped[datetime.datetime]
+    addition_date: Mapped[datetime.datetime | None]
 
     listing = relationship("Listing", back_populates="history")

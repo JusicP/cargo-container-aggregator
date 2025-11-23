@@ -1,12 +1,12 @@
+import datetime
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.models.listing import Listing
 from server.models.listing_history import ListingHistory
 
-async def create_listing_history(session: AsyncSession, listing: Listing, use_last_analytics: bool = False):
+async def create_listing_history(session: AsyncSession, price: float | None, listing: Listing, use_last_analytics: bool = False):
     if use_last_analytics:
-
         last_history = await session.execute(
             select(ListingHistory)
             .where(ListingHistory.listing_id == listing.id)
@@ -23,13 +23,16 @@ async def create_listing_history(session: AsyncSession, listing: Listing, use_la
 
     history = ListingHistory(
         listing_id=listing.id,
-        price=listing.price,
+        price=price,
         views=views,
         contacts=contacts,
         favorites=favorites,
-        addition_date=listing.addition_date,
+        addition_date=datetime.datetime.now(datetime.UTC) if use_last_analytics else None,
     )
     session.add(history)
     await session.commit()
     await session.refresh(history)
     return history
+
+async def update_listing_history(session: AsyncSession, price: float | None, listing: Listing):
+    ...

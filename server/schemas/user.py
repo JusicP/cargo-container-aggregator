@@ -1,6 +1,7 @@
 import datetime
 from enum import Enum
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
+from typing import Annotated
 
 
 class UserRole(str, Enum):
@@ -16,21 +17,33 @@ class UserBase(BaseModel):
     name: str = Field(max_length=128)
     email: str = Field(max_length=340)
     phone_number: str = Field(max_length=16)
-    company_name: str | None = Field(max_length=64)
+    company_name: str | None = Field(default=None, max_length=64)
     avatar_photo_id: int | None
 
 class UserRegister(UserBase):
     password: str = Field(max_length=128)
-    avatar_photo_id: int | None = Field(None, exclude=True) # don't allow to set avatar_photo_id on creation, we allow it after creation only
+    avatar_photo_id: Annotated[int | None, Field(default=None, exclude=True)] # don't allow to set avatar_photo_id on creation, we allow it after creation only
 
 class UserCreate(UserRegister):
-    role: str = "user"
+    role: UserRole = UserRole.USER
 
 class UserGet(UserBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
-    role: str
+    role: UserRole
     registration_date: datetime.datetime
-    status: str
+    status: UserStatus
     
 class UserUpdate(UserBase):
     pass
+
+class UserFilterParams(BaseModel):
+    search_query: str | None = None
+
+class UserPaginatedGet(BaseModel):
+    total: int
+    page: int
+    page_size: int
+    total_pages: int
+    users: list[UserGet]

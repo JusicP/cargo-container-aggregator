@@ -45,6 +45,7 @@ export default function RegisterForm() {
             const { repeatPassword, ...restData } = sanitizedData;
             const credentials: SignUpReqBody = {
                 ...(restData as Omit<SignUpReqBody, "avatar_photo_id" | "role">),
+                company_name: restData.company_name?.trim() ? restData.company_name : null,
                 avatar_photo_id: 0,
                 role: "user",
             };

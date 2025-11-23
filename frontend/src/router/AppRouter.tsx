@@ -4,9 +4,9 @@ import ProtectedRoute from '../components/ProtectedRoute';
 import { useAuth } from '../contexts/AuthContext';
 
 // Імпорти компонентів сторінок
-import HomePage from '../pages/HomePage';
-import LoginPage from '../pages/LoginPage';
-import RegisterPage from '../pages/RegisterPage';
+import HomePage from '../pages/homepage/HomePage.tsx';
+import LoginPage from '../pages/auth/LoginPage.tsx';
+import RegisterPage from '../pages/auth/RegisterPage.tsx';
 import MyAccountPage from '../pages/MyAccountPage';
 import ActiveListingsPage from '../pages/myaccount/ActiveListingsPage';
 import PendingListingsPage from '../pages/myaccount/PendingListingsPage';
@@ -94,6 +94,15 @@ const AppRouterContent: React.FC = () => {
       
       {/* Профіль і налаштування - доступні всім авторизованим користувачам */}
       <Route 
+        path="/profile/{:id}" 
+        element={
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
         path="/myaccount/profile" 
         element={
           <ProtectedRoute>
@@ -158,40 +167,14 @@ const AppRouterContent: React.FC = () => {
           <ProtectedRoute requiredRoles={['admin']}>
             <AdminPage />
           </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/admin/listings" 
-        element={
-          <ProtectedRoute requiredRoles={['admin']}>
-            <AdminListingsPage />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/admin/parser" 
-        element={
-          <ProtectedRoute requiredRoles={['admin']}>
-            <AdminParserPage />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/admin/users" 
-        element={
-          <ProtectedRoute requiredRoles={['admin']}>
-            <AdminUsersPage />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/admin/logs" 
-        element={
-          <ProtectedRoute requiredRoles={['admin']}>
-            <AdminLogsPage />
-          </ProtectedRoute>
-        } 
-      />
+        }
+      >
+        <Route path="listings" element={<AdminListingsPage />} />
+        <Route path="parser" element={<AdminParserPage />} />
+        <Route path="users" element={<AdminUsersPage />} />
+        <Route path="logs" element={<AdminLogsPage />} />
+      </Route>
+
       
       {/* 404 сторінка для всіх інших маршрутів */}
       <Route path="*" element={<NotFoundPage />} />

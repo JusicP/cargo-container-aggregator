@@ -1,14 +1,17 @@
 import "./App.css";
-import {useState} from "react";
-import background from "./assets/background.png";
 import './index.css'
-import AppRouter from './router/AppRouter';
+import AppRouter from '@/router/AppRouter';
+import Navbar from "@/router/Navbar.tsx"
+import Footer from "@/router/Footer.tsx"
 
 const App: React.FC = () => {
   return (
-    <div className="app-container">
-      <AppRouter />
-    </div>
+      <>
+          <Navbar />
+          <div className="app-container">
+              <AppRouter />
+          </div>
+      </>
   );
 };
 
