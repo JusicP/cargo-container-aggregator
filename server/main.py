@@ -1,12 +1,7 @@
-import os
-from dotenv import load_dotenv
-from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from time import time
-
 from fastapi import FastAPI, Request
-from dotenv import load_dotenv
-import os
+
 
 from server.logger import logger
 from server.routes import auth, user, listings, favorites, parserListings, analytics, user_photo_router, notification, logs
@@ -18,9 +13,8 @@ from server.utils.default_admin import ensure_superuser
 
 from fastapi.middleware.cors import CORSMiddleware
 
-load_dotenv()
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
-SYNC_DATABASE_URL = os.getenv("SYNC_DATABASE_URL")
+from server.config import DATABASE_URL, SYNC_DATABASE_URL, FRONTEND_URL,FRONTEND_URL_IP
+
 
 
 @asynccontextmanager
@@ -56,8 +50,8 @@ app = FastAPI(
 )
 
 origins = [
-    os.getenv("FRONTEND_URL"),
-    os.getenv("FRONTEND_URL_IP"),
+    FRONTEND_URL,
+    FRONTEND_URL_IP
 ]
 
 app.add_middleware(
