@@ -1,6 +1,5 @@
 import datetime
 import logging
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.schemas.listing import ListingCreate
 from server.schemas.listing_parser import ListingParserUpdate
@@ -74,12 +73,15 @@ async def run_listing_scraper():
                     )
                 )
             except Exception as e:
-                await listing_parser_service.update_listing_parser(
-                    session,
-                    listing_parse.id,
-                    ListingParserUpdate(
-                        status="error",
-                        last_finished_at=datetime.datetime.now(datetime.timezone.utc),
-                        error_message=str(e)[:250]
+                await session.rollback()
+
+                async with async_session_maker() as error_session:
+                    await listing_parser_service.update_listing_parser(
+                        error_session,
+                        listing_parse.id,
+                        ListingParserUpdate(
+                            status="error",
+                            last_finished_at=datetime.datetime.now(datetime.timezone.utc),
+                            error_message=str(e)[:250]
+                        )
                     )
-                )

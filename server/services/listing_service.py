@@ -12,7 +12,7 @@ from server.services.listing_photo_service import create_listing_photos
 from server.schemas.listing import ListingCreate, ListingFilterParams, ListingUpdate
 
 
-async def create_listing(session: AsyncSession, user_id: int, listing_create: ListingCreate):
+async def create_listing(session: AsyncSession, user_id: int | None, listing_create: ListingCreate, status: str = "pending"):
     listing = Listing(
         user_id=user_id,
         title=listing_create.title,
@@ -24,13 +24,16 @@ async def create_listing(session: AsyncSession, user_id: int, listing_create: Li
         location=listing_create.location,
         ral_color=listing_create.ral_color,
         original_url=listing_create.original_url,
+        status=status,
     )
 
     session.add(listing)
-    await session.commit()
+    await session.flush()
 
     await create_listing_photos(session, listing_id=listing.id, listing_photos=listing_create.photos)
     await create_listing_history(session, listing_create.price, listing)
+
+    await session.commit()
 
     await session.execute(select(Listing).options(
         selectinload(Listing.photos),
@@ -43,29 +46,12 @@ async def create_listing(session: AsyncSession, user_id: int, listing_create: Li
 async def create_or_update_listings(session: AsyncSession, listings_create: list[ListingCreate]):
     for listing_create in listings_create:
         # find listing by url, ral_color
-        query = (
-            select(Listing)
-            .where(Listing.original_url == listing_create.original_url,
-                   Listing.ral_color == Listing.ral_color)
-        )
+        query = select(Listing).where(Listing.original_url == listing_create.original_url, Listing.ral_color == Listing.ral_color)
 
         result = await session.execute(query)
         listing = result.scalar_one_or_none()
         if not listing:
-            # create listing
-            listing = Listing(
-                title=listing_create.title,
-                description=listing_create.description,
-                container_type=listing_create.container_type,
-                condition=listing_create.condition,
-                type=listing_create.type,
-                currency=listing_create.currency,
-                location=listing_create.location,
-                ral_color=listing_create.ral_color,
-                original_url=listing_create.original_url,
-            )
-
-            session.add(listing)
+            listing = await create_listing(session, None, listing_create, "active")
         else:
             listing.title = listing_create.title
             listing.description = listing_create.description
@@ -77,11 +63,7 @@ async def create_or_update_listings(session: AsyncSession, listings_create: list
             listing.ral_color = listing_create.ral_color
             listing.original_url = listing_create.original_url
 
-        await session.flush()
-        await session.refresh(listing)
-
-        if listing_create.photos:
-            await create_listing_photos(session, listing_id=listing.id, listing_photos=listing_create.photos)
+            await session.flush()
 
     await session.commit()
 

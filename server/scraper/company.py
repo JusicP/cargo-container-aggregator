@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 
-from server.schemas.listing import ListingCreate, ListingCreate
+from server.schemas.listing import ListingCreate
 from server.schemas.listing_parser import ListingParserGet
+from server.schemas.listing_photo import ListingPhotoCreate
 
 
 class Company(ABC):
@@ -42,9 +43,9 @@ class Company(ABC):
         raise ValueError(f"Company {name} not registered.")
     
     @staticmethod
-    def create_listing(listing_parse: ListingParserGet, ral_color: str, price: float | None) -> ListingCreate:
+    def create_listing(listing_parse: ListingParserGet, ral_color: str | None, price: float | None, image_urls: list[str] = []) -> ListingCreate:
         return ListingCreate(
-            title=f"{listing_parse.company_name} - container",
+            title=f"{listing_parse.company_name} - {listing_parse.container_type} container",
             description=f"Container from {listing_parse.company_name}",
             container_type=listing_parse.container_type,
             type=listing_parse.type,
@@ -52,6 +53,14 @@ class Company(ABC):
             location=listing_parse.location,
             ral_color=ral_color,
             price=price,
-            currency="EUR",
+            currency=listing_parse.currency,
             original_url=listing_parse.url,
+            photos=[
+                ListingPhotoCreate(
+                    photo_id=None, 
+                    photo_url=image_url, 
+                    is_main=(i == 0)
+                ) 
+                for i, image_url in enumerate(image_urls)
+            ]
         )

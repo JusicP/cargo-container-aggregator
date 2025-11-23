@@ -2,7 +2,8 @@ import {z} from 'zod';
 import { conditionMap, containerTypes, listingTypes } from './listingSchema';
 
 export const parserMethods: Record<string, string> = {
-  BS_SEDNA: "BS Sedna",
+  BS_BRINKBOX: "BS Brinkbox",
+  BS_CARU: "BS Caru",
 };
 
 export const listingParserBaseSchema = z.object({
