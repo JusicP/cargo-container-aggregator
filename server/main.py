@@ -12,7 +12,7 @@ from server.logger import logger
 from server.routes import auth, user, listings, favorites, parserListings, analytics, user_photo_router, notification, logs
 from server.database.connection import async_engine, async_session_maker
 from server.database.base import Base
-from server.scheduler.listing_analytics_job import start_scheduler
+from server.scheduler.mgr import start_scheduler, shutdown_scheduler
 
 from server.utils.default_admin import ensure_superuser
 
@@ -25,7 +25,7 @@ SYNC_DATABASE_URL = os.getenv("SYNC_DATABASE_URL")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    start_scheduler()
+    app.state.scheduler = start_scheduler()    
 
     if "sqlite" not in DATABASE_URL and SYNC_DATABASE_URL:
         print(">>> Running migrations...")
@@ -46,6 +46,7 @@ async def lifespan(app: FastAPI):
 
     yield
 
+    shutdown_scheduler(app.state.scheduler)
 
 
 app = FastAPI(

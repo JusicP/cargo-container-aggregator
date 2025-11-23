@@ -36,6 +36,14 @@ export interface ListingParserFilters {
     page_size?: number;
 }
 
+export interface ListingParserRunResponse {
+    alreadyRunning: boolean;
+}
+
+export interface ListingParserPollResponse {
+    isRunning: boolean;
+}
+
 export const useCreateListingParser = () => {
     const queryClient = useQueryClient();
 
@@ -63,6 +71,42 @@ export const useUpdateListingParser = () => {
         }
     })
 }
+
+export const useDeleteListingParser = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (parserId: number) => {
+            await defaultAxiosInstance.delete(`/parserlistings/${parserId}`);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["listings"] });
+        },
+    });
+};
+
+export const useRunListingParser = () => {
+    return useMutation({
+        mutationFn: async () => {
+            const { data } = await defaultAxiosInstance.post<ListingParserRunResponse>("/parserlistings/run");
+            return data;
+        },
+    });
+};
+
+export const usePollListingParser = (enabled: boolean) => {
+    return useQuery({
+        queryKey: ["listings", "parser", "poll"],
+        queryFn: async () => {
+            const { data } = await defaultAxiosInstance.post<ListingParserPollResponse>("/parserlistings/poll");
+            return data;
+        },
+        enabled,
+        refetchInterval: enabled ? 5000 : false,
+        refetchOnWindowFocus: false,
+        refetchOnMount: "always",
+    });
+};
 
 export const useListingParser = (filters: ListingParserFilters) => {
     return useQuery({

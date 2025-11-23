@@ -41,25 +41,47 @@ async def create_listing(session: AsyncSession, user_id: int, listing_create: Li
 
 
 async def create_or_update_listings(session: AsyncSession, listings_create: list[ListingCreate]):
-    # TODO: implement update logic
     for listing_create in listings_create:
-        listing = Listing(
-            title=listing_create.title,
-            description=listing_create.description,
-            container_type=listing_create.container_type,
-            condition=listing_create.condition,
-            type=listing_create.type,
-            currency=listing_create.currency,
-            location=listing_create.location,
-            ral_color=listing_create.ral_color,
-            original_url=listing_create.original_url,
+        # find listing by url, ral_color
+        query = (
+            select(Listing)
+            .where(Listing.original_url == listing_create.original_url,
+                   Listing.ral_color == Listing.ral_color)
         )
 
-        session.add(listing)
+        result = await session.execute(query)
+        listing = result.scalar_one_or_none()
+        if not listing:
+            # create listing
+            listing = Listing(
+                title=listing_create.title,
+                description=listing_create.description,
+                container_type=listing_create.container_type,
+                condition=listing_create.condition,
+                type=listing_create.type,
+                currency=listing_create.currency,
+                location=listing_create.location,
+                ral_color=listing_create.ral_color,
+                original_url=listing_create.original_url,
+            )
+
+            session.add(listing)
+        else:
+            listing.title = listing_create.title
+            listing.description = listing_create.description
+            listing.container_type = listing_create.container_type
+            listing.condition = listing_create.condition
+            listing.type = listing_create.type
+            listing.currency = listing_create.currency
+            listing.location = listing_create.location
+            listing.ral_color = listing_create.ral_color
+            listing.original_url = listing_create.original_url
+
         await session.flush()
         await session.refresh(listing)
 
-        await create_listing_photos(session, listing_id=listing.id, listing_photos=listing_create.photos)
+        if listing_create.photos:
+            await create_listing_photos(session, listing_id=listing.id, listing_photos=listing_create.photos)
 
     await session.commit()
 

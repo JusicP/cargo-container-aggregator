@@ -1,6 +1,4 @@
-import asyncio
 from datetime import datetime
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
@@ -64,8 +62,3 @@ async def update_listing_analytics_job():
                 await update_listing_analytics(session, listing.id, analytics_data)
             else:
                 await create_listing_analytics(session, analytics_data)
-
-def start_scheduler():
-    scheduler = AsyncIOScheduler()
-    scheduler.add_job(lambda: asyncio.create_task(update_listing_analytics_job()), "cron", hour=0, minute=0)
-    scheduler.start()

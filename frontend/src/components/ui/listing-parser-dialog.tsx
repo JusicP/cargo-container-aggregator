@@ -81,24 +81,24 @@ export const ListingParserDlg = ({ isOpen, onClose, isEdit = false, listingParse
                         <form onSubmit={handleSubmit(onSubmit)}>
                             <Dialog.Header>
                                 <Dialog.Title>
-                                    {isEdit ? "Edit listing parser" : "Create listing parser"}
+                                    {isEdit ? "Редагувати парсер" : "Створити парсер"}
                                 </Dialog.Title>
                             </Dialog.Header>
                             <Dialog.Body>
                                 <VStack gap="4">
                                     <Field.Root required>
                                         <Field.Label>
-                                            Company name <Field.RequiredIndicator />
+                                            Назва компанії <Field.RequiredIndicator />
                                         </Field.Label>
                                         <Input
                                             {...register("company_name")}
-                                            placeholder="Company name"
+                                            placeholder="Назва компанії"
                                         />
                                         {errors.company_name && <Text role="alert" color="red.500">{errors.company_name.message}</Text>}
                                     </Field.Root>
                                     <Field.Root required>
                                         <Field.Label>
-                                            Method <Field.RequiredIndicator />
+                                            Метод <Field.RequiredIndicator />
                                         </Field.Label>
                                         <NativeSelect.Root>
                                             <NativeSelect.Field
@@ -127,18 +127,18 @@ export const ListingParserDlg = ({ isOpen, onClose, isEdit = false, listingParse
 
                                     <Field.Root required>
                                         <Field.Label>
-                                            Location <Field.RequiredIndicator />
+                                            Локація <Field.RequiredIndicator />
                                         </Field.Label>
                                         <Input
                                             {...register("location")}
-                                            placeholder="City, country"
+                                            placeholder="Локація"
                                         />
                                         {errors.location && <Text role="alert" color="red.500">{errors.location.message}</Text>}
                                     </Field.Root>
 
                                     <Field.Root required>
                                         <Field.Label>
-                                            Condition <Field.RequiredIndicator />
+                                            Стан <Field.RequiredIndicator />
                                         </Field.Label>
                                         <NativeSelect.Root>
                                             <NativeSelect.Field
@@ -156,7 +156,7 @@ export const ListingParserDlg = ({ isOpen, onClose, isEdit = false, listingParse
 
                                     <Field.Root>
                                         <Field.Label>
-                                            Listing type
+                                            Тип оголошення
                                         </Field.Label>
                                         <NativeSelect.Root>
                                             <NativeSelect.Field
@@ -174,7 +174,7 @@ export const ListingParserDlg = ({ isOpen, onClose, isEdit = false, listingParse
 
                                     <Field.Root>
                                         <Field.Label>
-                                            Currency
+                                            Валюта
                                         </Field.Label>
                                         <NativeSelect.Root>
                                             <NativeSelect.Field
@@ -191,7 +191,7 @@ export const ListingParserDlg = ({ isOpen, onClose, isEdit = false, listingParse
                                     </Field.Root>
                                     <Field.Root>
                                         <Field.Label>
-                                            Container type
+                                            Тип контейнера
                                         </Field.Label>
                                         <NativeSelect.Root>
                                             <NativeSelect.Field
@@ -208,17 +208,17 @@ export const ListingParserDlg = ({ isOpen, onClose, isEdit = false, listingParse
                                     </Field.Root>
 
                                     {error && (
-                                        <Text>There is some error: {error}</Text>
+                                        <Text>Помилка: {error}</Text>
                                     )}
 
                                 </VStack>
                             </Dialog.Body>
                             <Dialog.Footer>
                                 <Dialog.ActionTrigger asChild>
-                                    <Button variant="outline" onClick={onClose}>Cancel</Button>
+                                    <Button variant="outline" onClick={onClose}>Скасувати</Button>
                                 </Dialog.ActionTrigger>
                                 <Button type="submit">
-                                    {isSubmitting ? "Processing..." : isEdit ? "Update parser" : "Create parser"}
+                                    {isSubmitting ? "Обробка..." : isEdit ? "Оновити" : "Створити"}
                                 </Button>
                             </Dialog.Footer>
                             <Dialog.CloseTrigger asChild>
