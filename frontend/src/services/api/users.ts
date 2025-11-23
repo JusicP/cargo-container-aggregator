@@ -39,6 +39,7 @@ export const useUsers = (filters: UserFilters) => {
             const { data } = await defaultAxiosInstance.get<UserPaginatedGet>("/users", { params });
             return data;
         },
+        refetchOnWindowFocus: false
     });
 };
 

@@ -93,6 +93,7 @@ export const useListings = (filters: ListingFilters) => {
             const { data } = await defaultAxiosInstance.get<ListingsPaginatedGet>("/listings", { params });
             return data;
         },
+        refetchOnWindowFocus: false
     });
 };
 

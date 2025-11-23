@@ -117,5 +117,6 @@ export const useListingParser = (filters: ListingParserFilters) => {
             const { data } = await defaultAxiosInstance.get<ListingParserPaginatedGet>("/parserlistings", { params });
             return data;
         },
+        refetchOnWindowFocus: false
     });
 };
