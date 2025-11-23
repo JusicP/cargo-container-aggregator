@@ -1,4 +1,4 @@
-import { Box, Button, Text } from "@chakra-ui/react";
+import { Box, Button, VStack, Text, Image} from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 
 const CreateListingSuccessPage = () => {
@@ -14,16 +14,43 @@ const CreateListingSuccessPage = () => {
             alignItems="center"
             justifyContent="center"
         >
+            <VStack>
+
+                <Image
+                    src="/src/assets/svg/Key.svg"
+                    alt="sent-icon"
+                    boxSize="110px"
+                />
+
+                <Box textAlign="center">
             <Text
+                as="div"
                 fontFamily="Avenir, sans-serif"
-                fontSize="32px"
-                fontWeight="500"
+                fontSize="48px"
+                fontWeight="900"
                 textAlign="center"
-                mb="32px"
-                color="#18181B"
+                verticalAlign="middle"
+                mb="10px"
+                color="#52525B"
             >
-                Оголошення відправлено на модерацію
+                <div>ОГОЛОШЕННЯ</div>
+            <div>ВІДПРАВЛЕНО НА МОДЕРАЦІЮ</div>
             </Text>
+                </Box>
+            <Text
+                as="div"
+                fontFamily="Geologica, sans-serif"
+                fontSize="24px"
+                fontWeight="400"
+                textAlign="center"
+                verticalAlign="middle"
+                mb="32px"
+                color="#A1A1AA"
+            >
+                <div>Ваше оголошення у черзі на перевірку.</div>
+                <div>Ми вже працюємо над цим — очікуйте!</div>
+            </Text>
+            </VStack>
 
             <Button
                 onClick={() => navigate("/")}
@@ -33,12 +60,12 @@ const CreateListingSuccessPage = () => {
                 h="51px"
                 borderRadius="4px"
                 fontFamily="Avenir, sans-serif"
-                fontSize="16px"
+                fontSize="18px"
                 fontWeight="500"
-                _hover={{ bg: "#18181B" }} // в фигме hover нет → оставляем
+                _hover={{ bg: "#18181B" }}
                 _active={{ bg: "#18181B" }}
             >
-                повернутись на головну
+                На головну
             </Button>
         </Box>
     );
