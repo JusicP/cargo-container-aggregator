@@ -1,12 +1,9 @@
-import os
-from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from server.database.base import Base
+from server.config import SYNC_DATABASE_URL
 
-load_dotenv()
 
-SYNC_DATABASE_URL = os.getenv("SYNC_DATABASE_URL")
 
 if not SYNC_DATABASE_URL:
     raise RuntimeError("SYNC_DATABASE_URL is not set in environment variables")

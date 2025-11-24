@@ -2,16 +2,12 @@ from datetime import datetime, timedelta, timezone  # For working with timestamp
 from passlib.context import CryptContext  # Library for secure password hashing
 from jose import jwt, JWTError  # For creating and verifying JSON Web Tokens (JWTs)
 import secrets  # For generating cryptographically secure random strings
-import os
 
 # ======================================================
 # Environment variables
 # ======================================================
-SECRET_KEY = os.getenv("SECRET_KEY", "supersecret")
-ALGORITHM = os.getenv("ALGORITHM", "HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 15))
-REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", 30))
 
+from server.config import (SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_DAYS)
 
 # ==========================
 # Password Hashing
