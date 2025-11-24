@@ -6,14 +6,34 @@ export const conditionMap: Record<string, string> = {
 
 export const containerTypes: Record<string, string> = {
   standard: "Standard",
+  general_purpose: "General purpose",
   high_cube: "High Cube",
-  reefer: "Reefer",
+  pallet_wide: "Pallet Wide",
+  refrigerated: "Refrigerated (Reefer)",
+  insulated: "Insulated",
   open_top: "Open Top",
-  open_side: "Open Side",
+  ventilated: "Ventilated",
+  hard_top: "Hard Top",
+  platform: "Platform",
   flat_rack: "Flat Rack",
-  double_door: "Double Door",
   tank: "Tank",
+  bulk: "Bulk",
+  special: "Special Purpose",
+  double_door: "Double Door",
+  side_door: "Side Door",
   other: "Інший",
+};
+
+export const containerDimensions: Record<string, string> = {
+  ft4: "4ft",
+  ft6: "6ft",
+  ft8: "8ft",
+  ft10: "10ft",
+  ft20: "20ft",
+  ft40: "40ft",
+  ft45: "45ft",
+  ft53: "53ft",
+  unknown: "Невідомий"
 };
 
 export const listingTypes: Record<string, string> = {

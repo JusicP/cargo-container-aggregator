@@ -62,5 +62,6 @@ class Company(ABC):
                     is_main=(i == 0)
                 ) 
                 for i, image_url in enumerate(image_urls)
-            ]
+            ],
+            dimension=listing_parse.dimension
         )

@@ -52,6 +52,7 @@ export interface Listing {
     analytics?: ListingAnalytics;
     last_history: ListingHistory;
     original_url: string | null;
+    dimension: string;
 }
 
 export interface ListingsPaginatedGet {
@@ -77,6 +78,7 @@ export interface ListingFilters {
     sort_order?: "asc" | "desc";
     page?: number;
     page_size?: number;
+    dimension?: string[];
 }
 
 export const useListings = (filters: ListingFilters) => {

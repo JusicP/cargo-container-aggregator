@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime, timezone
 
-from server.schemas.listing import ListingFilterParams, ListingGet, ListingCreate, ListingPaginatedGet, ListingUpdate
+from server.schemas.listing import ListingFilterParams, ListingGet, ListingCreate, ListingPaginatedGet, ListingStatus, ListingUpdate
 from server.database.connection import generate_async_session
 from server.services.listing_service import (
     create_listing as create_listing_service,
@@ -86,7 +86,7 @@ async def delete_listing(
 @router.post("/{listing_id}/status/{status}")
 async def update_listing_status(
     listing_id: int,
-    status: str,
+    status: ListingStatus,
     session: AsyncSession = Depends(generate_async_session),
     _: User = Depends(get_current_user()),
 ):

@@ -8,7 +8,7 @@ import FilterableCheckboxGroup from "@/components/ui/filterable-checkbox-group";
 
 import RalColorBox from "@/components/ui/ral-color-box";
 import { ListingCard } from "@/components/ui/listing-card";
-import { conditionMap, containerTypes, listingTypes, ralColors } from "@/schemas/listingSchema";
+import { conditionMap, containerDimensions, containerTypes, listingTypes, ralColors } from "@/schemas/listingSchema";
 
 
 const sortOptions = [
@@ -40,6 +40,7 @@ function App() {
     const [page, setPage] = useState(1);
     const [sortBy, setSortBy] = useState<keyof ListingFilters>("addition_date");
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+    const [dimensionFilter, setDimensionFilter] = useState<string[]>([]);
 
     const { data, isLoading, isFetching, refetch } = useListings({
         title: titleFilter || undefined,
@@ -50,6 +51,7 @@ function App() {
         price_min: priceMin,
         price_max: priceMax,
         ral_color: colorFilter,
+        dimension: dimensionFilter,
         page,
         page_size: 10,
         sort_by: sortBy,
@@ -182,6 +184,14 @@ function App() {
                                     items={locations}
                                     selected={locationFilter}
                                     onChange={setLocationFilter}
+                                />
+                        </div>
+                        <div className="filter-section">
+                            <h2 className="filter-subtitle">Розміри</h2>
+                                <FilterableCheckboxGroup
+                                    items={containerDimensions}
+                                    selected={dimensionFilter}
+                                    onChange={setDimensionFilter}
                                 />
                         </div>
 

@@ -1,5 +1,8 @@
 import datetime
+from typing import Optional
 
+from sqlalchemy import and_, asc, desc, func, select
+from sqlalchemy.orm import selectinload, aliased
 from sqlalchemy import and_, asc, desc, func, select
 from sqlalchemy.orm import selectinload, aliased
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,16 +12,18 @@ from server.models.listing_history import ListingHistory
 from server.models.user import User
 from server.services.listing_history_service import create_listing_history, update_listing_history
 from server.services.listing_photo_service import create_listing_photos
-from server.schemas.listing import ListingCreate, ListingFilterParams, ListingUpdate
+from server.schemas.listing import ListingCreate, ListingFilterParams, ListingStatus, ListingUpdate
+from server.schemas.container import ContainerType, ContainerCondition, ContainerDimension
 
 
-async def create_listing(session: AsyncSession, user_id: int | None, listing_create: ListingCreate, status: str = "pending"):
+async def create_listing(session: AsyncSession, user_id: int | None, listing_create: ListingCreate, status: ListingStatus = ListingStatus.PENDING):
     listing = Listing(
         user_id=user_id,
         title=listing_create.title,
         description=listing_create.description,
         container_type=listing_create.container_type,
         condition=listing_create.condition,
+        dimension=listing_create.dimension,
         type=listing_create.type,
         currency=listing_create.currency,
         location=listing_create.location,
@@ -34,8 +39,9 @@ async def create_listing(session: AsyncSession, user_id: int | None, listing_cre
     await create_listing_history(session, listing_create.price, listing)
 
     await session.commit()
+    await session.refresh(listing)
 
-    await session.execute(select(Listing).options(
+    listing = await session.execute(select(Listing).options(
         selectinload(Listing.photos),
         selectinload(Listing.analytics)
     ).filter(Listing.id == listing.id))
@@ -51,7 +57,7 @@ async def create_or_update_listings(session: AsyncSession, listings_create: list
         result = await session.execute(query)
         listing = result.scalar_one_or_none()
         if not listing:
-            listing = await create_listing(session, None, listing_create, "active")
+            listing = await create_listing(session, None, listing_create, ListingStatus.ACTIVE)
         else:
             listing.title = listing_create.title
             listing.description = listing_create.description
@@ -62,6 +68,7 @@ async def create_or_update_listings(session: AsyncSession, listings_create: list
             listing.location = listing_create.location
             listing.ral_color = listing_create.ral_color
             listing.original_url = listing_create.original_url
+            listing.dimension = listing_create.dimension
 
             await session.flush()
 
@@ -112,6 +119,8 @@ async def get_all_listings_paginated(
         query = query.where(Listing.ral_color.in_(filters.ral_color))
     if filters.status:
         query = query.where(Listing.status == filters.status)
+    if filters.dimension:
+        query = query.where(Listing.dimension.in_(filters.dimension))
 
     count_query = select(func.count()).select_from(Listing).where(
         *query._where_criteria
@@ -160,22 +169,22 @@ async def get_all_listings(session: AsyncSession):
 
 
 async def get_listing_by_id(session: AsyncSession, listing_id: int):
-    result = await session.execute(select(Listing).where(Listing.id==listing_id).options(
+    result = await session.execute(select(Listing).where(Listing.id == listing_id).options(
         selectinload(Listing.photos),
-        selectinload(Listing.analytics)
+        selectinload(Listing.analytics),
+        selectinload(Listing.last_history)
     ))
     return result.scalars().one_or_none()
 
 
-# FIXME: make permission check as fastapi dependency? 
 async def get_listing_by_id_and_check_rights(session: AsyncSession, listing_id: int, user: User):
     listing = await get_listing_by_id(session, listing_id)
 
     if not listing:
         raise ValueError("Listing doesn't exist")
-    
+
     if not user.is_admin() and listing.user_id != user.id:
-        raise PermissionError("You are not allowed to modify this listing") # FIXME: not sure if it's suitable exception type...
+        raise PermissionError("You are not allowed to modify this listing")
 
     return listing
 

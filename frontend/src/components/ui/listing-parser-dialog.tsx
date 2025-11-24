@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { listingParserBaseSchema, parserMethods, type listingParserCreate } from "@/schemas/listingParserSchema";
 import { useCreateListingParser, useUpdateListingParser, type ListingParser, type ListingParserBase } from "@/services/api/listing_parser";
 import DOMPurify from "dompurify";
-import { conditionMap, containerTypes, listingTypes } from "@/schemas/listingSchema";
+import { conditionMap, containerDimensions, containerTypes, listingTypes } from "@/schemas/listingSchema";
 import { useEffect, useMemo, useState } from "react";
 
 interface ListingParserDlgProps {
@@ -28,6 +28,7 @@ export const ListingParserDlg = ({ isOpen, onClose, isEdit = false, listingParse
         type: listingParser?.type ?? Object.keys(listingTypes)[0] ?? "",
         currency: listingParser?.currency ?? Intl.supportedValuesOf("currency")[0],
         container_type: listingParser?.container_type ?? Object.keys(containerTypes)[0],
+        dimension: listingParser?.dimension ?? Object.keys(containerDimensions)[0],
     }), [listingParser]);
 
     const { handleSubmit, register, formState: { errors, isSubmitting }, reset } = useForm<listingParserCreate>({
@@ -198,6 +199,23 @@ export const ListingParserDlg = ({ isOpen, onClose, isEdit = false, listingParse
                                                 {...register("container_type")}
                                             >
                                                 {Object.entries(containerTypes).map(([key, label]) => (
+                                                    <option key={key} value={key}>{label}</option>
+                                                ))}
+                                            </NativeSelect.Field>
+                                            <NativeSelect.Indicator />
+                                        </NativeSelect.Root>
+
+                                        {errors.type && <Text role="alert" color="red.500">{errors.type.message}</Text>}
+                                    </Field.Root>
+                                    <Field.Root>
+                                        <Field.Label>
+                                            Розмір контейнера
+                                        </Field.Label>
+                                        <NativeSelect.Root>
+                                            <NativeSelect.Field
+                                                {...register("dimension")}
+                                            >
+                                                {Object.entries(containerDimensions).map(([key, label]) => (
                                                     <option key={key} value={key}>{label}</option>
                                                 ))}
                                             </NativeSelect.Field>

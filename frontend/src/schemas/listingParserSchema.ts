@@ -1,5 +1,5 @@
 import {z} from 'zod';
-import { conditionMap, containerTypes, listingTypes } from './listingSchema';
+import { conditionMap, containerDimensions, containerTypes, listingTypes } from './listingSchema';
 
 export const parserMethods: Record<string, string> = {
   BS_BRINKBOX: "BS Brinkbox",
@@ -19,6 +19,7 @@ export const listingParserBaseSchema = z.object({
     condition: z.enum(Object.keys(conditionMap)),
     type: z.enum(Object.keys(listingTypes)),
     currency: z.enum(Intl.supportedValuesOf("currency")),
-    container_type: z.enum(Object.keys(containerTypes))
+    container_type: z.enum(Object.keys(containerTypes)),
+    dimension: z.enum(Object.keys(containerDimensions))
 })
 export type listingParserCreate = z.infer<typeof listingParserBaseSchema>

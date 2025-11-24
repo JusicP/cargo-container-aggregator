@@ -10,6 +10,7 @@ export interface ListingParserBase {
     container_type: string
     condition: string
     type: string
+    dimension: string
     currency: string
 }
 
