@@ -7,7 +7,7 @@ import { useAuth } from '../contexts/AuthContext';
 import HomePage from '../pages/homepage/HomePage.tsx';
 import LoginPage from '../pages/auth/LoginPage.tsx';
 import RegisterPage from '../pages/auth/RegisterPage.tsx';
-import MyAccountPage from '../pages/MyAccountPage';
+import MyAccountPage from '../pages/myaccount/MyAccountPage.tsx';
 import ActiveListingsPage from '../pages/myaccount/ActiveListingsPage';
 import PendingListingsPage from '../pages/myaccount/PendingListingsPage';
 import RejectedListingsPage from '../pages/myaccount/RejectedListingsPage';
@@ -30,151 +30,142 @@ import AboutUsPage from '@/pages/AboutUsPage.tsx';
 const AppRouterContent: React.FC = () => {
     const { isAuthenticated } = useAuth();
 
-    return (
-        <Routes>
-            {/* Головна сторінка - доступна всім */}
-            <Route path="/" element={<HomePage />} />
+  return (
+    <Routes>
+      {/* Головна сторінка - доступна всім */}
+      <Route path="/" element={<HomePage />} />
+      
+      {/* Аутентифікація - доступна тільки неавторизованим користувачам */}
+      <Route 
+        path="/login" 
+        element={
+          isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />
+        } 
+      />
+      <Route 
+        path="/register" 
+        element={
+          isAuthenticated ? <Navigate to="/" replace /> : <RegisterPage />
+        } 
+      />
+      
+      {/* Мій акаунт - доступний тільки авторизованим користувачам */}
+      <Route 
+        path="/myaccount" 
+        element={
+          <ProtectedRoute>
+            <MyAccountPage />
+        </ProtectedRoute>
+        } 
+      >
+        <Route index element={<Navigate to="profile" replace />} />
 
-            {/* Аутентифікація - доступна тільки неавторизованим користувачам */}
-            <Route
-                path="/login"
-                element={
-                    isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />
-                }
-            />
-            <Route
-                path="/register"
-                element={
-                    isAuthenticated ? <Navigate to="/" replace /> : <RegisterPage />
-                }
-            />
+        {/* Оголошення в акаунті - доступні для користувачів (user може і купляти, і продавати) */}
+        <Route 
+          path="listings/active" 
+          element={
+            <ProtectedRoute requiredRoles={['user']}>
+              <ActiveListingsPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="listings/pending" 
+          element={
+            <ProtectedRoute requiredRoles={['user']}>
+              <PendingListingsPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="listings/rejected" 
+          element={
+            <ProtectedRoute requiredRoles={['user']}>
+              <RejectedListingsPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="listings/deleted" 
+          element={
+            <ProtectedRoute requiredRoles={['user']}>
+              <DeletedListingsPage />
+            </ProtectedRoute>
+          } 
+        />
+        
+        {/* Профіль і налаштування - доступні всім авторизованим користувачам */}
+        <Route 
+          path="profile" 
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="user-settings" 
+          element={
+            <ProtectedRoute>
+              <UserSettingsPage />
+            </ProtectedRoute>
+          } 
+        />
+      </Route>
 
-            {/* Мій акаунт - доступний тільки авторизованим користувачам */}
-            <Route
-                path="/myaccount"
-                element={
-                    <ProtectedRoute>
-                        <MyAccountPage />
-                    </ProtectedRoute>
-                }
-            />
-
-            {/* Оголошення в акаунті - доступні для користувачів (user може і купляти, і продавати) */}
-            <Route
-                path="/myaccount/listings/active"
-                element={
-                    <ProtectedRoute requiredRoles={['user']}>
-                        <ActiveListingsPage />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/myaccount/listings/pending"
-                element={
-                    <ProtectedRoute requiredRoles={['user']}>
-                        <PendingListingsPage />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/myaccount/listings/rejected"
-                element={
-                    <ProtectedRoute requiredRoles={['user']}>
-                        <RejectedListingsPage />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/myaccount/listings/deleted"
-                element={
-                    <ProtectedRoute requiredRoles={['user']}>
-                        <DeletedListingsPage />
-                    </ProtectedRoute>
-                }
-            />
-
-            {/* Профіль і налаштування - доступні всім авторизованим користувачам */}
-            <Route
-                path="/profile/{:id}"
-                element={
-                    <ProtectedRoute>
-                        <ProfilePage />
-                    </ProtectedRoute>
-                }
-            />
-
-            <Route
-                path="/myaccount/profile"
-                element={
-                    <ProtectedRoute>
-                        <ProfilePage />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/myaccount/user-settings"
-                element={
-                    <ProtectedRoute>
-                        <UserSettingsPage />
-                    </ProtectedRoute>
-                }
-            />
-
-            {/* Створення оголошення - тільки для користувачів */}
-            <Route
-                path="/create-listing"
-                element={
-                    <ProtectedRoute requiredRoles={['user']}>
-                        <CreateListingPage />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/create-listing/success"
-                element={
-                    <ProtectedRoute requiredRoles={['user']}>
-                        <CreateListingSuccessPage />
-                    </ProtectedRoute>
-                }
-            />
-
-            {/* Перегляд оголошення - доступний всім */}
-            <Route path="/listing/:id" element={<ListingPage />} />
-
-            {/* Аналітика оголошення - тільки для власника оголошення або адмінів */}
-            <Route
-                path="/listing/:id/analytics"
-                element={
-                    <ProtectedRoute requiredRoles={['user', 'admin']}>
-                        <ListingAnalyticsPage />
-                    </ProtectedRoute>
-                }
-            />
-
-            {/* Редагування оголошення - тільки для власника оголошення або адмінів */}
-            <Route
-                path="/listing/:id/edit"
-                element={
-                    <ProtectedRoute requiredRoles={['user', 'admin']}>
-                        <EditListingPage />
-                    </ProtectedRoute>
-                }
-            />
-
-            {/* Адмін панель - тільки для адміністраторів */}
-            <Route
-                path="/admin"
-                element={
-                    <ProtectedRoute requiredRoles={['admin']}>
-                        <AdminPage />
-                    </ProtectedRoute>
-                }
-            >
-                <Route path="listings" element={<AdminListingsPage />} />
-                <Route path="parser" element={<AdminParserPage />} />
-                <Route path="users" element={<AdminUsersPage />} />
-                <Route path="logs" element={<AdminLogsPage />} />
-            </Route>
+      {/* Створення оголошення - тільки для користувачів */}
+      <Route 
+        path="/create-listing" 
+        element={
+          <ProtectedRoute requiredRoles={['user']}>
+            <CreateListingPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/create-listing/success" 
+        element={
+          <ProtectedRoute requiredRoles={['user']}>
+            <CreateListingSuccessPage />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Перегляд оголошення - доступний всім */}
+      <Route path="/listing/:id" element={<ListingPage />} />
+      
+      {/* Аналітика оголошення - тільки для власника оголошення або адмінів */}
+      <Route 
+        path="/listing/:id/analytics" 
+        element={
+          <ProtectedRoute requiredRoles={['user', 'admin']}>
+            <ListingAnalyticsPage />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Редагування оголошення - тільки для власника оголошення або адмінів */}
+      <Route 
+        path="/listing/:id/edit" 
+        element={
+          <ProtectedRoute requiredRoles={['user', 'admin']}>
+            <EditListingPage />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Адмін панель - тільки для адміністраторів */}
+      <Route 
+        path="/admin" 
+        element={
+            <AdminPage />
+        }
+      >
+        <Route path="listings" element={<AdminListingsPage />} />
+        <Route path="parser" element={<AdminParserPage />} />
+        <Route path="users" element={<AdminUsersPage />} />
+        <Route path="logs" element={<AdminLogsPage />} />
+      </Route>
 
             <Route path="/about" element={<AboutUsPage />} />
 

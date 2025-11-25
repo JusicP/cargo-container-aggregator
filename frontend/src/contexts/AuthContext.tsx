@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import {getUserInfo} from "@/services/api/auth.ts";
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
 
 // Типи користувачів
 export type UserRole = 'guest' | 'user' | 'admin';
