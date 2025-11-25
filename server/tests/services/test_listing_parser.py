@@ -1,9 +1,7 @@
 import pytest
-import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from server.models.listing_parser import ListingParser
-from server.schemas.listing_parser import ListingParserCreate, ListingParserGet
+from server.schemas.listing_parser import ListingParserCreate, ListingParserUpdate
 from server.services.listing_parser_service import (
     create_listing_parser,
     get_all_listing_parsers,
@@ -24,7 +22,6 @@ async def test_create_listing_parser(session: AsyncSession):
         condition="used",
         type="sale",
         currency="UAH",
-        error_message=""
     )
     parser = await create_listing_parser(session, parser_data)
     assert parser.id is not None
@@ -44,7 +41,6 @@ async def test_get_all_and_by_id_parser(session: AsyncSession):
         condition="new",
         type="rent",
         currency="USD",
-        error_message=""
     )
     parser = await create_listing_parser(session, parser_data)
 
@@ -53,6 +49,7 @@ async def test_get_all_and_by_id_parser(session: AsyncSession):
     assert any(p.id == parser.id for p in all_parsers)
 
     fetched = await get_listing_parser_by_id(session, parser.id)
+    assert fetched
     assert fetched.id == parser.id
 
 
@@ -67,11 +64,10 @@ async def test_update_listing_parser(session: AsyncSession):
         condition="used",
         type="sale",
         currency="EUR",
-        error_message=""
     )
     parser = await create_listing_parser(session, parser_data)
 
-    update_data = ListingParserGet(
+    update_data = ListingParserUpdate(
         company_name="UpdatedCompany",
         method="bot",
         url="https://updated.com",
@@ -80,7 +76,6 @@ async def test_update_listing_parser(session: AsyncSession):
         condition="new",
         type="rent",
         currency="EUR",
-        addition_date=parser.addition_date,
         last_started_at=None,
         last_finished_at=None,
         status="done",  
@@ -103,7 +98,6 @@ async def test_delete_listing_parser(session: AsyncSession):
         condition="new",
         type="sale",
         currency="USD",
-        error_message=""
     )
     parser = await create_listing_parser(session, parser_data)
     await delete_listing_parser(session, parser.id)
@@ -115,7 +109,7 @@ async def test_delete_listing_parser(session: AsyncSession):
 @pytest.mark.asyncio
 async def test_update_nonexistent_listing_parser(session: AsyncSession):
     fake_id = 999
-    update_data = ListingParserGet(
+    update_data = ListingParserUpdate(
         company_name="Ghost",
         method="ghost",
         url="https://ghost.com",
@@ -124,7 +118,6 @@ async def test_update_nonexistent_listing_parser(session: AsyncSession):
         condition="new",
         type="sale",
         currency="USD",
-        addition_date=datetime.datetime.now(datetime.timezone.utc),
         last_started_at=None,
         last_finished_at=None,
         status="done",

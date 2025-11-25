@@ -2,8 +2,12 @@ import SvgLogo from "@/components/icons/Logo.tsx";
 import {Box, Link, Text} from "@chakra-ui/react";
 import LoginForm from "@/components/authentication/LoginForm.tsx";
 import PageLayout from "@/router/PageLayout.tsx";
+import { useSearchParams } from "react-router-dom";
 
 export default function LoginPage() {
+    const [searchParams] = useSearchParams();
+    const next = searchParams.get("next") ?? "/";
+
     return (
         <PageLayout>
             <div className="bg-white h-screen px-20 flex flex-col items-center justify-center">
@@ -30,7 +34,7 @@ export default function LoginPage() {
                         </Text>
                     </div>
                 </div>
-                <LoginForm />
+                <LoginForm next={next}/>
                 <Box paddingTop="4" className="flex flex-col items-center gap-0.5">
                     <Text textStyle="xs" color="gray.400">
                         Не реєстрував акаунт платформі раніше?

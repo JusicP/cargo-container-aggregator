@@ -16,6 +16,7 @@ class UserPhoto(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="CASCADE", use_alter=True))
     filename: Mapped[str | None] = mapped_column(String(2048))
+    ref_url: Mapped[str | None] = mapped_column(String(2048))
     uploaded_at: Mapped[datetime.datetime] = mapped_column(default=datetime.datetime.now(datetime.timezone.utc))
 
     user: Mapped["User"] = relationship(

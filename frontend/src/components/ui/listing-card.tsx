@@ -1,0 +1,82 @@
+import type { Listing } from "@/services/api/listings";
+import { Box, Card, Flex, IconButton, Link, Text } from "@chakra-ui/react";
+import { ArrowUpRight } from "@mynaui/icons-react";
+import container from "@/assets/container.png";
+
+export function extractPhotoUrl(listing: Listing): string {
+    const mainPhoto = listing.photos?.find(p => p.is_main) 
+        ?? listing.photos?.[0];
+
+    return mainPhoto
+        ? `${import.meta.env.VITE_SERVER_URL}/user/photo/${mainPhoto.photo_id}`
+        : container; // fallback
+}
+
+export function ListingCard({ listing }: { listing: Listing }) {
+    const photoUrl = extractPhotoUrl(listing);
+
+    return (
+        <Card.Root
+            key={listing.id}
+            width="417px"
+            height="277px"
+            position="relative"
+            overflow="hidden"
+            borderRadius="10px"
+            bgColor="#F5F5F5"
+            border={0}
+        >
+            {/* Full background */}
+            <Box
+                position="absolute"
+                inset={0}
+                bgImage={`url(${photoUrl})`}
+                bgSize="cover"
+                bgRepeat="no-repeat"
+                zIndex={0}
+                margin={1}
+                borderRadius="10px"
+            />
+
+            {/* Overlay */}
+            <Box
+                position="absolute"
+                inset={0}
+                zIndex={1}
+            />
+
+            <Card.Body zIndex={2}></Card.Body>
+
+            <Card.Footer zIndex={2}>
+                <Flex 
+                    bgColor="#f5f5f5c7" 
+                    width="100%" 
+                    borderRadius="md"
+                    height="60px" 
+                    alignItems="center"
+                    px={4} 
+                    gap={3}
+                >
+                    <Text 
+                        flex="1" 
+                        minW="0" 
+                        title={listing.title}
+                    >
+                        {listing.title}
+                    </Text>
+
+                    {listing.last_history.price !== null && listing.last_history.price > 0 && (
+                        <Text 
+                            fontWeight="bold" 
+                            whiteSpace="nowrap"
+                        >
+                            {listing.last_history.price} {listing.currency}
+                        </Text>
+                    )}
+
+                    <IconButton as={Link} size="md" paddingRight={5} paddingLeft={5} href={`/listing/${listing.id}`}><ArrowUpRight color="white"/></IconButton>
+                </Flex>
+            </Card.Footer>
+        </Card.Root>
+    );
+}
