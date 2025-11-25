@@ -35,15 +35,23 @@ async def get_favorites_by_user_id(session: AsyncSession, user_id: int):
     result = await session.execute(stmt)
     return result.scalars().all()
 
-
 async def add_favorite_listing(session: AsyncSession, user_id: int, listing_id: int):
     listing = await get_listing_by_id(session, listing_id)
     if not listing:
         raise ValueError(f"Listing with ID {listing_id} doesn't exist")
 
-    existing = await session.get(UserFavoriteListing, (user_id, listing_id))
+
+    query = select(UserFavoriteListing).where(
+        UserFavoriteListing.user_id == user_id,
+        UserFavoriteListing.listing_id == listing_id
+    )
+    result = await session.execute(query)
+    existing = result.scalars().first()
+
     if existing:
-        return await _load_favorite_listing(session, user_id, listing_id)
+        # ВАЖНО: Вызываем ошибку. Роутер поймает её, вернет 409 Conflict 
+        # и НЕ будет увеличивать счетчик статистики.
+        raise ValueError("Listing is already in favorites")
 
     favorite = UserFavoriteListing(user_id=user_id, listing_id=listing_id)
     session.add(favorite)
@@ -52,7 +60,7 @@ async def add_favorite_listing(session: AsyncSession, user_id: int, listing_id: 
         await session.commit()
     except IntegrityError:
         await session.rollback()
-        raise Exception("Failed to add listing to favorites.")
+        raise ValueError("Listing is already in favorites")
 
     return await _load_favorite_listing(session, user_id, listing_id)
 

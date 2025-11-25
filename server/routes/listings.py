@@ -1,9 +1,19 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime, timezone
+import sqlalchemy as sa
 
-from server.schemas.listing import ListingFilterParams, ListingGet, ListingCreate, ListingPaginatedGet, ListingStatus, ListingUpdate
+from server.models.listing_history import ListingHistory
+from server.schemas.listing import (
+    ListingFilterParams,
+    ListingGet,
+    ListingCreate,
+    ListingPaginatedGet,
+    ListingStatus,
+    ListingUpdate,
+)
 from server.database.connection import generate_async_session
+from server.schemas.listing_history import ListingHistoryBase
 from server.services.listing_service import (
     create_listing as create_listing_service,
     get_all_listings_paginated as get_all_listings_service,
@@ -14,9 +24,25 @@ from server.services.listing_service import (
 from server.models.user import User
 from server.routes.dependencies import get_current_user, get_listing_filters
 
+# history updates
+from server.services.listing_history_service import (
+    increment_views,
+    increment_contacts,
+)
+
 router = APIRouter(prefix="/listings", tags=["listings"])
 
-
+@router.get("/all_histories", response_model=list[ListingHistoryBase]) # Або list[dict], якщо схема не співпадає ідеально
+async def get_all_listing_histories(
+    session: AsyncSession = Depends(generate_async_session),
+    current_user: User = Depends(get_current_user()),
+):
+    result = await session.execute(sa.select(ListingHistory))
+    histories = result.scalars().all()
+    return histories
+# ---------------------------------------------------------------------
+# GET paginated listings
+# ---------------------------------------------------------------------
 @router.get("/", response_model=ListingPaginatedGet)
 async def get_listings(
     filters: ListingFilterParams = Depends(get_listing_filters),
@@ -28,6 +54,9 @@ async def get_listings(
     return res
 
 
+# ---------------------------------------------------------------------
+# Create listing
+# ---------------------------------------------------------------------
 @router.post("/", response_model=ListingGet)
 async def create_listing(
     listing: ListingCreate,
@@ -41,17 +70,28 @@ async def create_listing(
         raise HTTPException(status_code=400, detail=str(e))
 
 
+# ---------------------------------------------------------------------
+# GET listing + increment views
+# ---------------------------------------------------------------------
 @router.get("/{listing_id}", response_model=ListingGet)
 async def get_listing(
     listing_id: int,
     session: AsyncSession = Depends(generate_async_session),
+    current_user: User | None = Depends(get_current_user()),
 ):
     listing = await get_listing_by_id_service(session, listing_id)
     if not listing:
         raise HTTPException(status_code=404, detail="Listing not found")
+
+    if current_user:
+        await increment_views(session, listing_id)
+
     return listing
 
 
+# ---------------------------------------------------------------------
+# Update listing
+# ---------------------------------------------------------------------
 @router.put("/{listing_id}", response_model=ListingGet)
 async def update_listing(
     listing_id: int,
@@ -68,6 +108,9 @@ async def update_listing(
         raise HTTPException(status_code=404, detail=str(e))
 
 
+# ---------------------------------------------------------------------
+# Delete listing
+# ---------------------------------------------------------------------
 @router.delete("/{listing_id}")
 async def delete_listing(
     listing_id: int,
@@ -83,6 +126,9 @@ async def delete_listing(
         raise HTTPException(status_code=404, detail=str(e))
 
 
+# ---------------------------------------------------------------------
+# Update status
+# ---------------------------------------------------------------------
 @router.post("/{listing_id}/status/{status}")
 async def update_listing_status(
     listing_id: int,
@@ -96,7 +142,30 @@ async def update_listing_status(
 
     listing.status = status
     listing.approval_date = datetime.now(timezone.utc)
+
     await session.commit()
     await session.refresh(listing)
 
     return {"status": status, "id": listing_id, "approval_date": listing.approval_date}
+
+
+
+
+
+# ---------------------------------------------------------------------
+# CONTACT endpoint (increment contacts +1)
+# ---------------------------------------------------------------------
+@router.post("/{listing_id}/contact")
+async def contact_listing(
+    listing_id: int,
+    session: AsyncSession = Depends(generate_async_session),
+    current_user: User = Depends(get_current_user()),
+):
+    listing = await get_listing_by_id_service(session, listing_id)
+    if not listing:
+        raise HTTPException(status_code=404, detail="Listing not found")
+
+    await increment_contacts(session, listing_id)
+
+    return {"status": "ok", "listing_id": listing_id, "contacts_increased": True}
+
