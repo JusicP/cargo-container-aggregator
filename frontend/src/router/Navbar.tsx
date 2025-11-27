@@ -1,7 +1,7 @@
 import {useState} from "react";
 import '@/pages/homepage/homepage.css'
 import { useAuth } from "@/contexts/AuthContext";
-import { Cart, UserCircle } from "@mynaui/icons-react";
+import { BookmarkHome, UserCircle } from "@mynaui/icons-react";
 import { Link, Box, Flex, IconButton, NativeSelect } from "@chakra-ui/react";
 
 export default function Navbar() {
@@ -27,21 +27,22 @@ export default function Navbar() {
                 <Flex colorPalette="bg">
                     <NativeSelect.Root key="lang" width="fit-content">
                         <NativeSelect.Field
+                            color="white"
                             value={lang}
                             onChange={(e) => setLang(e.target.value)}
                         >
-                            <option value="UA">UA</option>
-                            <option value="EN">EN</option>
+                            <option value="UA" style={{ color: "black" }}>UA</option>
+                            <option value="EN" style={{ color: "black" }}>EN</option>
                         </NativeSelect.Field>
-                        <NativeSelect.Indicator />
+                        <NativeSelect.Indicator color="#FD7F16"/>
                     </NativeSelect.Root>
 
-                    <IconButton aria-label="cart" variant="ghost" rounded="full"><Cart /></IconButton>
+                    <IconButton as={Link} variant="ghost" _hover={{ bg: "orange.400" }} rounded="full" href="???"><BookmarkHome color="white"/></IconButton>
 
                     {!isAuthenticated ? (
-                        <IconButton as={Link} aria-label="profile" variant="ghost" rounded="full" size="md" href="/login"><UserCircle /></IconButton>
+                        <IconButton as={Link} variant={{ base: "ghost", _selected: "subtle" }} _hover={{ bg: "orange.400" }} rounded="full" href="/login"><UserCircle color="white"/></IconButton>
                     ) : (
-                        <IconButton as={Link} aria-label="profile" variant="ghost" rounded="full" href="/myaccount"><UserCircle /></IconButton>
+                        <IconButton as={Link} variant={{ base: "ghost", _selected: "subtle" }} rounded="full" href="/myaccount"><UserCircle color="white"/></IconButton>
                     )}
                 </Flex>
             </Box>

@@ -5,3 +5,4 @@ uploaded_photos
 *.pyc
 __pycache__/
 *.env
+*.log

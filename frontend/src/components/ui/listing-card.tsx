@@ -48,10 +48,33 @@ export function ListingCard({ listing }: { listing: Listing }) {
             <Card.Body zIndex={2}></Card.Body>
 
             <Card.Footer zIndex={2}>
-                <Flex bgColor="#F5F5F5" width="100%" padding={3} justifyContent="space-between" borderRadius="md">
-                    <Text>{listing.title}</Text>
-                    {/* лінк чомусь фарбує інонку в синій колір -_- */}
-                    <IconButton as={Link} size="md" paddingRight={5} paddingLeft={5} href={`/listing/${listing.id}`}><ArrowUpRight/></IconButton>
+                <Flex 
+                    bgColor="#f5f5f5c7" 
+                    width="100%" 
+                    borderRadius="md"
+                    height="60px" 
+                    alignItems="center"
+                    px={4} 
+                    gap={3}
+                >
+                    <Text 
+                        flex="1" 
+                        minW="0" 
+                        title={listing.title}
+                    >
+                        {listing.title}
+                    </Text>
+
+                    {listing.last_history.price !== null && listing.last_history.price > 0 && (
+                        <Text 
+                            fontWeight="bold" 
+                            whiteSpace="nowrap"
+                        >
+                            {listing.last_history.price} {listing.currency}
+                        </Text>
+                    )}
+
+                    <IconButton as={Link} size="md" paddingRight={5} paddingLeft={5} href={`/listing/${listing.id}`}><ArrowUpRight color="white"/></IconButton>
                 </Flex>
             </Card.Footer>
         </Card.Root>

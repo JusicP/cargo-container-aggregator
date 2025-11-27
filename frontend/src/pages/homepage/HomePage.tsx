@@ -8,6 +8,7 @@ import FilterableCheckboxGroup from "@/components/ui/filterable-checkbox-group";
 
 import RalColorBox from "@/components/ui/ral-color-box";
 import { ListingCard } from "@/components/ui/listing-card";
+import { conditionMap, containerDimensions, containerTypes, listingTypes, ralColors } from "@/schemas/listingSchema";
 
 
 const sortOptions = [
@@ -21,38 +22,6 @@ const sortOrders = [
   { value: "asc", label: "За зростанням" },
   { value: "desc", label: "За спаданням" },
 ];
-
-const conditionMap: Record<string, string> = {
-    new: "Новий",
-    used: "Б/В",
-    restored: "Відновлений",
-};
-
-const containerTypes: Record<string, string> = {
-  standard: "Standard",
-  high_cube: "High Cube",
-  reefer: "Reefer",
-  open_top: "Open Top",
-  open_side: "Open Side",
-  flat_rack: "Flat Rack",
-  double_door: "Double Door",
-  tank: "Tank",
-  other: "Інший",
-};
-
-const listingTypes: Record<string, string> = {
-  sale: "Продаж",
-  rent: "Оренда",
-};
-
-const ralColors: Record<string, string> = {
-    RAL1000: "Зеленувато-бежевий",
-    RAL1001: "Бежевий",
-    RAL1002: "Піщаний жовтий",
-    RAL1003: "Сигнальний жовтий",
-    RAL1004: "Золотисто-жовтий",
-    RAL1005: "Жовтий медовий",
-};
 
 const locations: Record<string, string> = {
     ua: "Україна",
@@ -71,8 +40,9 @@ function App() {
     const [page, setPage] = useState(1);
     const [sortBy, setSortBy] = useState<keyof ListingFilters>("addition_date");
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+    const [dimensionFilter, setDimensionFilter] = useState<string[]>([]);
 
-    const { data, isLoading, refetch } = useListings({
+    const { data, isLoading, isFetching, refetch } = useListings({
         title: titleFilter || undefined,
         container_type: containerTypeFilter || undefined,
         condition: conditionFilter || undefined,
@@ -81,6 +51,7 @@ function App() {
         price_min: priceMin,
         price_max: priceMax,
         ral_color: colorFilter,
+        dimension: dimensionFilter,
         page,
         page_size: 10,
         sort_by: sortBy,
@@ -215,6 +186,14 @@ function App() {
                                     onChange={setLocationFilter}
                                 />
                         </div>
+                        <div className="filter-section">
+                            <h2 className="filter-subtitle">Розміри</h2>
+                                <FilterableCheckboxGroup
+                                    items={containerDimensions}
+                                    selected={dimensionFilter}
+                                    onChange={setDimensionFilter}
+                                />
+                        </div>
 
                         <div className="divider"></div>
 
@@ -239,7 +218,7 @@ function App() {
                             </Button>
                         </Group>
 
-                        {isLoading ? (
+                        {isLoading || isFetching ? (
                             <Center mt="32px" mb="16px">
                                 <Spinner size="xl"/>
                             </Center>

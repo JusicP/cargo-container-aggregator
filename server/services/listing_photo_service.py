@@ -7,7 +7,8 @@ from server.models.user import User
 from server.schemas.listing_photo import ListingPhotoCreate, ListingPhotoUpdate
 
 import server.services.listing_service as listing_service
-
+from server.services.user_photo_service import create_user_photo_and_write
+    
 
 async def create_listing_photo(session: AsyncSession, user: User, listing_id: int, listing_photo_create: ListingPhotoCreate):
     _ = await listing_service.get_listing_by_id_and_check_rights(session, listing_id, user)
@@ -27,6 +28,15 @@ async def create_listing_photo(session: AsyncSession, user: User, listing_id: in
 async def create_listing_photos(session: AsyncSession, listing_id: int, listing_photos: list[ListingPhotoCreate]):
     # TODO: check if photo attribute is_main == True for only one photo from the list
     for listing_photo in listing_photos:
+        if listing_photo.photo_url:
+            photo = await create_user_photo_and_write(session, url=listing_photo.photo_url)
+            if not photo:
+                raise ValueError("no photo")
+            
+            listing_photo.photo_id = photo.id
+        else:
+            assert listing_photo.photo_id, "Listing photo should contain photo_id, call /user/uploadphoto before"
+
         session.add(ListingPhoto(
             listing_id=listing_id,
             photo_id=listing_photo.photo_id,

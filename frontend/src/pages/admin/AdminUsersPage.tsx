@@ -1,8 +1,20 @@
-import { Button, ButtonGroup, Center, Group, IconButton, Input, InputGroup, Pagination, Stack, Table, Text } from "@chakra-ui/react";
-import { Ban, Search, User, UserPlus } from "@mynaui/icons-react";
+import { useUpdateUserStatus, useUsers, type User } from "@/services/api/users";
+import { Button, ButtonGroup, Center, Group, IconButton, Input, InputGroup, Link, Pagination, Spinner, Stack, Table, Text } from "@chakra-ui/react";
+import { Ban, Search, User as UserIcon, UserPlus } from "@mynaui/icons-react";
+import { useState } from "react";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 
 export default function AdminUsersPage() {
+    const [searchQueryFilter, setSearchQueryFilter] = useState("");
+    const [page, setPage] = useState(1);
+    const { mutate: updateStatus, isPending } = useUpdateUserStatus();
+
+    const {data, isLoading, isFetching, refetch} = useUsers({
+        searchQuery: searchQueryFilter || undefined,
+        page,
+        pageSize: 10,
+    });
+
     const statusToColor = (status: string) => {
         switch (status) {
             case "active":
@@ -36,6 +48,15 @@ export default function AdminUsersPage() {
         return isNull ? "#A1A1AA" : "inherit";
     }
 
+    const search = () => {
+        setPage(1);
+        refetch();
+    };
+
+    const banUnbanUser = (user: User) => {
+        updateStatus({ userId: user.id, status: user.status == "active" ? "blocked": "active" });
+    }
+
     return (
         <Stack gap="3">
             <Text textAlign="center">Вітаємо на вкладці “Управління користувачами”.</Text>
@@ -46,10 +67,12 @@ export default function AdminUsersPage() {
                     <Input 
                         size="sm" 
                         flex="1"
-                        placeholder="Введіть ім’я, пошту, телефон користувача" 
+                        placeholder="Введіть ім’я, пошту, телефон користувача"
+                        value={searchQueryFilter}
+                        onChange={(e) => setSearchQueryFilter(e.target.value)}
                     />
                 </InputGroup>
-                <Button size="sm" pl="12" pr="12">
+                <Button size="sm" pl="12" pr="12" onClick={search}>
                     Пошук
                 </Button>
             </Group>
@@ -58,7 +81,7 @@ export default function AdminUsersPage() {
             <Table.Root size="sm">
                 <Table.Header>
                     <Table.Row>
-                        <Table.ColumnHeader><User color="#A1A1AA"/></Table.ColumnHeader>
+                        <Table.ColumnHeader><UserIcon color="#A1A1AA"/></Table.ColumnHeader>
                         <Table.ColumnHeader>Ім'я користувача</Table.ColumnHeader>
                         <Table.ColumnHeader>Назва компанії</Table.ColumnHeader>
                         <Table.ColumnHeader>Роль</Table.ColumnHeader>
@@ -68,48 +91,62 @@ export default function AdminUsersPage() {
                         <Table.ColumnHeader></Table.ColumnHeader>
                     </Table.Row>
                 </Table.Header>
-                <Table.Body>
-                    <Table.Row key={1}>
-                        <Table.Cell>1</Table.Cell>
-                        <Table.Cell>John Doe</Table.Cell>
-                        <Table.Cell>TechSolutions</Table.Cell>
-                        <Table.Cell>admin</Table.Cell>
-                        <Table.Cell color={statusToColor("active")}>active</Table.Cell>
-                        <Table.Cell>+380501234567</Table.Cell>
-                        <Table.Cell textAlign="center" textDecoration="underline" textDecorationColor="#FD7F16">john.doe.123@example.com</Table.Cell>
-                        <Table.Cell>
-                            <IconButton variant={{ base: "ghost", _selected: "outline" }} color={statusToBanBtnColor("active")}><Ban/></IconButton>
-                            <IconButton variant={{ base: "ghost", _selected: "outline" }} color={statusToEditBtnColor("active")}><UserPlus/></IconButton>
-                        </Table.Cell>
-
-                    </Table.Row>
-                </Table.Body>
+                {!isLoading && !isFetching && (
+                    <Table.Body>
+                        {data?.users.map((user) => (
+                            <Table.Row key={user.id}>
+                                <Table.Cell>{user.id}</Table.Cell>
+                                <Table.Cell>{user.name}</Table.Cell>
+                                <Table.Cell color={colorIfNull(user.companyName == null)}>{user.companyName || "null"}</Table.Cell>
+                                <Table.Cell>{user.role}</Table.Cell>
+                                <Table.Cell color={statusToColor(user.status)}>{user.status}</Table.Cell>
+                                <Table.Cell color={colorIfNull(user.phoneNumber == null)}>{user.phoneNumber || "null"}</Table.Cell>
+                                <Table.Cell textAlign="center" textDecoration="underline" textDecorationColor="#FD7F16">{user.email}</Table.Cell>
+                                <Table.Cell>
+                                    <IconButton variant={{ base: "ghost", _selected: "outline" }} color={statusToBanBtnColor(user.status)} onClick={() => banUnbanUser(user)}><Ban/></IconButton>
+                                    <IconButton as={Link} variant={{ base: "ghost", _selected: "outline" }} color={statusToEditBtnColor(user.status)} href={`/profile/${user.id}`}><UserPlus/></IconButton>
+                                </Table.Cell>
+                            </Table.Row>
+                        ))}
+                    </Table.Body>
+                )}
             </Table.Root>
 
+            {isLoading || isFetching && (
+                <Center>
+                    <Spinner size="xl"/>
+                </Center>
+            )}
+
             <Center>
-            <Pagination.Root count={5} pageSize={5} page={1}>
-                <ButtonGroup variant="ghost" size="sm" wrap="wrap">
-                <Pagination.PrevTrigger asChild>
-                    <IconButton>
-                    <LuChevronLeft />
-                    </IconButton>
-                </Pagination.PrevTrigger>
+                <Pagination.Root
+                    count={data?.total ?? 0}
+                    pageSize={data?.pageSize ?? 10}
+                    page={data?.page ?? page}
+                    onPageChange={(p) => setPage(p.page)}
+                >
+                    <ButtonGroup variant="ghost" size="sm" wrap="wrap">
+                        <Pagination.PrevTrigger asChild>
+                            <IconButton>
+                                <LuChevronLeft />
+                            </IconButton>
+                        </Pagination.PrevTrigger>
 
-                <Pagination.Items
-                    render={(page) => (
-                    <IconButton variant={{ base: "ghost", _selected: "outline" }}>
-                        {page.value}
-                    </IconButton>
-                    )}
-                />
+                        <Pagination.Items
+                            render={(page) => (
+                                <IconButton variant={{ base: "ghost", _selected: "outline" }}>
+                                    {page.value}
+                                </IconButton>
+                            )}
+                        />
 
-                <Pagination.NextTrigger asChild>
-                    <IconButton>
-                    <LuChevronRight />
-                    </IconButton>
-                </Pagination.NextTrigger>
-                </ButtonGroup>
-            </Pagination.Root>
+                        <Pagination.NextTrigger asChild>
+                            <IconButton>
+                                <LuChevronRight />
+                            </IconButton>
+                        </Pagination.NextTrigger>
+                    </ButtonGroup>
+                </Pagination.Root>
             </Center>
         </Stack>
     )

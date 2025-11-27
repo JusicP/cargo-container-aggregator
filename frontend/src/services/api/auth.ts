@@ -1,6 +1,6 @@
 import {useMutation} from "@tanstack/react-query";
-import axios from "axios";
-import {defaultAxiosInstance} from "@/services/axiosInstances.ts"
+import {defaultAxiosInstance, privateAxiosInstance} from "@/services/axiosInstances.ts"
+import { type userData } from "@/schemas/authUserSchema.ts"
 
 export interface SignUpReqBody {
     name: string;
@@ -21,14 +21,6 @@ export const useSignUpUser = () => {
         },
         onSuccess: () => {
             console.log("User registered successfully!");
-        },
-        onError: (err: any) => {
-            if (axios.isAxiosError(err)) {
-                console.log(err.status)
-                console.error(err.response)
-            } else {
-                console.error(err);
-            }
         }
     })
 }
@@ -50,14 +42,30 @@ export const useSignInUser = () => {
         },
         onSuccess: () => {
             console.log("User logged in successfully!");
-        },
-        onError: (err: any) => {
-            if (axios.isAxiosError(err)) {
-                console.log(err.status);
-                console.error(err.response);
-            } else {
-                console.error(err);
-            }
-        },
+        }
     });
 };
+
+export const refreshAccessToken = async () => {
+    try {
+        const { data } = await defaultAxiosInstance.post("/auth/refresh", {});
+        const newAccessToken = data.access_token;
+        if (!newAccessToken) {
+            throw new Error("No access token returned from refresh endpoint");
+        }
+        sessionStorage.setItem("accessToken", newAccessToken);
+
+        return newAccessToken;
+    } catch (err) {
+        console.error("Token refresh failed:", err);
+    }
+}
+
+export const getUserInfo = async () => {
+    try {
+        const { data } = await privateAxiosInstance.get<userData>("/users/me");
+        return data;
+    } catch (err) {
+        console.error("Fetching user data failed", err);
+    }
+}
