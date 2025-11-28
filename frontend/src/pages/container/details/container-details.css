@@ -1,0 +1,505 @@
+/* Основні стилі сторінки */
+.container-details-page {
+    width: 100%;
+    min-height: 100vh;
+    background: #ffffff;
+    padding-top: 80px; /* Відступ для navbar */
+}
+
+/* Desktop версія - приховується на мобільних */
+.details-desktop {
+    display: block;
+}
+
+.details-mobile {
+    display: none;
+}
+
+/* Основний контент */
+.details-content {
+    display: flex;
+    gap: 48px;
+    padding: 64px 128px;
+    max-width: 1920px;
+    margin: 0 auto;
+}
+
+.content-left {
+    flex: 1;
+    max-width: 600px;
+}
+
+.content-right {
+    flex: 1;
+    max-width: 600px;
+}
+
+/* Карусель зображень */
+.image-carousel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: relative;
+    padding: 0 60px; /* Простір для кнопок */
+}
+
+.carousel-main {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4/3;
+    background: #F5F5F5;
+    border-radius: 8px;
+    overflow: visible; /* Змінено з hidden на visible */
+}
+
+.carousel-image-wrapper {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.carousel-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    color: #18181B;
+    border: none;
+    width: 48px;
+    height: 48px;
+    font-size: 48px;
+    font-weight: 300;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 2;
+    text-shadow: 0 2px 8px rgba(255, 255, 255, 0.3);
+}
+
+.carousel-btn:hover {
+    color: #FD7F16;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-btn-prev {
+    left: -54px;
+}
+
+.carousel-btn-next {
+    right: -54px;
+}
+
+.carousel-thumbnails {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+}
+
+.thumbnail {
+    min-width: 80px;
+    height: 80px;
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.3s ease;
+}
+
+.thumbnail:hover {
+    border-color: #FD7F16;
+}
+
+.thumbnail-active {
+    border-color: #FD7F16;
+}
+
+.thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Опис контейнера */
+.container-description {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.description-header {
+    display: flex;
+    gap: 8px;
+}
+
+.size-badge,
+.type-badge {
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-family: 'Geologica', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.size-badge {
+    background: #E5E5E5;
+    color: #18181B;
+}
+
+.type-badge {
+    background: #E5E5E5;
+    color: #18181B;
+}
+
+.container-title {
+    font-family: 'Avenir', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    color: #18181B;
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* Кольорові теги */
+.color-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.color-tag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: #F5F5F5;
+    border-radius: 4px;
+}
+
+.color-swatch {
+    width: 16px;
+    height: 16px;
+    border-radius: 2px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.color-code {
+    font-family: 'Geologica', sans-serif;
+    font-size: 14px;
+    color: #52525B;
+}
+
+/* Секція ціни */
+.price-section {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 24px 0;
+    border-top: 1px solid #E5E5E5;
+    border-bottom: 1px solid #E5E5E5;
+}
+
+.price {
+    font-family: 'Avenir', sans-serif;
+    font-size: 48px;
+    font-weight: 900;
+    color: #18181B;
+}
+
+.currency {
+    font-family: 'Geologica', sans-serif;
+    font-size: 24px;
+    font-weight: 400;
+    color: #71717A;
+}
+
+.cta-button {
+    margin-left: auto;
+    background: #FD7F16;
+    color: white;
+    padding: 12px 32px;
+    border-radius: 4px;
+    font-family: 'Avenir', sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.cta-button:hover {
+    background: #e65c00;
+}
+
+/* Мета-інформація */
+.meta-info {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+}
+
+.meta-label {
+    font-family: 'Geologica', sans-serif;
+    font-size: 16px;
+    color: #71717A;
+    padding: 8px 16px;
+    background: #F5F5F5;
+    border-radius: 4px;
+}
+
+/* Рекомендовані контейнери */
+.recommended-section {
+    padding: 64px 128px;
+    background: #FAFAFA;
+}
+
+.recommended-title {
+    font-family: 'Avenir', sans-serif;
+    font-size: 36px;
+    font-weight: 800;
+    color: #18181B;
+    margin-bottom: 32px;
+}
+
+.recommended-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+/* Картка контейнера */
+.container-card {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.container-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.card-image {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+}
+
+.card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-content {
+    padding: 16px;
+}
+
+.card-header {
+    margin-bottom: 8px;
+}
+
+.card-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    background: #E5E5E5;
+    border-radius: 4px;
+    font-family: 'Geologica', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: #52525B;
+}
+
+.card-title {
+    font-family: 'Avenir', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #18181B;
+    margin: 8px 0 4px 0;
+}
+
+.card-subtitle {
+    font-family: 'Geologica', sans-serif;
+    font-size: 14px;
+    color: #71717A;
+    margin: 4px 0;
+}
+
+.card-location {
+    font-family: 'Geologica', sans-serif;
+    font-size: 14px;
+    color: #A1A1AA;
+    margin: 4px 0 12px 0;
+}
+
+.card-specs {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.spec-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Адаптивність для планшетів */
+@media (max-width: 1280px) {
+    .details-content {
+        padding: 48px 64px;
+    }
+
+    .recommended-section {
+        padding: 48px 64px;
+    }
+
+    .recommended-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 1024px) {
+    .recommended-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Мобільна версія */
+@media (max-width: 768px) {
+    .details-desktop {
+        display: none;
+    }
+
+    .details-mobile {
+        display: block;
+    }
+
+    .details-content {
+        flex-direction: column;
+        padding: 24px;
+        gap: 24px;
+    }
+
+    .content-left,
+    .content-right {
+        max-width: 100%;
+    }
+
+    .container-title {
+        font-size: 24px;
+    }
+
+    .price {
+        font-size: 36px;
+    }
+
+    .currency {
+        font-size: 18px;
+    }
+
+    .cta-button {
+        width: 100%;
+        margin-left: 0;
+        margin-top: 16px;
+    }
+
+    .price-section {
+        flex-wrap: wrap;
+    }
+
+    .recommended-section {
+        padding: 32px 24px;
+    }
+
+    .recommended-title {
+        font-size: 24px;
+        margin-bottom: 24px;
+    }
+
+    .recommended-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .recommended-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* На мобільних кнопки повертаємо на зображення */
+    .image-carousel {
+        padding: 0;
+    }
+
+    .carousel-main {
+        margin: 0;
+    }
+
+    .carousel-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 40px;
+    }
+
+    .carousel-btn-prev {
+        left: 8px;
+    }
+
+    .carousel-btn-next {
+        right: 8px;
+    }
+
+    .carousel-thumbnails {
+        gap: 8px;
+    }
+
+    .thumbnail {
+        min-width: 60px;
+        height: 60px;
+    }
+}
+
+/* Дуже маленькі екрани */
+@media (max-width: 480px) {
+    .details-content {
+        padding: 16px;
+    }
+
+    .recommended-section {
+        padding: 24px 16px;
+    }
+
+    .container-title {
+        font-size: 20px;
+    }
+
+    .price {
+        font-size: 28px;
+    }
+
+    .meta-info {
+        gap: 12px;
+    }
+
+    .color-tags {
+        gap: 6px;
+    }
+}
