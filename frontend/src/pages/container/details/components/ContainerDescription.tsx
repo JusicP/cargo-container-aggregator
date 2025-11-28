@@ -1,6 +1,7 @@
 import React from 'react';
-import { Button } from '@chakra-ui/react';
 import type {Container} from '../mockData';
+// Імпорт іконок з MynaUI (встанови: npm install @mynaui/icons-react)
+import { Click, Bookmark } from '@mynaui/icons-react';
 
 interface ContainerDescriptionProps {
     data: Container;
@@ -10,8 +11,14 @@ export const ContainerDescription: React.FC<ContainerDescriptionProps> = ({ data
     return (
         <div className="container-description">
             <div className="description-header">
-                <span className="size-badge">{data.specifications?.size}</span>
-                <span className="type-badge">{data.specifications?.type}</span>
+                <div className="stat-badge">
+                    <span className="stat-value">{data.specifications?.clicks || 54}</span>
+                    <Click className="stat-icon" />
+                </div>
+                <div className="stat-badge">
+                    <span className="stat-value">{data.specifications?.saves || 13}</span>
+                    <Bookmark className="stat-icon" />
+                </div>
             </div>
 
             <h1 className="container-title">{data.title}</h1>
@@ -29,23 +36,29 @@ export const ContainerDescription: React.FC<ContainerDescriptionProps> = ({ data
             </div>
 
             <div className="price-section">
-                <span className="price">{data.price}</span>
-                <span className="currency">{data.currency}</span>
-                <Button className="!cta-button">Придбати</Button>
+                <div className="price-wrapper">
+                    <span className="price">{data.price}</span>
+                    <span className="currency">{data.currency}</span>
+                </div>
+                <button className="cta-button">Продовжити</button>
             </div>
 
-            <div className="meta-info">
-                <div className="meta-item">
-                    <span className="meta-label">sale</span>
+            <div className="meta-info-grid">
+                <div className="meta-info-item">
+                    <span className="meta-info-label">Тип</span>
+                    <span className="meta-info-value">sale</span>
                 </div>
-                <div className="meta-item">
-                    <span className="meta-label">{data.condition}</span>
+                <div className="meta-info-item">
+                    <span className="meta-info-label">Стан</span>
+                    <span className="meta-info-value">{data.condition}</span>
                 </div>
-                <div className="meta-item">
-                    <span className="meta-label">{data.location}</span>
+                <div className="meta-info-item">
+                    <span className="meta-info-label">Локація</span>
+                    <span className="meta-info-value">{data.location}</span>
                 </div>
-                <div className="meta-item">
-                    <span className="meta-label">{data.owner}</span>
+                <div className="meta-info-item">
+                    <span className="meta-info-label">Тип конейнера</span>
+                    <span className="meta-info-value">{data.owner}</span>
                 </div>
             </div>
         </div>

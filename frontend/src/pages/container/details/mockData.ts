@@ -16,10 +16,12 @@ export interface Container {
     owner?: string;
     colors?: string[];
     specifications?: {
-        size: string;
-        type: string;
-        door: string;
-        status: string;
+        size: "10ft",
+        type: "High Cube",
+        door: "Roll-Up",
+        status: "used",
+        clicks: 54,
+        saves: 13
     };
     specs?: string[];
 }
@@ -44,7 +46,9 @@ export const containerData: Container = {
         size: "10ft",
         type: "High Cube",
         door: "Roll-Up",
-        status: "used"
+        status: "used",
+        clicks: 54,
+        saves: 13
     }
 };
 

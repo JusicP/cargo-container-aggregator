@@ -6,7 +6,7 @@
     padding-top: 80px; /* Відступ для navbar */
 }
 
-/* Desktop версія - приховується на мобільних */
+/* Desktop версія */
 .details-desktop {
     display: block;
 }
@@ -49,7 +49,7 @@
     aspect-ratio: 4/3;
     background: #F5F5F5;
     border-radius: 8px;
-    overflow: visible; /* Змінено з hidden на visible */
+    overflow: visible;
 }
 
 .carousel-image-wrapper {
@@ -137,9 +137,34 @@
 
 .description-header {
     display: flex;
-    gap: 8px;
+    gap: 16px;
+    align-items: center;
 }
 
+/* Статистичні бейджі (кліки та збереження) */
+.stat-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #A1A1AA;
+}
+
+.stat-value {
+    font-family: 'Geologica', sans-serif;
+    font-size: 21px;
+    font-weight: 500;
+    line-height: 100%;
+    letter-spacing: 0;
+    color: #A1A1AA;
+}
+
+.stat-icon {
+    width: 21px;
+    height: 21px;
+    color: #A1A1AA;
+}
+
+/* Старі бейджі (якщо потрібні) */
 .size-badge,
 .type-badge {
     padding: 4px 12px;
@@ -147,6 +172,14 @@
     font-family: 'Geologica', sans-serif;
     font-size: 14px;
     font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.badge-icon {
+    width: 16px;
+    height: 16px;
 }
 
 .size-badge {
@@ -201,10 +234,17 @@
 .price-section {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 16px;
     padding: 24px 0;
     border-top: 1px solid #E5E5E5;
     border-bottom: 1px solid #E5E5E5;
+}
+
+.price-wrapper {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
 }
 
 .price {
@@ -212,6 +252,7 @@
     font-size: 48px;
     font-weight: 900;
     color: #18181B;
+    line-height: 1;
 }
 
 .currency {
@@ -219,16 +260,16 @@
     font-size: 24px;
     font-weight: 400;
     color: #71717A;
+    text-transform: uppercase;
 }
 
 .cta-button {
-    margin-left: auto;
     background: #FD7F16;
     color: white;
     padding: 12px 32px;
     border-radius: 4px;
-    font-family: 'Avenir', sans-serif;
-    font-size: 18px;
+    font-family: 'Geologica', sans-serif;
+    font-size: 16px;
     font-weight: 500;
     border: none;
     cursor: pointer;
@@ -239,7 +280,34 @@
     background: #e65c00;
 }
 
-/* Мета-інформація */
+/* Мета-інформація в одну лінію */
+.meta-info-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.meta-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.meta-info-label {
+    font-family: 'Geologica', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: #A1A1AA;
+}
+
+.meta-info-value {
+    font-family: 'Geologica', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: #18181B;
+}
+
+/* Старі стилі мета-інформації (можна видалити) */
 .meta-info {
     display: flex;
     gap: 24px;
@@ -277,28 +345,43 @@
 .recommended-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
+    gap: 0;
 }
 
 /* Картка контейнера */
 .container-card {
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: transparent;
+    border-radius: 0;
+    overflow: visible;
+    box-shadow: none;
+    transition: none;
     cursor: pointer;
+    padding: 0 16px;
+    position: relative;
+}
+
+/* Вертикальна перегородка між картками */
+.container-card:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 45%;
+    bottom: 45%;
+    width: 6px;
+    background: #E5E5E5;
 }
 
 .container-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    transform: none;
+    box-shadow: none;
 }
 
 .card-image {
-    width: 100%;
-    height: 200px;
+    width: 155px;
+    height: 100px;
     overflow: hidden;
+    border-radius: 8px;
+    margin: 0 auto 16px auto;
 }
 
 .card-image img {
@@ -308,7 +391,12 @@
 }
 
 .card-content {
-    padding: 16px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+    text-align: center;
 }
 
 .card-header {
@@ -331,7 +419,44 @@
     font-size: 18px;
     font-weight: 700;
     color: #18181B;
-    margin: 8px 0 4px 0;
+    margin: 0;
+}
+
+.card-price-text {
+    font-family: 'Geologica', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #18181B;
+    margin: 0;
+}
+
+.card-meta-text {
+    font-family: 'Geologica', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: #18181B;
+    margin: 0;
+}
+
+.card-color-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.card-color-indicator {
+    width: 16px;
+    height: 16px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.card-color-code {
+    font-family: 'Geologica', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    color: #52525B;
 }
 
 .card-subtitle {
@@ -359,147 +484,4 @@
     height: 12px;
     border-radius: 50%;
     border: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-/* Адаптивність для планшетів */
-@media (max-width: 1280px) {
-    .details-content {
-        padding: 48px 64px;
-    }
-
-    .recommended-section {
-        padding: 48px 64px;
-    }
-
-    .recommended-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-@media (max-width: 1024px) {
-    .recommended-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-/* Мобільна версія */
-@media (max-width: 768px) {
-    .details-desktop {
-        display: none;
-    }
-
-    .details-mobile {
-        display: block;
-    }
-
-    .details-content {
-        flex-direction: column;
-        padding: 24px;
-        gap: 24px;
-    }
-
-    .content-left,
-    .content-right {
-        max-width: 100%;
-    }
-
-    .container-title {
-        font-size: 24px;
-    }
-
-    .price {
-        font-size: 36px;
-    }
-
-    .currency {
-        font-size: 18px;
-    }
-
-    .cta-button {
-        width: 100%;
-        margin-left: 0;
-        margin-top: 16px;
-    }
-
-    .price-section {
-        flex-wrap: wrap;
-    }
-
-    .recommended-section {
-        padding: 32px 24px;
-    }
-
-    .recommended-title {
-        font-size: 24px;
-        margin-bottom: 24px;
-    }
-
-    .recommended-list {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-    }
-
-    .recommended-grid {
-        grid-template-columns: 1fr;
-    }
-
-    /* На мобільних кнопки повертаємо на зображення */
-    .image-carousel {
-        padding: 0;
-    }
-
-    .carousel-main {
-        margin: 0;
-    }
-
-    .carousel-btn {
-        width: 40px;
-        height: 40px;
-        font-size: 40px;
-    }
-
-    .carousel-btn-prev {
-        left: 8px;
-    }
-
-    .carousel-btn-next {
-        right: 8px;
-    }
-
-    .carousel-thumbnails {
-        gap: 8px;
-    }
-
-    .thumbnail {
-        min-width: 60px;
-        height: 60px;
-    }
-}
-
-/* Дуже маленькі екрани */
-@media (max-width: 480px) {
-    .details-content {
-        padding: 16px;
-    }
-
-    .recommended-section {
-        padding: 24px 16px;
-    }
-
-    .container-title {
-        font-size: 20px;
-    }
-
-    .price {
-        font-size: 28px;
-    }
-
-    .meta-info {
-        gap: 12px;
-    }
-
-    .color-tags {
-        gap: 6px;
-    }
 }

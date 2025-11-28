@@ -6,27 +6,21 @@ interface ContainerCardProps {
 }
 
 export const ContainerCard: React.FC<ContainerCardProps> = ({ container }) => {
+    const colorCode = container.specs?.[0] || '#204F73';
+
     return (
         <div className="container-card">
             <div className="card-image">
                 <img src={container.image} alt={container.title} />
             </div>
             <div className="card-content">
-                <div className="card-header">
-                    <span className="card-badge">40ft High Cube</span>
-                </div>
                 <h3 className="card-title">{container.title}</h3>
-                <p className="card-subtitle">Used: {container.price} {container.currency}</p>
-                <p className="card-subtitle">Від: вих.</p>
-                <p className="card-location">Одеса, Ukraine</p>
-                <div className="card-specs">
-                    {container.specs?.map((color, index) => (
-                        <span
-                            key={index}
-                            className="spec-dot"
-                            style={{ backgroundColor: color }}
-                        />
-                    ))}
+                <p className="card-price-text">Ціна: {container.price} {container.currency}</p>
+                <p className="card-meta-text">Тип: sale</p>
+                <p className="card-meta-text">Стан: used</p>
+                <div className="card-color-row">
+                    <div className="card-color-indicator" style={{ backgroundColor: colorCode }}></div>
+                    <span className="card-color-code">{colorCode}</span>
                 </div>
             </div>
         </div>
