@@ -1,14 +1,14 @@
 import {useState} from "react";
 import '@/pages/homepage/homepage.css'
 import { useAuth } from "@/contexts/AuthContext";
-import { BookmarkHome, UserCircle } from "@mynaui/icons-react";
+import { Cart, UserCircle } from "@mynaui/icons-react";
 import { Link, Box, Flex, IconButton, NativeSelect } from "@chakra-ui/react";
 
 export default function Navbar() {
     const [lang, setLang] = useState("UA");
     const {isAuthenticated, user} = useAuth();
     return (
-        <Box className="homepage">
+        <Box className="homepage w-full">
             <Box as="header" className="site-header" colorPalette="fg">
                 <nav className="nav-left">
                     <Link href="/#">Головна</Link>
@@ -30,19 +30,59 @@ export default function Navbar() {
                             color="white"
                             value={lang}
                             onChange={(e) => setLang(e.target.value)}
+                            color="white"
+                            className="!border-none"
                         >
-                            <option value="UA" style={{ color: "black" }}>UA</option>
-                            <option value="EN" style={{ color: "black" }}>EN</option>
+                            <option className="!bg-gray-800" value="UA">UA</option>
+                            <option className="!bg-gray-800"  value="EN">EN</option>
                         </NativeSelect.Field>
-                        <NativeSelect.Indicator color="#FD7F16"/>
+                        <NativeSelect.Indicator color="#FD7F16" />
                     </NativeSelect.Root>
 
-                    <IconButton as={Link} variant="ghost" _hover={{ bg: "orange.400" }} rounded="full" href="???"><BookmarkHome color="white"/></IconButton>
+                    <IconButton
+                        aria-label="cart"
+                        variant="ghost"
+                        rounded="full"
+                        _hover={{
+                            bg: 'orange.500',
+                            color: 'white',
+                            transform: 'scale(1.05)',
+                        }}
+                    >
+                        <Cart color="#ffffff"/>
+                    </IconButton>
 
                     {!isAuthenticated ? (
-                        <IconButton as={Link} variant={{ base: "ghost", _selected: "subtle" }} _hover={{ bg: "orange.400" }} rounded="full" href="/login"><UserCircle color="white"/></IconButton>
+                        <IconButton
+                            as={Link}
+                            aria-label="profile"
+                            variant="ghost"
+                            rounded="full"
+                            size="md"
+                            href="/login"
+                            _hover={{
+                                bg: 'orange.500',
+                                color: 'white',
+                                transform: 'scale(1.05)',
+                            }}
+                        >
+                            <UserCircle color="#ffffff"/>
+                        </IconButton>
                     ) : (
-                        <IconButton as={Link} variant={{ base: "ghost", _selected: "subtle" }} rounded="full" href="/myaccount"><UserCircle color="white"/></IconButton>
+                        <IconButton
+                            as={Link}
+                            aria-label="profile"
+                            variant="ghost"
+                            rounded="full"
+                            href="/myaccount"
+                            _hover={{
+                                bg: 'orange.500',
+                                color: 'white',
+                                transform: 'scale(1.05)',
+                            }}
+                        >
+                            <UserCircle color="#ffffff"/>
+                        </IconButton>
                     )}
                 </Flex>
             </Box>

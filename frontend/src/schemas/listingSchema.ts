@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export const conditionMap: Record<string, string> = {
     new: "Новий",
     used: "Б/В",
@@ -49,3 +51,61 @@ export const ralColors: Record<string, string> = {
     RAL1004: "Золотисто-жовтий",
     RAL1005: "Жовтий медовий",
 };
+
+const enumFromRecord = <T extends Record<string, string>>(record: T) =>
+  z.enum(Object.keys(record) as [keyof T & string, ...(keyof T & string)[]]);
+
+const optionalEnum = <T extends Record<string, string>>(record: T) =>
+  z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    enumFromRecord(record).optional()
+  );
+
+const optionalText = (max: number, message: string) =>
+  z
+    .string()
+    .trim()
+    .max(max, { message })
+    .optional()
+    .or(z.literal(""))
+    .nullable();
+
+export const listingCreateSchema = z.object({
+  title: z
+    .string()
+    .trim()
+    .min(1, { message: "Title is required" })
+    .max(1, { message: "Max length is 128 characters" }),
+  description: z
+    .string()
+    .trim()
+    .min(1, { message: "Description is required" })
+    .max(2048, { message: "Max length is 2048 characters" }),
+  price: z.preprocess(
+    (value) => {
+      if (value === "" || value === null || value === undefined) return undefined;
+      if (typeof value === "number" && Number.isNaN(value)) return undefined;
+      return value;
+    },
+    z
+      .number({
+        invalid_type_error: "Price is required",
+        required_error: "Price is required",
+      })
+      .nonnegative({ message: "Price must be zero or positive" })
+  ),
+  container_type: enumFromRecord(containerTypes),
+  condition: enumFromRecord(conditionMap),
+  type: enumFromRecord(listingTypes),
+  currency: z.enum(Intl.supportedValuesOf("currency") as [string, ...string[]], {
+    errorMap: () => ({ message: "Currency is required" }),
+  }),
+  location: z
+    .string()
+    .trim()
+    .min(1, { message: "Location is required" })
+    .max(128, { message: "Max length is 128 characters" }),
+  ral_color: enumFromRecord(ralColors),
+  dimension: enumFromRecord(containerDimensions),
+});
+export type ListingCreateFormValues = z.infer<typeof listingCreateSchema>;

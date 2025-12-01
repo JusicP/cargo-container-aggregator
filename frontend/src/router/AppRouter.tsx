@@ -176,11 +176,11 @@ const AppRouterContent: React.FC = () => {
 };
 
 const AppRouter: React.FC = () => {
-    return (
-        <BrowserRouter>
-            <AppRouterContent />
-        </BrowserRouter>
-    );
+  return (
+    <BrowserRouter>
+      <AppRouterContent />
+    </BrowserRouter>
+  );
 };
 
 export default AppRouter;
