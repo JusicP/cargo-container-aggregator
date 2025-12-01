@@ -167,11 +167,11 @@ const AppRouterContent: React.FC = () => {
         <Route path="logs" element={<AdminLogsPage />} />
       </Route>
 
-            <Route path="/about" element={<AboutUsPage />} />
+      <Route path="/about" element={<AboutUsPage />} />
 
-            {/* 404 сторінка для всіх інших маршрутів */}
-            <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+        {/* 404 сторінка для всіх інших маршрутів */}
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
   );
 };
 
