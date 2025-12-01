@@ -82,7 +82,7 @@ async def login(
     
     response.set_cookie(
         key="access_token",
-        value=access_token,
+        value=f"Bearer {access_token}",
         httponly=True,
         secure=False,
         samesite="lax",
@@ -145,6 +145,14 @@ async def refresh(
 
     # Return new access token and set refresh token cookie
     response = JSONResponse(content={"access_token": access_token, "token_type": "bearer"})
+    response.set_cookie(
+        key="access_token",
+        value=f"Bearer {access_token}",
+        httponly=True,
+        secure=False,
+        samesite="lax",
+        max_age=REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
+    )
     response.set_cookie(
         key="refresh_token",
         value=new_refresh_token_plain,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from '../components/ProtectedRoute';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -28,7 +28,7 @@ import NotFoundPage from '../pages/NotFoundPage';
 import AboutUsPage from '@/pages/AboutUsPage.tsx';
 
 const AppRouterContent: React.FC = () => {
-    const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   return (
     <Routes>
@@ -177,9 +177,7 @@ const AppRouterContent: React.FC = () => {
 
 const AppRouter: React.FC = () => {
   return (
-    <BrowserRouter>
       <AppRouterContent />
-    </BrowserRouter>
   );
 };
 

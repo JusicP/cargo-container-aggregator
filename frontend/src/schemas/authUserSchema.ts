@@ -43,12 +43,12 @@ export const loginUserSchema = z.object({
 export type loginUser = z.infer<typeof loginUserSchema>;
 
 export const UserInfo = z.object({
-    id: z.string(),
+    id: z.number(),
     name: z.string(),
     email: z.string(),
     phone_number: z.string(),
     company_name: z.string(),
-    avatar_photo_id: z.string().optional(),
+    avatar_photo_id: z.number().optional(),
     role: z.string(),
     registration_date: z.string(),
     status: z.string()

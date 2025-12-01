@@ -15,17 +15,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await refreshAccessToken();
-        console.log(res);
-        const accessToken = res.acces_token;
-        if (accessToken) {
-          privateAxiosInstance.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-          const userData = await getUserInfo()
-          setUser(userData);
+        if (!user) {
+          const userData = await getUserInfo();
+          if (userData) {
+            setUser(userData);
+          }
         }
       } catch (err) {
-        console.error("Auth check failed:", err);
-        setUser(null);
+        try {
+          refreshAccessToken();
+        } catch (err) {
+          setUser(null);
+        }
+
+        const userData = await getUserInfo();
+        if (userData) {
+          setUser(userData);
+        }
+
       } finally {
         setIsLoading(false);
       }
