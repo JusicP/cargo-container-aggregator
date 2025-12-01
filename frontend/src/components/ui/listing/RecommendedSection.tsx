@@ -1,6 +1,6 @@
 import React from 'react';
 import { ContainerCard } from './ContainerCard';
-import type {Container} from '../mockData';
+import type {Container} from './mockData';
 
 interface RecommendedSectionProps {
     containers: Container[];

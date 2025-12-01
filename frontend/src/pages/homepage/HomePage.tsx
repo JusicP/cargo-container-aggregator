@@ -75,8 +75,6 @@ function App() {
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat",
-                width: "100vw",
-                height: "100vh",
             }}
         >
             <div className="hero-overlay"/>
@@ -203,11 +201,10 @@ function App() {
 
                     {/* Main Content */}
                     <main className="content-main">
-                        <Group attached display="flex" ms="33px" me="33px">
-                            <InputGroup startElement={<Search />}>
+                        <Group attached display="flex" alignItems="center" justifyContent="center">
+                            <InputGroup w="75%" startElement={<Search />}>
                                 <Input 
                                     size="lg" 
-                                    flex="1" 
                                     placeholder="Введіть назву контейнера ..." 
                                     value={titleFilter}
                                     onChange={(e) => setTitleFilter(e.target.value)}
