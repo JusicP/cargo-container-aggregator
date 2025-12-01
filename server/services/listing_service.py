@@ -121,6 +121,8 @@ async def get_all_listings_paginated(
         query = query.where(Listing.status == filters.status)
     if filters.dimension:
         query = query.where(Listing.dimension.in_(filters.dimension))
+    if filters.user_id:
+        query = query.where(Listing.user_id == filters.user_id)
 
     count_query = select(func.count()).select_from(Listing).where(
         *query._where_criteria

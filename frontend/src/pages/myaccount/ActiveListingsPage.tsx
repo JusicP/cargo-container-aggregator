@@ -1,18 +1,37 @@
-import { Box, Heading } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import ListingsGrid from "@/components/ListingsGrid";
-import { mockListings } from "./mockListings";
+import { useState } from "react";
+import { useListings, useUpdateListingStatus } from "@/services/api/listings";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function ActiveListingsPage() {
+  const {user} = useAuth();
+  const [page, setPage] = useState(1);
+  const { mutate: updateStatus } = useUpdateListingStatus();
+
+  const { data, isLoading, isFetching, refetch } = useListings({
+      status: "active",
+      page,
+      page_size: 4,
+      user_id: user?.id
+  });
+
+  const onDelete = (listingId: number) => {
+    updateStatus({listingId: listingId, status: "deleted"})
+  }
+
   return (
     <Box>
-      <Heading size="md" mb={4}>Активні оголошення</Heading>
-
-      <ListingsGrid
-        listings={mockListings.filter((l) => l.status === "active")}
-        status="active"
-        onEdit={(id) => console.log("edit", id)}
-        onDelete={(id) => console.log("delete", id)}
-      />
+      {!isLoading && data && (
+        <ListingsGrid
+          listings={data?.listings}
+          onPageSet={setPage}
+          pageSize={data?.page_size}
+          currentPage={data?.page}
+          total={data?.total}
+          onDelete={onDelete}
+        />
+      )}
     </Box>
   );
 }

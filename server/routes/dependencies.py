@@ -80,6 +80,7 @@ def get_listing_filters(
     status: str | None = Query("active"),
     sort_by: str | None = Query("addition_date"),
     sort_order: str | None = Query("desc"),
+    user_id: int | None = Query(None, alias="user_id"),
 ) -> ListingFilterParams:
     params = ListingFilterParams()
     params.title = title
@@ -94,6 +95,7 @@ def get_listing_filters(
     params.status = status
     params.sort_by = sort_by
     params.sort_order = sort_order
+    params.user_id = user_id
     return params
 
 

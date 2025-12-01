@@ -99,6 +99,7 @@ export interface ListingFilters {
     page?: number;
     page_size?: number;
     dimension?: string[];
+    user_id?: number;
 }
 
 export const useCreateListing = () => {
