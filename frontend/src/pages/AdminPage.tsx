@@ -1,17 +1,21 @@
 import { TabNavBar, type Tab } from "@/components/ui/tab-navbar";
-import { Flex } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import { Outlet } from "react-router-dom";
 
 const tabs: Tab[] = [
-    { label: "Users", path: "/admin/users" },
-    { label: "Parser", path: "/admin/parser" },
+    { label: "Управління парсером оголошень", path: "/admin/parser" },
+    { label: "Модерація оголошень", path: "/admin/listings" },
+    { label: "Журнал подій", path: "/admin/logs" },
+    { label: "Управління користувачами", path: "/admin/users" },
 ];
 
 export default function AdminPage() {
     return (
-        <Flex height="100vh">
+        <Flex width="100%">
             <TabNavBar tabs={tabs}/>
-            <Outlet/>
+            <Box flex="1" p={5} pt={14}>
+                <Outlet/>
+            </Box>
         </Flex>
     )
 }

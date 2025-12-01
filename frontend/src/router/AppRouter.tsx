@@ -7,7 +7,7 @@ import { useAuth } from '../contexts/AuthContext';
 import HomePage from '../pages/homepage/HomePage.tsx';
 import LoginPage from '../pages/auth/LoginPage.tsx';
 import RegisterPage from '../pages/auth/RegisterPage.tsx';
-import MyAccountPage from '../pages/MyAccountPage';
+import MyAccountPage from '../pages/myaccount/MyAccountPage.tsx';
 import ActiveListingsPage from '../pages/myaccount/ActiveListingsPage';
 import PendingListingsPage from '../pages/myaccount/PendingListingsPage';
 import RejectedListingsPage from '../pages/myaccount/RejectedListingsPage';
@@ -25,11 +25,10 @@ import AdminParserPage from '../pages/admin/AdminParserPage';
 import AdminUsersPage from '../pages/admin/AdminUsersPage';
 import AdminLogsPage from '../pages/admin/AdminLogsPage';
 import NotFoundPage from '../pages/NotFoundPage';
-import Navbar from "@/router/Navbar.tsx";
-import Footer from "@/router/Footer.tsx"
+import AboutUsPage from '@/pages/AboutUsPage.tsx';
 
 const AppRouterContent: React.FC = () => {
-  const { isAuthenticated } = useAuth();
+    const { isAuthenticated } = useAuth();
 
   return (
     <Routes>
@@ -56,62 +55,64 @@ const AppRouterContent: React.FC = () => {
         element={
           <ProtectedRoute>
             <MyAccountPage />
-          </ProtectedRoute>
+        </ProtectedRoute>
         } 
-      />
-      
-      {/* Оголошення в акаунті - доступні для користувачів (user може і купляти, і продавати) */}
-      <Route 
-        path="/myaccount/listings/active" 
-        element={
-          <ProtectedRoute requiredRoles={['user']}>
-            <ActiveListingsPage />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/myaccount/listings/pending" 
-        element={
-          <ProtectedRoute requiredRoles={['user']}>
-            <PendingListingsPage />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/myaccount/listings/rejected" 
-        element={
-          <ProtectedRoute requiredRoles={['user']}>
-            <RejectedListingsPage />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/myaccount/listings/deleted" 
-        element={
-          <ProtectedRoute requiredRoles={['user']}>
-            <DeletedListingsPage />
-          </ProtectedRoute>
-        } 
-      />
-      
-      {/* Профіль і налаштування - доступні всім авторизованим користувачам */}
-      <Route 
-        path="/myaccount/profile" 
-        element={
-          <ProtectedRoute>
-            <ProfilePage />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/myaccount/user-settings" 
-        element={
-          <ProtectedRoute>
-            <UserSettingsPage />
-          </ProtectedRoute>
-        } 
-      />
-      
+      >
+        <Route index element={<Navigate to="profile" replace />} />
+
+        {/* Оголошення в акаунті - доступні для користувачів (user може і купляти, і продавати) */}
+        <Route 
+          path="listings/active" 
+          element={
+            <ProtectedRoute requiredRoles={['user']}>
+              <ActiveListingsPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="listings/pending" 
+          element={
+            <ProtectedRoute requiredRoles={['user']}>
+              <PendingListingsPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="listings/rejected" 
+          element={
+            <ProtectedRoute requiredRoles={['user']}>
+              <RejectedListingsPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="listings/deleted" 
+          element={
+            <ProtectedRoute requiredRoles={['user']}>
+              <DeletedListingsPage />
+            </ProtectedRoute>
+          } 
+        />
+        
+        {/* Профіль і налаштування - доступні всім авторизованим користувачам */}
+        <Route 
+          path="profile" 
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="user-settings" 
+          element={
+            <ProtectedRoute>
+              <UserSettingsPage />
+            </ProtectedRoute>
+          } 
+        />
+      </Route>
+
       {/* Створення оголошення - тільки для користувачів */}
       <Route 
         path="/create-listing" 
@@ -166,8 +167,9 @@ const AppRouterContent: React.FC = () => {
         <Route path="logs" element={<AdminLogsPage />} />
       </Route>
 
-      
-      {/* 404 сторінка для всіх інших маршрутів */}
+      <Route path="/about" element={<AboutUsPage />} />
+
+        {/* 404 сторінка для всіх інших маршрутів */}
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
@@ -175,13 +177,9 @@ const AppRouterContent: React.FC = () => {
 
 const AppRouter: React.FC = () => {
   return (
-      <div className="flex flex-col min-h-screen">
-          <Navbar />
-          <div className="flex-1 h-full">
-              <AppRouterContent/>
-          </div>
-          <Footer />
-      </div>
+    <BrowserRouter>
+      <AppRouterContent />
+    </BrowserRouter>
   );
 };
 

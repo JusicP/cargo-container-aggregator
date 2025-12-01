@@ -1,41 +1,33 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List
 
 from starlette import status
 
 from server.models import User
-from server.schemas.user import UserRegister, UserGet, UserUpdate, UserRole, UserStatus, UserCreate
+from server.schemas.user import UserFilterParams, UserGet, UserPaginatedGet, UserStatus, UserUpdate, UserCreate
 from server.database.connection import generate_async_session
 from server.services.user_service import (
     create_user,
-    get_all_users,
+    get_all_users_paginated,
     get_user_by_id,
     update_user as crud_update_user,
+    set_user_status
 )
 
-from server.routes.dependencies import get_current_user
+from server.routes.dependencies import get_current_user, get_user_filters
 
 router = APIRouter(prefix="/users", tags=["users"])
 
 
-@router.get("/", response_model=List[UserGet])
-async def get_users(session: AsyncSession = Depends(generate_async_session)):
-    users = await get_all_users(session)
-    return [
-        UserGet(
-            id=user.id,
-            name=user.name,
-            email=user.email,
-            phone_number=user.phone_number,
-            company_name=user.company_name,
-            role=user.role,
-            registration_date=user.registration_date,
-            status=user.status,
-            avatar_photo_id=user.avatar_photo_id,
-        )
-        for user in users
-    ]
+@router.get("/", response_model=UserPaginatedGet)
+async def get_users(
+    filters: UserFilterParams = Depends(get_user_filters),
+    session: AsyncSession = Depends(generate_async_session),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100, alias="pageSize"),
+):
+    response = await get_all_users_paginated(session, filters, page, page_size)
+    return response
 
 
 @router.get("/me", response_model=UserGet)
@@ -112,3 +104,12 @@ async def update_user(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
         )
+
+@router.put("/{id}/status/{status}")
+async def update_user(
+    id: int,
+    status: UserStatus,
+    session: AsyncSession = Depends(generate_async_session)
+):
+    await set_user_status(session, id, status)
+    return {"details": "success"}

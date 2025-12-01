@@ -1,21 +1,46 @@
-// src/services/api/listings.ts
-import { useQuery } from "@tanstack/react-query";
-import { defaultAxiosInstance } from "../axiosInstances";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { defaultAxiosInstance, privateAxiosInstance } from "../axiosInstances";
 
-interface ListingPhoto {
+export interface ListingPhoto {
     photo_id: number;
     is_main: boolean;
     listing_int: number;
     uploaded_at: string
 }
 
+export interface ListingAnalytics {
+    listing_id: number;
+
+    average_price: number | null;
+    min_price: number | null;
+    max_price: number | null;
+
+    price_trend: object;
+
+    views: number;
+    contacts: number;
+    favorites: number;
+
+    updated_at: string;
+}
+
+export interface ListingHistory {
+    price: number | null
+
+    views: number
+    contacts: number
+    favorites: number
+    
+    addition_date: string | null
+}
+
 export interface Listing {
     id: number;
     title: string;
+    description: string;
     container_type: string;
     condition: string;
     type: string;
-    price: number | null;
     currency: string | null;
     location: string;
     ral_color: string | null;
@@ -24,7 +49,30 @@ export interface Listing {
     approval_date: string | null;
     updated_at: string | null;
     photos?: ListingPhoto[];
-    analytics?: any;
+    analytics?: ListingAnalytics;
+    last_history: ListingHistory;
+    original_url: string | null;
+    dimension: string;
+}
+
+export interface ListingPhotoCreate {
+    photo_id?: number;
+    photo_url?: string | null;
+    is_main: boolean;
+}
+
+export interface ListingCreate {
+    title: string;
+    description: string;
+    container_type: string;
+    condition: string;
+    type: string;
+    currency: string;
+    location: string;
+    ral_color: string;
+    dimension: string;
+    price: number;
+    photos: ListingPhotoCreate[];
 }
 
 export interface ListingsPaginatedGet {
@@ -50,6 +98,23 @@ export interface ListingFilters {
     sort_order?: "asc" | "desc";
     page?: number;
     page_size?: number;
+    dimension?: string[];
+}
+
+export const useCreateListing = () => {
+    return useMutation({
+        mutationFn: async (body: ListingCreate) => {
+            const payload: ListingCreate = {
+                ...body,
+                photos: body.photos ?? [],
+            };
+            const { data } = await privateAxiosInstance.post("/listings", payload);
+            return data;
+        },
+        onSuccess: () => {
+            console.log("Listing created!");
+        }
+    })
 }
 
 export const useListings = (filters: ListingFilters) => {
@@ -65,6 +130,20 @@ export const useListings = (filters: ListingFilters) => {
 
             const { data } = await defaultAxiosInstance.get<ListingsPaginatedGet>("/listings", { params });
             return data;
+        },
+        refetchOnWindowFocus: false
+    });
+};
+
+export const useUpdateListingStatus = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ listingId, status }: { listingId: number; status: string }) => {
+            await defaultAxiosInstance.post(`/listings/${listingId}/status/${status}`);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["listings"] });
         },
     });
 };

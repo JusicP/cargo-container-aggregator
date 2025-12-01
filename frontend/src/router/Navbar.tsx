@@ -12,7 +12,7 @@ export default function Navbar() {
             <Box as="header" className="site-header" colorPalette="fg">
                 <nav className="nav-left">
                     <Link href="/#">Головна</Link>
-                    <Link href="#">Пошук контейнерів</Link>
+                    <Link href="/create-listing">Створити оголошення</Link>
                     {isAuthenticated ? (
                         user?.role === "admin" ? (
                             <a href="#">Адмін панель</a>
@@ -27,6 +27,7 @@ export default function Navbar() {
                 <Flex colorPalette="bg">
                     <NativeSelect.Root key="lang" width="fit-content">
                         <NativeSelect.Field
+                            color="white"
                             value={lang}
                             onChange={(e) => setLang(e.target.value)}
                             color="white"

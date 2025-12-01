@@ -12,6 +12,9 @@ from sqlalchemy.engine import url as sa_url
 import pymysql
 
 def create_database_if_not_exists(database_url: str):
+    if "sqlite" in database_url:
+        return
+    
     url_obj = sa_url.make_url(database_url)
     database_name = url_obj.database
 
@@ -38,8 +41,7 @@ if config.config_file_name is not None:
 target_metadata = Base.metadata
 
 DATABASE_URL = os.getenv(
-    "SYNC_DATABASE_URL",
-    "mysql+pymysql://root:Aa2324252627%2A@localhost:3306/cargo_container_aggregator"
+    "SYNC_DATABASE_URL"
 )
 config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
@@ -51,6 +53,7 @@ def run_migrations_offline():
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        render_as_batch=True,
     )
 
     with context.begin_transaction():
@@ -65,6 +68,7 @@ def run_migrations_online():
         context.configure(
             connection=connection,
             target_metadata=target_metadata,
+            render_as_batch=True,
         )
 
         with context.begin_transaction():

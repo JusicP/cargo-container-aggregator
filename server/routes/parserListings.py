@@ -1,13 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from server.schemas.listing_parser import ListingParserGet, ListingParserCreate, ListingParserUpdate
+from server.scheduler.listing_parser_job import is_job_running, run_listing_scraper_job
+from server.schemas.listing_parser import ListingParserGet, ListingParserCreate, ListingParserPaginatedGet, ListingParserUpdate
 from server.database.connection import generate_async_session
 from server.services.listing_parser_service import (
     create_listing_parser,
-    get_all_listing_parsers,
-    get_listing_parser_by_id,
+    get_all_listing_parsers_paginated,
     update_listing_parser,
     delete_listing_parser,
 )
@@ -15,9 +15,9 @@ from server.services.listing_parser_service import (
 router = APIRouter(prefix="/parserlistings", tags=["parserlistings"])
 
 
-@router.get("/", response_model=list[ListingParserGet])
+@router.get("/", response_model=ListingParserPaginatedGet)
 async def get_parser_listings(session: AsyncSession = Depends(generate_async_session)):
-    parsers = await get_all_listing_parsers(session)
+    parsers = await get_all_listing_parsers_paginated(session)
     return parsers
 
 
@@ -56,5 +56,16 @@ async def delete_parser_listing(
 
 
 @router.post("/run")
-async def run_parser():
-    return {"message": "Parser started", "started_at": datetime.utcnow()}
+async def run_parser(request: Request):
+    scheduler = request.app.state.scheduler
+    assert scheduler
+
+    already_running = await run_listing_scraper_job(scheduler)
+    return {"alreadyRunning": already_running}
+
+@router.post("/poll")
+async def poll_parser(request: Request):
+    scheduler = request.app.state.scheduler
+    assert scheduler
+
+    return {"isRunning": is_job_running("parser")}

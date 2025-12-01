@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.auth.utils import decode_token
 from server.schemas.listing import ListingFilterParams
+from server.schemas.user import UserFilterParams, UserStatus
 from server.services.user_service import get_user_by_id
 from server.models.user import User
 from server.database.connection import generate_async_session
@@ -55,6 +56,12 @@ def get_current_user(role: str = "user"):
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Insufficient privileges",
             )
+        
+        if user.status == UserStatus.BLOCKED:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Blocked",
+            )
 
         return user
 
@@ -70,7 +77,7 @@ def get_listing_filters(
     currency: str | None = Query(None),
     location: list[str] | None = Query(None, alias="location[]"),
     ral_color: list[str] | None = Query(None, alias="ral_color[]"),
-    status: str | None = Query(None),
+    status: str | None = Query("active"),
     sort_by: str | None = Query("addition_date"),
     sort_order: str | None = Query("desc"),
 ) -> ListingFilterParams:
@@ -87,4 +94,12 @@ def get_listing_filters(
     params.status = status
     params.sort_by = sort_by
     params.sort_order = sort_order
+    return params
+
+
+def get_user_filters(
+    search_query: str | None = Query(None, alias="searchQuery"),
+) -> UserFilterParams:
+    params = UserFilterParams()
+    params.search_query = search_query
     return params

@@ -64,7 +64,7 @@ async (error: AxiosError | Error) => {
 
     // connection / cors / user context (restrictions)
     if (!error.response) {
-        if (error.request && error.config?.url?.includes("/user/me")) {
+        if (error.request && error.config?.url?.includes("/users/me")) {
             return Promise.reject(new AuthExpiredError());
         }
         return Promise.reject(new NetworkConnectionError());

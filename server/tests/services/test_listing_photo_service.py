@@ -26,6 +26,7 @@ async def test_create_and_get_listing_photo(session: AsyncSession):
         email="photo_user@test.com",
         phone_number="1111111111",
         company_name="Photo Company",
+        avatar_photo_id=None
     )
     user: User = await create_user(session, user_data)
 
@@ -65,10 +66,10 @@ async def test_create_and_get_listing_photo(session: AsyncSession):
 @pytest.mark.asyncio
 async def test_check_rights_update_and_delete_listing_photo(session: AsyncSession):
     user1 = await create_user(session, UserCreate(
-        name="user1", password="pass1", email="u1@test.com", phone_number="111", company_name="C1"
+        name="user1", password="pass1", email="u1@test.com", phone_number="111", company_name="C1", avatar_photo_id=None
     ))
     user2 = await create_user(session, UserCreate(
-        name="user2", password="pass2", email="u2@test.com", phone_number="222", company_name="C2"
+        name="user2", password="pass2", email="u2@test.com", phone_number="222", company_name="C2", avatar_photo_id=None
     ))
 
     listing_data = ListingCreate(
