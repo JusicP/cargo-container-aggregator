@@ -2,6 +2,7 @@ import "../App.css";
 import { useState } from "react";
 import background from "../assets/background.png";
 import "../index.css";
+import { Link as RouterLink } from "react-router-dom";
 
 import {
   Box,
@@ -234,7 +235,7 @@ function App() {
             flexWrap="wrap"
             mb={6}
           >
-            {/* Левая часть - Лого и описание */}
+
             <VStack align="flex-start" gap={2}>
               <Text fontSize="2xl" fontWeight="bold">
                 Cargo Containers
@@ -247,19 +248,15 @@ function App() {
             {/* Правая часть - Контакты и соцсети */}
             <VStack align="flex-end" gap={3}>
               {/* Ссылки */}
-              <HStack gap={6}>
-                <Link href="About.tsx" _hover={{ textDecoration: "underline" }} color="gray.300">
-                  Про нас
-                </Link>
-                <Link href="#" _hover={{ textDecoration: "underline" }} color="gray.300">
-                  Контакти
-                </Link>
-                <Link href="#" _hover={{ textDecoration: "underline" }} color="gray.300">
-                  Оголошення
-                </Link>
-              </HStack>
+                  <VStack align="flex-end" gap={3}>
+  <HStack gap={6}>
+    <RouterLink to="/about">Про нас</RouterLink>
+    <RouterLink to="/contacts">Контакти</RouterLink>
+    <RouterLink to="/listings">Оголошення</RouterLink>
+  </HStack>
+</VStack>
 
-              {/* Иконки соцсетей */}
+
               <HStack gap={4}>
                 <Link href="https://google.com" target="_blank" rel="noopener noreferrer">
                   <Icon as={FaGoogle} boxSize={5} color="gray.300" _hover={{ color: "white" }} />
@@ -275,7 +272,7 @@ function App() {
                 </Link>
               </HStack>
 
-              {/* Email */}
+
               <Link
                 href="mailto:contact@cargocontainers.com"
                 color="gray.300"
@@ -287,7 +284,7 @@ function App() {
             </VStack>
           </Flex>
 
-          {/* Разделительная полоска */}
+
           <Box border="1px solid #AEACAC" width="100%" height="0px" mb={5} />
 
           {/* Копирайт */}

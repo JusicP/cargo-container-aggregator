@@ -8,6 +8,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { FaGithub, FaTelegram, FaGoogle, FaFacebook } from "react-icons/fa";
+import {Link as RouterLink} from "react-router-dom";
 
 export default function Footer() {
   return (
@@ -34,17 +35,13 @@ export default function Footer() {
           gap={2}
           mt={{ base: 6, md: 0 }}
         >
-          <HStack gap={6}>
-            <Link href="#" _hover={{ textDecoration: "underline" }} color="gray.300">
-              Про нас
-            </Link>
-            <Link href="#" _hover={{ textDecoration: "underline" }} color="gray.300">
-              Контакти
-            </Link>
-            <Link href="#" _hover={{ textDecoration: "underline" }} color="gray.300">
-              Оголошення
-            </Link>
-          </HStack>
+          <VStack align="flex-end" gap={3}>
+            <HStack gap={6}>
+    <RouterLink to="/about">Про нас</RouterLink>
+    <RouterLink to="/contacts">Контакти</RouterLink>
+    <RouterLink to="/listings">Оголошення</RouterLink>
+           </HStack>
+            </VStack>
 
           <HStack gap={4}>
             <Link href="https://google.com" target="_blank" rel="noopener noreferrer">

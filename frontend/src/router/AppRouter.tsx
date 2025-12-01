@@ -23,6 +23,8 @@ import AdminParserPage from '../pages/admin/AdminParserPage';
 import AdminUsersPage from '../pages/admin/AdminUsersPage';
 import AdminLogsPage from '../pages/admin/AdminLogsPage';
 import NotFoundPage from '../pages/NotFoundPage';
+import AboutPage from "../pages/AboutPage.tsx";
+
 
 const AppRouter: React.FC = () => {
   return (
@@ -30,6 +32,8 @@ const AppRouter: React.FC = () => {
       <Routes>
         {/* Головна сторінка */}
         <Route path="/" element={<HomePage />} />
+        <Route path="/about" element={<AboutPage />} />
+
         
         {/* Аутентифікація */}
         <Route path="/login" element={<LoginPage />} />
