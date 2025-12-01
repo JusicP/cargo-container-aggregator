@@ -3,7 +3,7 @@
     width: 100%;
     min-height: 100vh;
     background: #ffffff;
-    padding-top: 80px; /* Відступ для navbar */
+    padding-top: 30px; /* Відступ для navbar */
 }
 
 /* Desktop версія */
@@ -135,6 +135,10 @@
     gap: 24px;
 }
 
+.container-description > * {
+    max-width: 100%;
+}
+
 .description-header {
     display: flex;
     gap: 16px;
@@ -150,7 +154,7 @@
 }
 
 .stat-value {
-    font-family: 'Geologica', sans-serif;
+    font-family: 'Geologica Variable', sans-serif;
     font-size: 21px;
     font-weight: 500;
     line-height: 100%;
@@ -164,38 +168,10 @@
     color: #A1A1AA;
 }
 
-/* Старі бейджі (якщо потрібні) */
-.size-badge,
-.type-badge {
-    padding: 4px 12px;
-    border-radius: 4px;
-    font-family: 'Geologica', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.badge-icon {
-    width: 16px;
-    height: 16px;
-}
-
-.size-badge {
-    background: #E5E5E5;
-    color: #18181B;
-}
-
-.type-badge {
-    background: #E5E5E5;
-    color: #18181B;
-}
-
 .container-title {
-    font-family: 'Avenir', sans-serif;
+    font-family: 'Geologica Variable', sans-serif;
     font-size: 32px;
-    font-weight: 800;
+    font-weight: 600; /* Semi-Bold */
     color: #18181B;
     margin: 0;
     line-height: 1.2;
@@ -203,9 +179,10 @@
 
 /* Кольорові теги */
 .color-tags {
-    display: flex;
+    display: inline-flex;
     flex-wrap: wrap;
     gap: 8px;
+    max-width: 100%;
 }
 
 .color-tag {
@@ -225,8 +202,9 @@
 }
 
 .color-code {
-    font-family: 'Geologica', sans-serif;
+    font-family: 'Geologica Variable', sans-serif;
     font-size: 14px;
+    font-weight: 400; /* Regular */
     color: #52525B;
 }
 
@@ -234,11 +212,9 @@
 .price-section {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 16px;
     padding: 24px 0;
-    border-top: 1px solid #E5E5E5;
-    border-bottom: 1px solid #E5E5E5;
+    flex-wrap: wrap;
 }
 
 .price-wrapper {
@@ -248,15 +224,15 @@
 }
 
 .price {
-    font-family: 'Avenir', sans-serif;
+    font-family: 'Geologica Variable', sans-serif;
     font-size: 48px;
-    font-weight: 900;
+    font-weight: 700; /* Bold */
     color: #18181B;
     line-height: 1;
 }
 
 .currency {
-    font-family: 'Geologica', sans-serif;
+    font-family: 'Geologica Variable', sans-serif;
     font-size: 24px;
     font-weight: 400;
     color: #71717A;
@@ -268,7 +244,7 @@
     color: white;
     padding: 12px 32px;
     border-radius: 4px;
-    font-family: 'Geologica', sans-serif;
+    font-family: 'Geologica Variable', sans-serif;
     font-size: 16px;
     font-weight: 500;
     border: none;
@@ -294,38 +270,17 @@
 }
 
 .meta-info-label {
-    font-family: 'Geologica', sans-serif;
+    font-family: 'Geologica Variable', sans-serif;
     font-size: 14px;
     font-weight: 400;
     color: #A1A1AA;
 }
 
 .meta-info-value {
-    font-family: 'Geologica', sans-serif;
+    font-family: 'Geologica Variable', sans-serif;
     font-size: 16px;
     font-weight: 500;
     color: #18181B;
-}
-
-/* Старі стилі мета-інформації (можна видалити) */
-.meta-info {
-    display: flex;
-    gap: 24px;
-    flex-wrap: wrap;
-}
-
-.meta-item {
-    display: flex;
-    align-items: center;
-}
-
-.meta-label {
-    font-family: 'Geologica', sans-serif;
-    font-size: 16px;
-    color: #71717A;
-    padding: 8px 16px;
-    background: #F5F5F5;
-    border-radius: 4px;
 }
 
 /* Рекомендовані контейнери */
@@ -335,9 +290,9 @@
 }
 
 .recommended-title {
-    font-family: 'Avenir', sans-serif;
+    font-family: 'Geologica Variable', sans-serif;
     font-size: 36px;
-    font-weight: 800;
+    font-weight: 700; /* Bold */
     color: #18181B;
     margin-bottom: 32px;
 }
@@ -408,22 +363,22 @@
     padding: 4px 8px;
     background: #E5E5E5;
     border-radius: 4px;
-    font-family: 'Geologica', sans-serif;
+    font-family: 'Geologica Variable', sans-serif;
     font-size: 12px;
     font-weight: 500;
     color: #52525B;
 }
 
 .card-title {
-    font-family: 'Avenir', sans-serif;
+    font-family: 'Geologica Variable', sans-serif;
     font-size: 18px;
-    font-weight: 700;
+    font-weight: 500; /* Medium */
     color: #18181B;
     margin: 0;
 }
 
 .card-price-text {
-    font-family: 'Geologica', sans-serif;
+    font-family: 'Geologica Variable', sans-serif;
     font-size: 14px;
     font-weight: 500;
     color: #18181B;
@@ -431,7 +386,7 @@
 }
 
 .card-meta-text {
-    font-family: 'Geologica', sans-serif;
+    font-family: 'Geologica Variable', sans-serif;
     font-size: 14px;
     font-weight: 400;
     color: #18181B;
@@ -453,22 +408,24 @@
 }
 
 .card-color-code {
-    font-family: 'Geologica', sans-serif;
+    font-family: 'Geologica Variable', sans-serif;
     font-size: 12px;
     font-weight: 400;
     color: #52525B;
 }
 
 .card-subtitle {
-    font-family: 'Geologica', sans-serif;
+    font-family: 'Geologica Variable', sans-serif;
     font-size: 14px;
+    font-weight: 400; /* Regular */
     color: #71717A;
     margin: 4px 0;
 }
 
 .card-location {
-    font-family: 'Geologica', sans-serif;
+    font-family: 'Geologica Variable', sans-serif;
     font-size: 14px;
+    font-weight: 400; /* Regular */
     color: #A1A1AA;
     margin: 4px 0 12px 0;
 }
