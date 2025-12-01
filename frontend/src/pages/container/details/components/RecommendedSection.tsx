@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Grid, Heading } from '@chakra-ui/react';
 import { ContainerCard } from './ContainerCard';
-import type {Container} from './mockData';
+import type { Container } from '../mockData';
 
 interface RecommendedSectionProps {
     containers: Container[];
