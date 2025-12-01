@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Flex, Heading, Text, Button, Grid } from '@chakra-ui/react';
-import type { Container } from '../mockData';
+import type { Container } from './mockData';
+// Імпорт іконок з MynaUI (встанови: npm install @mynaui/icons-react)
 import { Click, Bookmark } from '@mynaui/icons-react';
 
 interface ContainerDescriptionProps {
