@@ -30,7 +30,6 @@ export default function Navbar() {
                             color="white"
                             value={lang}
                             onChange={(e) => setLang(e.target.value)}
-                            color="white"
                             className="!border-none"
                         >
                             <option className="!bg-gray-800" value="UA">UA</option>
