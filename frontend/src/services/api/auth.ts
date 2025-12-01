@@ -47,25 +47,10 @@ export const useSignInUser = () => {
 };
 
 export const refreshAccessToken = async () => {
-    try {
-        const { data } = await defaultAxiosInstance.post("/auth/refresh", {});
-        const newAccessToken = data.access_token;
-        if (!newAccessToken) {
-            throw new Error("No access token returned from refresh endpoint");
-        }
-        sessionStorage.setItem("accessToken", newAccessToken);
-
-        return newAccessToken;
-    } catch (err) {
-        console.error("Token refresh failed:", err);
-    }
+    await defaultAxiosInstance.post("/auth/refresh", {});
 }
 
 export const getUserInfo = async () => {
-    try {
-        const { data } = await privateAxiosInstance.get<userData>("/users/me");
-        return data;
-    } catch (err) {
-        console.error("Fetching user data failed", err);
-    }
+    const { data } = await privateAxiosInstance.get<userData>("/users/me");
+    return data;
 }

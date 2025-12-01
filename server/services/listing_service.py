@@ -46,7 +46,7 @@ async def create_listing(session: AsyncSession, user_id: int | None, listing_cre
         selectinload(Listing.analytics)
     ).filter(Listing.id == listing.id))
 
-    return listing
+    return listing.scalar_one()
 
 
 async def create_or_update_listings(session: AsyncSession, listings_create: list[ListingCreate]):

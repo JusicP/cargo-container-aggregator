@@ -81,5 +81,6 @@ class ListingPaginatedGet(BaseModel):
 
 
 class ListingCreate(ListingBase):
-    price: float | None
+    original_url: str | None = None
+    price: float
     photos: list[ListingPhotoCreate] = []

@@ -15,7 +15,7 @@ export default function Navbar() {
                     <Link href="/create-listing">Створити оголошення</Link>
                     {isAuthenticated ? (
                         user?.role === "admin" ? (
-                            <a href="#">Адмін панель</a>
+                            <Link href="/admin/listings">Адмін панель</Link>
                         ) : (
                             null
                         )
