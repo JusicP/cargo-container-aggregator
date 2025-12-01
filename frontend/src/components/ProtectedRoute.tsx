@@ -15,8 +15,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requiredRoles = [],
   requireAuth = true,
 }) => {
-  return <>{children}</>;
-  
   const { user, isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();

@@ -158,7 +158,9 @@ const AppRouterContent: React.FC = () => {
       <Route 
         path="/admin" 
         element={
+          <ProtectedRoute requiredRoles={['admin']}>
             <AdminPage />
+          </ProtectedRoute>
         }
       >
         <Route path="listings" element={<AdminListingsPage />} />
