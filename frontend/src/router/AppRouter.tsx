@@ -25,6 +25,7 @@ import AdminParserPage from '../pages/admin/AdminParserPage';
 import AdminUsersPage from '../pages/admin/AdminUsersPage';
 import AdminLogsPage from '../pages/admin/AdminLogsPage';
 import NotFoundPage from '../pages/NotFoundPage';
+import AboutUsPage from '@/pages/AboutUsPage.tsx';
 
 const AppRouterContent: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -175,7 +176,13 @@ const AppRouterContent: React.FC = () => {
         <Route path="logs" element={<AdminLogsPage />} />
       </Route>
 
-      
+      <Route 
+        path="/about" 
+        element={
+          <AboutUsPage />
+        } 
+      />
+
       {/* 404 сторінка для всіх інших маршрутів */}
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
