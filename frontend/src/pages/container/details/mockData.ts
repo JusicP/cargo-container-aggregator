@@ -13,15 +13,14 @@ export interface Container {
     images?: string[];
     condition?: string;
     location?: string;
-    owner?: string;
+    type?: string;
     colors?: string[];
     specifications?: {
-        size: "10ft",
-        type: "High Cube",
-        door: "Roll-Up",
-        status: "used",
-        clicks: 54,
-        saves: 13
+        size: "10ft";
+        door: "Roll-Up";
+        status: "used";
+        clicks: number;
+        saves: number;
     };
     specs?: string[];
 }
@@ -40,11 +39,10 @@ export const containerData: Container = {
     ],
     condition: "used",
     location: "Odesa, Ukraine",
-    owner: "Власник",
+    type: "Вантажний",
     colors: ["#204F73", "#4A4F73", "#524F73", "#694F73", "#524F21", "#4A4F21", "#4A4F73"],
     specifications: {
         size: "10ft",
-        type: "High Cube",
         door: "Roll-Up",
         status: "used",
         clicks: 54,
