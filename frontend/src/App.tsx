@@ -3,13 +3,15 @@ import './index.css'
 import AppRouter from '@/router/AppRouter';
 import Navbar from "@/router/Navbar.tsx"
 import Footer from "@/router/Footer.tsx"
-import { Flex } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 
 const App: React.FC = () => {
   return (
-    <Flex direction="column">
+    <Flex direction="column" minH="100vh">
         <Navbar />
-            <AppRouter />
+          <Box flex="1">
+              <AppRouter /> 
+          </Box>
         <Footer />
     </Flex>
   );
