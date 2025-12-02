@@ -12,19 +12,11 @@ export default function Navbar() {
         <Box className="homepage w-full">
             <Box as="header" className="site-header" colorPalette="fg">
                 <nav className="nav-left">
-<<<<<<< HEAD
                     <Link href="/#">Головна</Link>
                     <Link href="/create-listing">Створити оголошення</Link>
                     {isAuthenticated ? (
                         user?.role === "admin" ? (
                             <Link href="/admin/listings">Адмін панель</Link>
-=======
-                    <Link as={RouterLink} to="/">Головна</Link>
-                    <Link as={RouterLink} to="/search">Пошук контейнерів</Link>
-                    {isAuthenticated ? (
-                        user?.role === "admin" ? (
-                            <Link as={RouterLink} to="/admin">Адмін панель</Link>
->>>>>>> d4d1866 (fix: improving the top layer app hierarchy & fixing inside app navigation (no rerender for the context))
                         ) : (
                             null
                         )

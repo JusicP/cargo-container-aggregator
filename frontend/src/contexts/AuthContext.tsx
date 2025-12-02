@@ -17,32 +17,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   useEffect(() => {
     const init = async () => {
       try {
-<<<<<<< HEAD
-<<<<<<< HEAD
         if (!user) {
           const userData = await getUserInfo();
           if (userData) {
             setUser(userData);
           }
         }
-      } catch (err) {
-        try {
-          refreshAccessToken();
-        } catch (err) {
-          setUser(null);
-        }
-
-        const userData = await getUserInfo();
-        if (userData) {
-          setUser(userData);
-        }
-
-=======
-        const {res} = await refreshAccessToken();
-        const accessToken = res.access_token;
-        if (accessToken) {
-          privateAxiosInstance.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-=======
         // on reload fetch user token from server cookie
         const { res } = await refreshAccessToken();
         if (res.access_token) {
@@ -50,17 +30,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           privateAxiosInstance.defaults.headers.common["Authorization"] =
               `Bearer ${res.access_token}`;
 
->>>>>>> 7919c88 (feat: adding manager for the token subscription (auth context))
           const userData = await getUserInfo();
           setUser(userData);
         }
       } catch {
         setUser(null);
-<<<<<<< HEAD
->>>>>>> 657cb92 (feat: adding custom hooks & modifying context)
-=======
         setAccessToken(null);
->>>>>>> 7919c88 (feat: adding manager for the token subscription (auth context))
       } finally {
         setIsLoading(false);
       }
