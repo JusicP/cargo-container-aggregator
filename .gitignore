@@ -6,3 +6,5 @@ uploaded_photos
 __pycache__/
 *.env
 *.log
+database.db
+*.db
