@@ -15,8 +15,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requiredRoles = [],
   requireAuth = true,
 }) => {
-  return <>{children}</>;
-  
   const { user, isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -41,7 +39,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   // Якщо користувач авторизований, але немає доступу за роллю
-  if (isAuthenticated && user && requiredRoles.length > 0 && !requiredRoles.includes(user.role)) {
+  if (isAuthenticated && user && requiredRoles.length > 0 && !requiredRoles.includes(user.role) && user.role != "admin") {
     return (
       <div className="verification-container">
         <h2 className="verification-title">

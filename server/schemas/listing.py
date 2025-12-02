@@ -67,6 +67,7 @@ class ListingFilterParams(BaseModel):
     ral_color: list[str] | None = None
     status: ListingStatus | None = None
     dimension: ContainerDimension | None = None
+    user_id: int | None = None
 
     sort_by: str | None = "addition_date"  # addition_date, approval_date, updated_at, price
     sort_order: str | None = "desc"        # asc / desc
@@ -81,5 +82,6 @@ class ListingPaginatedGet(BaseModel):
 
 
 class ListingCreate(ListingBase):
-    price: float | None
+    original_url: str | None = None
+    price: float
     photos: list[ListingPhotoCreate] = []

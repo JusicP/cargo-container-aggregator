@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { defaultAxiosInstance } from "../axiosInstances";
+import { defaultAxiosInstance, privateAxiosInstance } from "../axiosInstances";
 
 export interface ListingPhoto {
     photo_id: number;
@@ -55,6 +55,26 @@ export interface Listing {
     dimension: string;
 }
 
+export interface ListingPhotoCreate {
+    photo_id?: number;
+    photo_url?: string | null;
+    is_main: boolean;
+}
+
+export interface ListingCreate {
+    title: string;
+    description: string;
+    container_type: string;
+    condition: string;
+    type: string;
+    currency: string;
+    location: string;
+    ral_color: string;
+    dimension: string;
+    price: number;
+    photos: ListingPhotoCreate[];
+}
+
 export interface ListingsPaginatedGet {
     listings: Listing[];
     total: number;
@@ -79,6 +99,23 @@ export interface ListingFilters {
     page?: number;
     page_size?: number;
     dimension?: string[];
+    user_id?: number;
+}
+
+export const useCreateListing = () => {
+    return useMutation({
+        mutationFn: async (body: ListingCreate) => {
+            const payload: ListingCreate = {
+                ...body,
+                photos: body.photos ?? [],
+            };
+            const { data } = await privateAxiosInstance.post("/listings", payload);
+            return data;
+        },
+        onSuccess: () => {
+            console.log("Listing created!");
+        }
+    })
 }
 
 export const useListings = (filters: ListingFilters) => {

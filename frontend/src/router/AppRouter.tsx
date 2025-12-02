@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from '../components/ProtectedRoute';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -7,7 +7,7 @@ import { useAuth } from '../contexts/AuthContext';
 import HomePage from '../pages/homepage/HomePage.tsx';
 import LoginPage from '../pages/auth/LoginPage.tsx';
 import RegisterPage from '../pages/auth/RegisterPage.tsx';
-import MyAccountPage from '../pages/MyAccountPage';
+import MyAccountPage from '../pages/myaccount/MyAccountPage.tsx';
 import ActiveListingsPage from '../pages/myaccount/ActiveListingsPage';
 import PendingListingsPage from '../pages/myaccount/PendingListingsPage';
 import RejectedListingsPage from '../pages/myaccount/RejectedListingsPage';
@@ -187,11 +187,9 @@ const AppRouterContent: React.FC = () => {
 };
 
 const AppRouter: React.FC = () => {
-    return (
-        <BrowserRouter>
-            <AppRouterContent />
-        </BrowserRouter>
-    );
+  return (
+      <AppRouterContent />
+  );
 };
 
 export default AppRouter;
