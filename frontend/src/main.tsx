@@ -10,6 +10,8 @@ import './i18n/config'
 import { AuthProvider } from './contexts/AuthContext'
 // adding custom alexandria font
 import '@fontsource-variable/alexandria/index.css';
+// adding custom geologica font
+import "@fontsource-variable/geologica"
 // api - query packages
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query"
 import { BrowserRouter } from 'react-router-dom';
