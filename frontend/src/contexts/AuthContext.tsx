@@ -1,5 +1,5 @@
 import React, {createContext, useContext, useState, useEffect, useMemo, type ReactNode} from 'react';
-import { getUserInfo, refreshAccessToken } from "@/services/api/auth.ts";
+import { loginRequest, getUserInfo, refreshAccessToken } from "@/services/api/authImperative.ts";
 import {privateAxiosInstance} from "@/services/axiosInstances.ts";
 
 export type UserRole = 'guest' | 'user' | 'admin';
@@ -55,6 +55,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // Memoize context value to prevent unnecessary re-renders
   const contextValue = useMemo(() => ({
     user,
+    setUser,
     isAuthenticated: !!user,
     isLoading,
   }), [user, isLoading]);

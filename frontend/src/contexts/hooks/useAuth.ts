@@ -1,35 +1,33 @@
-import { useEffect } from "react";
 import { useUser } from "@/contexts/hooks/useUser";
-import { refreshAccessToken, getUserInfo } from "@/services/api/auth";
+import { loginRequest, getUserInfo, refreshAccessToken } from "@/services/api/authImperative";
 
 export const useAuth = () => {
     const { user, addUser, removeUser, setUser } = useUser();
 
-    useEffect(() => {
-        const init = async () => {
-            try{
-                const accessToken = await refreshAccessToken();
-                if (accessToken) {
-                    const userData = await getUserInfo();
-                    setUser(userData);
-                }
-            } catch {
-                setUser(null)
-            }
-        }
+    const login = async (credentials: FormData) => {
+        const loginRes = await loginRequest(credentials);  // backend sets HttpOnly cookie
+        if (!loginRes) return;
 
-        init();
-    }, [])
-
-    const login = async () => {
-        const newToken = await refreshAccessToken();
         const userData = await getUserInfo();
         addUser(userData);
     };
 
-    const logout = () => {
+    const logout = async () => {
         removeUser();
+        // /logout endpoint
     };
 
-    return { user, login, logout, setUser };
-}
+    const refresh = async () => {
+        const { res } = await refreshAccessToken();
+        if (!res?.access_token) {
+            removeUser();
+            return null;
+        }
+
+        const userData = await getUserInfo();
+        setUser(userData);
+        return userData;
+    };
+
+    return { user, login, logout, refresh };
+};

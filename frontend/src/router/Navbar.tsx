@@ -42,7 +42,7 @@ export default function Navbar() {
                             color="white"
                             className="!border-none"
                         >
-                            <option className="!bg-gray-800" value="UA">UA</option>
+                            <option className="к bg-gray-800" value="UA">UA</option>
                             <option className="!bg-gray-800"  value="EN">EN</option>
                         </NativeSelect.Field>
                         <NativeSelect.Indicator color="#FD7F16" />

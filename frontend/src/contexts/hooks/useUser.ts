@@ -1,17 +1,16 @@
 import { useContext } from "react";
-import { AuthContext } from "@/contexts/AuthContext.tsx";
-import { type User } from "@/contexts/contextInterfaces.ts"
+import { AuthContext } from "@/contexts/AuthContext";
 
 export const useUser = () => {
-    const { user, setUser } = useContext(AuthContext);
+    const context = useContext(AuthContext);
+    if (!context) throw new Error("useUser must be used within AuthProvider");
 
-    const addUser = (user: User) => {
-        setUser(user);
+    const { user, setUser } = context;
+
+    return {
+        user,
+        setUser,
+        addUser: setUser,
+        removeUser: () => setUser(null),
     };
-
-    const removeUser = () => {
-        setUser(null);
-    };
-
-    return { user, addUser, removeUser, setUser };
 };
