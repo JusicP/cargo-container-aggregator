@@ -1,14 +1,19 @@
 import React from 'react';
 import { Box, Flex, Heading, Text, Button, Grid } from '@chakra-ui/react';
-import type { Container } from '../mockData';
+import type { Listing } from '@/services/api/listings';
 import { Click, Bookmark } from '@mynaui/icons-react';
-import ColorBox from '../../../../components/ui/ral-color-box.tsx'
+import RalColorBox from '@/components/ui/ral-color-box';
+import { conditionMap, containerTypes, listingTypes, containerDimensions } from '@/schemas/listingSchema';
 
 interface ContainerDescriptionProps {
-    data: Container;
+    data: Listing;
 }
 
 export const ContainerDescription: React.FC<ContainerDescriptionProps> = ({ data }) => {
+    const price = data.last_history?.price || 0;
+    const views = data.analytics?.views || data.last_history?.views || 0;
+    const favorites = data.analytics?.favorites || data.last_history?.favorites || 0;
+
     return (
         <Flex direction="column" gap="24px">
             <Flex gap="16px" align="center">
@@ -20,7 +25,7 @@ export const ContainerDescription: React.FC<ContainerDescriptionProps> = ({ data
                         lineHeight="1"
                         color="#A1A1AA"
                     >
-                        {data.specifications?.clicks || 54}
+                        {views}
                     </Text>
                     <Box as={Click} w="21px" h="21px" color="#A1A1AA" />
                 </Flex>
@@ -32,7 +37,7 @@ export const ContainerDescription: React.FC<ContainerDescriptionProps> = ({ data
                         lineHeight="1"
                         color="#A1A1AA"
                     >
-                        {data.specifications?.saves || 13}
+                        {favorites}
                     </Text>
                     <Box as={Bookmark} w="21px" h="21px" color="#A1A1AA" />
                 </Flex>
@@ -49,7 +54,11 @@ export const ContainerDescription: React.FC<ContainerDescriptionProps> = ({ data
                 {data.title}
             </Heading>
 
-            <div className="!text-black"> <ColorBox ralColorKey="RAL1000" /> </div>
+            {data.ral_color && (
+                <div className="!text-black">
+                    <RalColorBox ralColorKey={data.ral_color} />
+                </div>
+            )}
 
             <Flex align="center" gap="16px" py="24px" flexWrap="wrap">
                 <Flex align="baseline" gap="8px">
@@ -60,7 +69,7 @@ export const ContainerDescription: React.FC<ContainerDescriptionProps> = ({ data
                         color="#18181B"
                         lineHeight="1"
                     >
-                        {data.price}
+                        {price}
                     </Text>
                     <Text
                         fontFamily="'Geologica Variable', sans-serif"
@@ -121,7 +130,7 @@ export const ContainerDescription: React.FC<ContainerDescriptionProps> = ({ data
                         fontWeight="500"
                         color="#18181B"
                     >
-                        sale
+                        {listingTypes[data.type] || data.type}
                     </Text>
                 </Flex>
                 <Flex direction="column" gap="4px">
@@ -139,7 +148,7 @@ export const ContainerDescription: React.FC<ContainerDescriptionProps> = ({ data
                         fontWeight="500"
                         color="#18181B"
                     >
-                        {data.condition}
+                        {conditionMap[data.condition] || data.condition}
                     </Text>
                 </Flex>
                 <Flex direction="column" gap="4px">
@@ -175,10 +184,51 @@ export const ContainerDescription: React.FC<ContainerDescriptionProps> = ({ data
                         fontWeight="500"
                         color="#18181B"
                     >
-                        {data.type}
+                        {containerTypes[data.container_type] || data.container_type}
+                    </Text>
+                </Flex>
+                <Flex direction="column" gap="4px">
+                    <Text
+                        fontFamily="'Geologica Variable', sans-serif"
+                        fontSize="14px"
+                        fontWeight="400"
+                        color="#A1A1AA"
+                    >
+                        Розмір
+                    </Text>
+                    <Text
+                        fontFamily="'Geologica Variable', sans-serif"
+                        fontSize="16px"
+                        fontWeight="500"
+                        color="#18181B"
+                    >
+                        {containerDimensions[data.dimension] || data.dimension}
                     </Text>
                 </Flex>
             </Grid>
+
+            {data.description && (
+                <Box mt="24px">
+                    <Text
+                        fontFamily="'Geologica Variable', sans-serif"
+                        fontSize="14px"
+                        fontWeight="400"
+                        color="#A1A1AA"
+                        mb="8px"
+                    >
+                        Опис
+                    </Text>
+                    <Text
+                        fontFamily="'Geologica Variable', sans-serif"
+                        fontSize="16px"
+                        fontWeight="400"
+                        color="#18181B"
+                        whiteSpace="pre-wrap"
+                    >
+                        {data.description}
+                    </Text>
+                </Box>
+            )}
         </Flex>
     );
 };

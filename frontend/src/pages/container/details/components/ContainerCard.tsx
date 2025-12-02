@@ -1,13 +1,18 @@
 import React from 'react';
 import { Box, Flex, Image, Text } from '@chakra-ui/react';
-import type { Container } from '../mockData';
+import type { Listing } from '@/services/api/listings';
+import { conditionMap, listingTypes } from '@/schemas/listingSchema';
 
 interface ContainerCardProps {
-    container: Container;
+    container: Listing;
 }
 
 export const ContainerCard: React.FC<ContainerCardProps> = ({ container }) => {
-    const colorCode = container.specs?.[0] || '#204F73';
+    // Отримуємо головне фото або перше доступне
+    const mainPhoto = container.photos?.find(photo => photo.is_main) || container.photos?.[0];
+    const imageUrl = mainPhoto?.photo_url || `/api/photos/${mainPhoto?.photo_id}` || '/placeholder-image.jpg';
+
+    const colorCode = container.ral_color || '#204F73';
 
     return (
         <Box
@@ -32,7 +37,14 @@ export const ContainerCard: React.FC<ContainerCardProps> = ({ container }) => {
             }}
         >
             <Box w="155px" h="100px" overflow="hidden" borderRadius="8px" mx="auto" mb="16px">
-                <Image src={container.image} alt={container.title} w="100%" h="100%" objectFit="cover" />
+                <Image
+                    src={imageUrl}
+                    alt={container.title}
+                    w="100%"
+                    h="100%"
+                    objectFit="cover"
+                    fallbackSrc="/placeholder-image.jpg"
+                />
             </Box>
 
             <Flex direction="column" gap="4px" align="center" textAlign="center">
@@ -41,6 +53,7 @@ export const ContainerCard: React.FC<ContainerCardProps> = ({ container }) => {
                     fontSize="18px"
                     fontWeight="500"
                     color="#18181B"
+                    noOfLines={2}
                 >
                     {container.title}
                 </Text>
@@ -51,7 +64,7 @@ export const ContainerCard: React.FC<ContainerCardProps> = ({ container }) => {
                     fontWeight="500"
                     color="#18181B"
                 >
-                    Ціна: {container.price} {container.currency}
+                    Ціна: {container.last_history?.price || 0} {container.currency}
                 </Text>
 
                 <Text
@@ -60,7 +73,7 @@ export const ContainerCard: React.FC<ContainerCardProps> = ({ container }) => {
                     fontWeight="400"
                     color="#18181B"
                 >
-                    Тип: sale
+                    Тип: {listingTypes[container.type] || container.type}
                 </Text>
 
                 <Text
@@ -69,26 +82,28 @@ export const ContainerCard: React.FC<ContainerCardProps> = ({ container }) => {
                     fontWeight="400"
                     color="#18181B"
                 >
-                    Стан: used
+                    Стан: {conditionMap[container.condition] || container.condition}
                 </Text>
 
-                <Flex align="center" gap="6px" mt="4px">
-                    <Box
-                        w="16px"
-                        h="16px"
-                        borderRadius="2px"
-                        flexShrink={0}
-                        bg={colorCode}
-                    />
-                    <Text
-                        fontFamily="'Geologica Variable', sans-serif"
-                        fontSize="12px"
-                        fontWeight="400"
-                        color="#52525B"
-                    >
-                        {colorCode}
-                    </Text>
-                </Flex>
+                {container.ral_color && (
+                    <Flex align="center" gap="6px" mt="4px">
+                        <Box
+                            w="16px"
+                            h="16px"
+                            borderRadius="2px"
+                            flexShrink={0}
+                            bg={colorCode}
+                        />
+                        <Text
+                            fontFamily="'Geologica Variable', sans-serif"
+                            fontSize="12px"
+                            fontWeight="400"
+                            color="#52525B"
+                        >
+                            {colorCode}
+                        </Text>
+                    </Flex>
+                )}
             </Flex>
         </Box>
     );
