@@ -40,7 +40,7 @@ export const containerData: Container = {
     condition: "used",
     location: "Odesa, Ukraine",
     type: "Вантажний",
-    colors: ["#204F73", "#4A4F73", "#524F73", "#694F73", "#524F21", "#4A4F21", "#4A4F73"],
+    colors: ["#204F73"],
     specifications: {
         size: "10ft",
         door: "Roll-Up",

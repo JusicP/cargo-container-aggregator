@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Container, Flex } from '@chakra-ui/react';
+import { Box, Flex } from '@chakra-ui/react';
 import { ImageCarousel } from './components/ImageCarousel';
 import { ContainerDescription } from './components/ContainerDescription';
 import { RecommendedSection } from './components/RecommendedSection';

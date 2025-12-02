@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Flex, Heading, Text, Button, Grid } from '@chakra-ui/react';
 import type { Container } from '../mockData';
 import { Click, Bookmark } from '@mynaui/icons-react';
+import ColorBox from '../../../../components/ui/ral-color-box.tsx'
 
 interface ContainerDescriptionProps {
     data: Container;
@@ -48,35 +49,7 @@ export const ContainerDescription: React.FC<ContainerDescriptionProps> = ({ data
                 {data.title}
             </Heading>
 
-            <Flex flexWrap="wrap" gap="8px">
-                {data.colors?.map((color, index) => (
-                    <Flex
-                        key={index}
-                        align="center"
-                        gap="6px"
-                        px="12px"
-                        py="6px"
-                        bg="#F5F5F5"
-                        borderRadius="4px"
-                    >
-                        <Box
-                            w="16px"
-                            h="16px"
-                            borderRadius="2px"
-                            border="1px solid rgba(0, 0, 0, 0.1)"
-                            bg={color}
-                        />
-                        <Text
-                            fontFamily="'Geologica Variable', sans-serif"
-                            fontSize="14px"
-                            fontWeight="400"
-                            color="#52525B"
-                        >
-                            {color}
-                        </Text>
-                    </Flex>
-                ))}
-            </Flex>
+            <div className="!text-black"> <ColorBox ralColorKey="RAL1000" /> </div>
 
             <Flex align="center" gap="16px" py="24px" flexWrap="wrap">
                 <Flex align="baseline" gap="8px">
@@ -99,20 +72,37 @@ export const ContainerDescription: React.FC<ContainerDescriptionProps> = ({ data
                         {data.currency}
                     </Text>
                 </Flex>
-                <Button
-                    bg="#FD7F16"
-                    color="white"
-                    px="32px"
-                    py="12px"
-                    borderRadius="4px"
-                    fontFamily="'Geologica Variable', sans-serif"
-                    fontSize="16px"
-                    fontWeight="500"
-                    _hover={{ bg: '#e65c00' }}
-                    transition="background 0.3s ease"
-                >
-                    Орендувати
-                </Button>
+                <Flex gap="12px">
+                    <Button
+                        bg="#FD7F16"
+                        color="white"
+                        px="32px"
+                        py="12px"
+                        borderRadius="4px"
+                        fontFamily="'Geologica Variable', sans-serif"
+                        fontSize="16px"
+                        fontWeight="500"
+                        _hover={{ bg: '#e65c00' }}
+                        transition="background 0.3s ease"
+                    >
+                        Контакти
+                    </Button>
+                    <Button
+                        bg="white"
+                        color="#18181B"
+                        border="1px solid #E4E4E7"
+                        px="32px"
+                        py="12px"
+                        borderRadius="4px"
+                        fontFamily="'Geologica Variable', sans-serif"
+                        fontSize="16px"
+                        fontWeight="500"
+                        _hover={{ bg: '#F4F4F5' }}
+                        transition="background 0.3s ease"
+                    >
+                        Додати в обране
+                    </Button>
+                </Flex>
             </Flex>
 
             <Grid templateColumns="repeat(4, 1fr)" gap="24px">
@@ -177,7 +167,7 @@ export const ContainerDescription: React.FC<ContainerDescriptionProps> = ({ data
                         fontWeight="400"
                         color="#A1A1AA"
                     >
-                        Тип конейнера
+                        Тип контейнера
                     </Text>
                     <Text
                         fontFamily="'Geologica Variable', sans-serif"
