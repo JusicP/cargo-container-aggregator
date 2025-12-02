@@ -13,7 +13,8 @@ export const getUserInfo = async () => {
 };
 
 export const refreshAccessToken = async () => {
-    const { data } = await privateAxiosInstance.post("/auth/refresh/");
+    const { data } = await defaultAxiosInstance.post("/auth/refresh/");
+    console.log("refresh", data);
     return data;
 };
 

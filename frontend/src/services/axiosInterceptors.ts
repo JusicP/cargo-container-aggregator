@@ -8,6 +8,7 @@ import {
     NotFoundError,
     RateLimitError
 } from "@/services/errors/ErrorClasses.ts"
+import {tokenManager} from "@/contexts/tokenManager.ts";
 
 // For Make Log on Develop Mode
 const logOnDev = (...args: any[]) => {
@@ -19,27 +20,19 @@ const logOnDev = (...args: any[]) => {
 // promise base for preventing infinite refresh retries
 let refreshPromise: Promise<string> | null = null;
 
-export const requestInterceptor =
-    async (config: InternalAxiosRequestConfig) => {
-        // checking existing token (if exist) in sessionStorage : TO REFACTOR
-        const accessToken = sessionStorage.getItem("accessToken")
-        // embedding within existing headers if there is one
-        // no token - error interceptor catch
-        if (accessToken) {
-            config.headers = {
-                ...config.headers,
-                Authorization: `Bearer ${accessToken}`,
-            };
-        }
-
-        logOnDev("REQUEST:", {
-            method: config.method,
-            url: config.url,
-            headers: config.headers,
-        });
-
-        return config;
+export const requestInterceptor = (config: InternalAxiosRequestConfig) => {
+    // getting token from manager
+    const token = tokenManager.getToken();
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
     }
+    logOnDev("REQUEST:", {
+        method: config.method,
+        url: config.url,
+        headers: config.headers,
+    });
+    return config;
+};
 
 export const responseInterceptor =
     async (response: AxiosResponse) => {
@@ -83,7 +76,7 @@ async (error: AxiosError | Error) => {
         case 401: {
             if(!originalRequest._retry) {
                 console.warn("Already retried once. Failing.");
-                sessionStorage.removeItem("accessToken");
+                tokenManager.setToken(null);
                 return Promise.reject(new AuthExpiredError());
             }
             originalRequest._retry = true;
@@ -91,7 +84,7 @@ async (error: AxiosError | Error) => {
                 if (!refreshPromise) {
                     refreshPromise = refreshAccessToken()
                         .then((token) => {
-                            sessionStorage.setItem("accessToken", token);
+                            tokenManager.setToken(token);
                             return token;
                         })
                         .finally(() => {
@@ -107,7 +100,7 @@ async (error: AxiosError | Error) => {
                 return axios(originalRequest);
             } catch (refreshError) {
                 console.error("REFRESH FAILED:", refreshError);
-                sessionStorage.removeItem("accessToken");
+                tokenManager.setToken(null);
                 return Promise.reject(new AuthExpiredError());
             }
         }
