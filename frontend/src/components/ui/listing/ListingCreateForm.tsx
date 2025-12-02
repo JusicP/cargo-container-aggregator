@@ -26,6 +26,7 @@ import {
 } from "@/schemas/listingSchema";
 import { useCreateListing, type ListingCreate } from "@/services/api/listings";
 import { privateAxiosInstance } from "@/services/axiosInstances";
+import { useNavigate } from "react-router-dom";
 
 type UploadedPhoto = {
     photoId: number;
@@ -48,6 +49,7 @@ export default function ListingCreateForm() {
     const [formError, setFormError] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const navigate = useNavigate();
 
     const defaultValues = useMemo<Partial<ListingCreateFormValues>>(
         () => ({
@@ -102,6 +104,9 @@ export default function ListingCreateForm() {
             };
 
             await createListing.mutateAsync(payload);
+
+            navigate("/create-listing/success")
+
             reset(defaultValues);
             setPhotos([]);
         } catch (error) {

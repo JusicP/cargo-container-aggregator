@@ -78,6 +78,7 @@ async def update_user(session: AsyncSession, user_id: int, user_update: UserUpda
     user.email = user_update.email
     user.phone_number = user_update.phone_number
     user.company_name = user_update.company_name
+    user.avatar_photo_id = user_update.avatar_photo_id
 
     await session.commit()
 

@@ -25,11 +25,8 @@ import AdminParserPage from '../pages/admin/AdminParserPage';
 import AdminUsersPage from '../pages/admin/AdminUsersPage';
 import AdminLogsPage from '../pages/admin/AdminLogsPage';
 import NotFoundPage from '../pages/NotFoundPage';
-<<<<<<< HEAD
 import AboutUsPage from '@/pages/AboutUsPage.tsx';
-=======
-import Footer from "@/router/Footer.tsx"
->>>>>>> d4d1866 (fix: improving the top layer app hierarchy & fixing inside app navigation (no rerender for the context))
+import ListingsBasePage from '@/pages/myaccount/ListingsPageBase.tsx';
 
 const AppRouterContent: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -59,60 +56,57 @@ const AppRouterContent: React.FC = () => {
         element={
           <ProtectedRoute>
             <MyAccountPage />
-        </ProtectedRoute>
+          </ProtectedRoute>
         } 
       >
         <Route index element={<Navigate to="profile" replace />} />
 
-        {/* Оголошення в акаунті - доступні для користувачів (user може і купляти, і продавати) */}
         <Route 
-          path="listings/active" 
+          path="/myaccount/listings" 
           element={
-            <ProtectedRoute requiredRoles={['user']}>
+            <ListingsBasePage />
+          } 
+        >
+          <Route index element={<Navigate to="/myaccount/listings/active" replace />} />
+
+          {/* Оголошення в акаунті - доступні для користувачів (user може і купляти, і продавати) */}
+          <Route 
+            path="/myaccount/listings/active" 
+            element={
               <ActiveListingsPage />
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path="listings/pending" 
-          element={
-            <ProtectedRoute requiredRoles={['user']}>
+            } 
+          />
+          <Route 
+            path="/myaccount/listings/pending" 
+            element={
               <PendingListingsPage />
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path="listings/rejected" 
-          element={
-            <ProtectedRoute requiredRoles={['user']}>
+            } 
+          />
+          <Route 
+            path="/myaccount/listings/rejected" 
+            element={
               <RejectedListingsPage />
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path="listings/deleted" 
-          element={
-            <ProtectedRoute requiredRoles={['user']}>
+            } 
+          />
+          <Route 
+            path="/myaccount/listings/deleted" 
+            element={
               <DeletedListingsPage />
-            </ProtectedRoute>
-          } 
-        />
+            } 
+          />
+        </Route>
         
         {/* Профіль і налаштування - доступні всім авторизованим користувачам */}
         <Route 
           path="profile" 
           element={
-            <ProtectedRoute>
-              <ProfilePage />
-            </ProtectedRoute>
+            <ProfilePage />
           } 
         />
         <Route 
           path="user-settings" 
           element={
-            <ProtectedRoute>
-              <UserSettingsPage />
-            </ProtectedRoute>
+            <UserSettingsPage />
           } 
         />
       </Route>
@@ -162,7 +156,9 @@ const AppRouterContent: React.FC = () => {
       <Route 
         path="/admin" 
         element={
+          <ProtectedRoute requiredRoles={['admin']}>
             <AdminPage />
+          </ProtectedRoute>
         }
       >
         <Route path="listings" element={<AdminListingsPage />} />
@@ -181,15 +177,7 @@ const AppRouterContent: React.FC = () => {
 
 const AppRouter: React.FC = () => {
   return (
-<<<<<<< HEAD
       <AppRouterContent />
-=======
-      <div className="flex flex-col min-h-screen">
-          <div className="flex-1 h-full">
-              <AppRouterContent/>
-          </div>
-      </div>
->>>>>>> d4d1866 (fix: improving the top layer app hierarchy & fixing inside app navigation (no rerender for the context))
   );
 };
 
