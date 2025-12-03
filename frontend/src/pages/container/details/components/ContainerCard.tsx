@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Flex, Image, Text } from '@chakra-ui/react';
 import type { Listing } from '@/services/api/listings';
 import { conditionMap, listingTypes } from '@/schemas/listingSchema';
+import RalColorBox from "@/components/ui/ral-color-box.tsx";
 
 interface ContainerCardProps {
     container: Listing;
@@ -86,23 +87,9 @@ export const ContainerCard: React.FC<ContainerCardProps> = ({ container }) => {
                 </Text>
 
                 {container.ral_color && (
-                    <Flex align="center" gap="6px" mt="4px">
-                        <Box
-                            w="16px"
-                            h="16px"
-                            borderRadius="2px"
-                            flexShrink={0}
-                            bg={colorCode}
-                        />
-                        <Text
-                            fontFamily="'Geologica Variable', sans-serif"
-                            fontSize="12px"
-                            fontWeight="400"
-                            color="#52525B"
-                        >
-                            {colorCode}
-                        </Text>
-                    </Flex>
+                    <div className="!text-black">
+                        <RalColorBox ralColorKey={container.ral_color} />
+                    </div>
                 )}
             </Flex>
         </Box>

@@ -14,17 +14,6 @@ export const RecommendedSection: React.FC<RecommendedSectionProps> = ({ containe
 
     return (
         <Box px={{ base: '16px', md: '128px' }} py="64px" bg="#FAFAFA">
-            <Heading
-                as="h2"
-                fontFamily="'Geologica Variable', sans-serif"
-                fontSize="36px"
-                fontWeight="700"
-                color="#18181B"
-                mb="32px"
-            >
-                Рекомендовані контейнери
-            </Heading>
-
             <Grid
                 templateColumns={{
                     base: '1fr',
