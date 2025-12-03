@@ -2,6 +2,9 @@ import {useMutation} from "@tanstack/react-query";
 import {defaultAxiosInstance, privateAxiosInstance} from "@/services/axiosInstances.ts"
 import { type userData } from "@/schemas/authUserSchema.ts"
 
+// for triggering notifications
+import { toaster } from "@/components/ui/toaster";
+
 export interface SignUpReqBody {
     name: string;
     email: string;
@@ -21,6 +24,9 @@ export const useSignUpUser = () => {
         },
         onSuccess: () => {
             console.log("User registered successfully!");
+            toaster.success(
+                {title: "Signed up successfully!",}
+            );
         }
     })
 }
@@ -42,6 +48,9 @@ export const useSignInUser = () => {
         },
         onSuccess: () => {
             console.log("User logged in successfully!");
+            toaster.success(
+                {title: "Signed in successfully!",}
+            );
         }
     });
 };
