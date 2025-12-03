@@ -10,11 +10,11 @@ const ContainerDetailsPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const listingId = Number(id);
 
-    // Отримуємо всі контейнери зі статусом 'pending'
+    // Отримуємо всі контейнери зі статусом 'active'
     const { data: allListingsData, isLoading, isFetching } = useListings({
         page: 1,
         page_size: 20,
-        status: 'pending',  // Використовуємо правильний статус!
+        status: 'active',  // Використовуємо правильний статус!
     });
 
     // Знаходимо поточний контейнер
