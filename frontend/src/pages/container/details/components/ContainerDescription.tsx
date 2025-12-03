@@ -1,21 +1,131 @@
-import React from 'react';
-import { Box, Flex, Heading, Text, Button, Grid } from '@chakra-ui/react';
-import type { Listing } from '@/services/api/listings';
-import { Click, Bookmark } from '@mynaui/icons-react';
+import React, { useState, useEffect } from 'react';
+import { Box, Flex, Heading, Text, Button, Grid, useTabs } from '@chakra-ui/react';
+import { Click, Bookmark, BookmarkCheck } from '@mynaui/icons-react';
 import RalColorBox from '@/components/ui/ral-color-box';
-import { conditionMap, containerTypes, listingTypes, containerDimensions } from '@/schemas/listingSchema';
+import { conditionMap, listingTypes, containerTypes, containerDimensions } from '@/schemas/listingSchema';
+import type { Listing } from '@/services/api/listings';
 
 interface ContainerDescriptionProps {
     data: Listing;
 }
 
 export const ContainerDescription: React.FC<ContainerDescriptionProps> = ({ data }) => {
-    const price = data.last_history?.price || 0;
-    const views = data.analytics?.views || data.last_history?.views || 0;
-    const favorites = data.analytics?.favorites || data.last_history?.favorites || 0;
+    const toast = useTabs();
+
+    // Стани для відслідковування взаємодій користувача
+    const [hasContacted, setHasContacted] = useState(false);
+    const [isFavorited, setIsFavorited] = useState(false);
+    const [contactCount, setContactCount] = useState(data.last_history?.contacts || 0);
+    const [favoriteCount, setFavoriteCount] = useState(data.last_history?.favorites || 0);
+
+    // Завантаження стану з localStorage при монтуванні
+    useEffect(() => {
+        const contactedKey = `listing_${data.id}_contacted`;
+        const favoritedKey = `listing_${data.id}_favorited`;
+
+        setHasContacted(localStorage.getItem(contactedKey) === 'true');
+        setIsFavorited(localStorage.getItem(favoritedKey) === 'true');
+    }, [data.id]);
+
+    // Обробник кнопки "Контакти"
+    const handleContact = async () => {
+        if (hasContacted) {
+            toast({
+                title: "Вже зареєстровано",
+                description: "Ви вже переглянули контакти для цього контейнера",
+                status: "info",
+                duration: 3000,
+                isClosable: true,
+                position: "top",
+            });
+            return;
+        }
+
+        try {
+            // TODO: Замініть на реальний API endpoint
+            // await axios.post(`/api/listings/${data.id}/contact`);
+
+            // Симуляція API запиту
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            setHasContacted(true);
+            setContactCount(prev => prev + 1);
+            localStorage.setItem(`listing_${data.id}_contacted`, 'true');
+
+            toast({
+                title: "Контакти відкрито",
+                description: "Телефон: +380 XX XXX XX XX",
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+                position: "top",
+            });
+        } catch (error) {
+            toast({
+                title: "Помилка",
+                description: "Не вдалося отримати контакти",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+                position: "top",
+            });
+        }
+    };
+
+    // Обробник кнопки "Додати в обране"
+    const handleFavorite = async () => {
+        try {
+            // TODO: Замініть на реальний API endpoint
+            // if (isFavorited) {
+            //     await axios.delete(`/api/listings/${data.id}/favorite`);
+            // } else {
+            //     await axios.post(`/api/listings/${data.id}/favorite`);
+            // }
+
+            // Симуляція API запиту
+            await new Promise(resolve => setTimeout(resolve, 300));
+
+            const newFavoritedState = !isFavorited;
+            setIsFavorited(newFavoritedState);
+            setFavoriteCount(prev => newFavoritedState ? prev + 1 : prev - 1);
+
+            if (newFavoritedState) {
+                localStorage.setItem(`listing_${data.id}_favorited`, 'true');
+            } else {
+                localStorage.removeItem(`listing_${data.id}_favorited`);
+            }
+
+            toast({
+                title: newFavoritedState ? "Додано в обране" : "Видалено з обраного",
+                description: newFavoritedState
+                    ? "Контейнер додано до вашого списку обраних"
+                    : "Контейнер видалено з вашого списку обраних",
+                status: "success",
+                duration: 3000,
+                isClosable: true,
+                position: "top",
+            });
+        } catch (error) {
+            toast({
+                title: "Помилка",
+                description: "Не вдалося оновити обране",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+                position: "top",
+            });
+        }
+    };
+
+    // Отримуємо локалізовані назви
+    const conditionLabel = conditionMap[data.condition] || data.condition;
+    const listingTypeLabel = listingTypes[data.type] || data.type;
+    const containerTypeLabel = containerTypes[data.container_type] || data.container_type;
+    const dimensionLabel = containerDimensions[data.dimension] || data.dimension;
 
     return (
         <Flex direction="column" gap="24px">
+            {/* Статистика переглядів і збережень */}
             <Flex gap="16px" align="center">
                 <Flex align="center" gap="6px" color="#A1A1AA">
                     <Text
@@ -25,7 +135,7 @@ export const ContainerDescription: React.FC<ContainerDescriptionProps> = ({ data
                         lineHeight="1"
                         color="#A1A1AA"
                     >
-                        {views}
+                        {contactCount}
                     </Text>
                     <Box as={Click} w="21px" h="21px" color="#A1A1AA" />
                 </Flex>
@@ -37,12 +147,13 @@ export const ContainerDescription: React.FC<ContainerDescriptionProps> = ({ data
                         lineHeight="1"
                         color="#A1A1AA"
                     >
-                        {favorites}
+                        {favoriteCount}
                     </Text>
                     <Box as={Bookmark} w="21px" h="21px" color="#A1A1AA" />
                 </Flex>
             </Flex>
 
+            {/* Назва контейнера */}
             <Heading
                 as="h1"
                 fontFamily="'Geologica Variable', sans-serif"
@@ -54,12 +165,14 @@ export const ContainerDescription: React.FC<ContainerDescriptionProps> = ({ data
                 {data.title}
             </Heading>
 
+            {/* Колір RAL */}
             {data.ral_color && (
-                <div className="!text-black">
+                <Box>
                     <RalColorBox ralColorKey={data.ral_color} />
-                </div>
+                </Box>
             )}
 
+            {/* Ціна та кнопки */}
             <Flex align="center" gap="16px" py="24px" flexWrap="wrap">
                 <Flex align="baseline" gap="8px">
                     <Text
@@ -69,7 +182,7 @@ export const ContainerDescription: React.FC<ContainerDescriptionProps> = ({ data
                         color="#18181B"
                         lineHeight="1"
                     >
-                        {price}
+                        {data.last_history?.price || 0}
                     </Text>
                     <Text
                         fontFamily="'Geologica Variable', sans-serif"
@@ -83,7 +196,7 @@ export const ContainerDescription: React.FC<ContainerDescriptionProps> = ({ data
                 </Flex>
                 <Flex gap="12px">
                     <Button
-                        bg="#FD7F16"
+                        bg={hasContacted ? "#71717A" : "#FD7F16"}
                         color="white"
                         px="32px"
                         py="12px"
@@ -91,30 +204,39 @@ export const ContainerDescription: React.FC<ContainerDescriptionProps> = ({ data
                         fontFamily="'Geologica Variable', sans-serif"
                         fontSize="16px"
                         fontWeight="500"
-                        _hover={{ bg: '#e65c00' }}
-                        transition="background 0.3s ease"
+                        _hover={{ bg: hasContacted ? "#52525B" : "#e65c00" }}
+                        transition="all 0.3s ease"
+                        onClick={handleContact}
+                        isDisabled={hasContacted}
+                        cursor={hasContacted ? "not-allowed" : "pointer"}
                     >
-                        Контакти
+                        {hasContacted ? "Контакти переглянуто" : "Контакти"}
                     </Button>
                     <Button
-                        bg="white"
-                        color="#18181B"
-                        border="1px solid #E4E4E7"
+                        bg={isFavorited ? "#FD7F16" : "white"}
+                        color={isFavorited ? "white" : "#18181B"}
+                        border={isFavorited ? "none" : "1px solid #E4E4E7"}
                         px="32px"
                         py="12px"
                         borderRadius="4px"
                         fontFamily="'Geologica Variable', sans-serif"
                         fontSize="16px"
                         fontWeight="500"
-                        _hover={{ bg: '#F4F4F5' }}
-                        transition="background 0.3s ease"
+                        _hover={{ bg: isFavorited ? "#e65c00" : "#F4F4F5" }}
+                        transition="all 0.3s ease"
+                        onClick={handleFavorite}
+                        leftIcon={isFavorited ? <BookmarkCheck size={20} /> : undefined}
                     >
-                        Додати в обране
+                        {isFavorited ? "В обраному" : "Додати в обране"}
                     </Button>
                 </Flex>
             </Flex>
 
-            <Grid templateColumns="repeat(4, 1fr)" gap="24px">
+            {/* Характеристики */}
+            <Grid
+                templateColumns={{ base: "repeat(2, 1fr)", md: "repeat(4, 1fr)" }}
+                gap="24px"
+            >
                 <Flex direction="column" gap="4px">
                     <Text
                         fontFamily="'Geologica Variable', sans-serif"
@@ -130,7 +252,7 @@ export const ContainerDescription: React.FC<ContainerDescriptionProps> = ({ data
                         fontWeight="500"
                         color="#18181B"
                     >
-                        {listingTypes[data.type] || data.type}
+                        {listingTypeLabel}
                     </Text>
                 </Flex>
                 <Flex direction="column" gap="4px">
@@ -148,7 +270,7 @@ export const ContainerDescription: React.FC<ContainerDescriptionProps> = ({ data
                         fontWeight="500"
                         color="#18181B"
                     >
-                        {conditionMap[data.condition] || data.condition}
+                        {conditionLabel}
                     </Text>
                 </Flex>
                 <Flex direction="column" gap="4px">
@@ -184,7 +306,7 @@ export const ContainerDescription: React.FC<ContainerDescriptionProps> = ({ data
                         fontWeight="500"
                         color="#18181B"
                     >
-                        {containerTypes[data.container_type] || data.container_type}
+                        {containerTypeLabel}
                     </Text>
                 </Flex>
                 <Flex direction="column" gap="4px">
@@ -202,13 +324,14 @@ export const ContainerDescription: React.FC<ContainerDescriptionProps> = ({ data
                         fontWeight="500"
                         color="#18181B"
                     >
-                        {containerDimensions[data.dimension] || data.dimension}
+                        {dimensionLabel}
                     </Text>
                 </Flex>
             </Grid>
 
+            {/* Опис */}
             {data.description && (
-                <Box mt="24px">
+                <Box>
                     <Text
                         fontFamily="'Geologica Variable', sans-serif"
                         fontSize="14px"
@@ -223,7 +346,7 @@ export const ContainerDescription: React.FC<ContainerDescriptionProps> = ({ data
                         fontSize="16px"
                         fontWeight="400"
                         color="#18181B"
-                        whiteSpace="pre-wrap"
+                        lineHeight="1.6"
                     >
                         {data.description}
                     </Text>
